@@ -1,28 +1,78 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import {
+    useSelector,
+    useDispatch
+} from "react-redux";
+
+import {
+    logoutSuccess
+} from "../features/auth/authSlice";
+
+import api from "../api/api";
 
 const Navbar = () => {
 
+    const navigate = useNavigate();
+
+    const dispatch = useDispatch();
+
+    const { isAuthenticated } = useSelector(
+        (state) => state.auth
+    );
+
+    const handleLogout = async () => {
+
+        try {
+
+            await api.post("/auth/logout");
+
+            dispatch(logoutSuccess());
+
+            navigate("/login");
+
+        } catch (error) {
+
+            console.log(error);
+
+            alert("Logout failed");
+        }
+    };
+
     return (
 
-        <nav className="bg-gray-900 text-white px-8 py-4 flex justify-between items-center">
+        <nav className="bg-gray-950 text-white px-10 py-6 flex justify-between items-center">
 
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-5xl font-bold">
                 SolydShop
             </h1>
 
-            <div className="flex items-center gap-6 text-lg">
+            <div className="flex gap-10 text-2xl">
 
-                <Link to="/" className="hover:text-blue-400">
+                <Link to="/">
                     Home
                 </Link>
 
-                <Link to="/login" className="hover:text-blue-400">
-                    Login
-                </Link>
+                {!isAuthenticated && (
+                    <>
+                        <Link to="/login">
+                            Login
+                        </Link>
 
-                <Link to="/register" className="hover:text-blue-400">
-                    Register
-                </Link>
+                        <Link to="/register">
+                            Register
+                        </Link>
+                    </>
+                )}
+
+                {isAuthenticated && (
+
+                    <button
+                        onClick={handleLogout}
+                    >
+                        Logout
+                    </button>
+                )}
 
             </div>
 

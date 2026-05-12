@@ -47,8 +47,12 @@ const LoginPage = () => {
             );
 
             console.log(response.data);
-
             alert("Login successful");
+
+            setFormData({
+             email: "",
+             password: ""
+             });
 
         } catch (error) {
 
