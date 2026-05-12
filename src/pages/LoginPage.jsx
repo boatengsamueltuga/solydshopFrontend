@@ -1,8 +1,18 @@
-
 import { useState } from "react";
+
+import { useDispatch } from "react-redux";
+
+import {
+    loginStart,
+    loginSuccess,
+    loginFailure
+} from "../features/auth/authSlice";
+
 import api from "../api/api";
 
 const LoginPage = () => {
+
+    const dispatch = useDispatch();
 
     const [formData, setFormData] = useState({
         email: "",
@@ -21,11 +31,19 @@ const LoginPage = () => {
 
         e.preventDefault();
 
+        dispatch(loginStart());
+
         try {
 
             const response = await api.post(
                 "/auth/login",
                 formData
+            );
+
+            dispatch(
+                loginSuccess({
+                    email: formData.email
+                })
             );
 
             console.log(response.data);
@@ -34,14 +52,21 @@ const LoginPage = () => {
 
         } catch (error) {
 
-           console.log(error.response);
+            dispatch(
+                loginFailure(
+                    error.response?.data ||
+                    "Login failed"
+                )
+            );
 
-              alert(
-    error.response?.data?.message ||
-    error.response?.data ||
-    error.message ||
-    "Login failed"
-);
+            console.log(error);
+
+            alert(
+                error.response?.data?.message ||
+                error.response?.data ||
+                error.message ||
+                "Login failed"
+            );
         }
     };
 
