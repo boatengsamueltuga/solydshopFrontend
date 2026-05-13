@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 import {
     loginStart,
@@ -13,6 +15,9 @@ import api from "../api/api";
 const LoginPage = () => {
 
     const dispatch = useDispatch();
+    const { isAuthenticated } = useSelector(
+    (state) => state.auth
+);
 
     const [formData, setFormData] = useState({
         email: "",
@@ -73,6 +78,10 @@ const LoginPage = () => {
             );
         }
     };
+
+    if (isAuthenticated) {
+    return <Navigate to="/" />;
+   }
 
     return (
 

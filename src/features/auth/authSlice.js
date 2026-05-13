@@ -37,7 +37,13 @@ const authSlice = createSlice({
 
             state.user = null;
             state.isAuthenticated = false;
-        }
+        },
+
+        restoreUser: (state, action) => {
+        state.isAuthenticated = true;
+        state.user = action.payload;
+},
+        
     }
 });
 
@@ -45,6 +51,7 @@ export const {
 
     loginStart,
     loginSuccess,
+    restoreUser,
     loginFailure,
     logoutSuccess
 

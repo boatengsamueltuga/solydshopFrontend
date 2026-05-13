@@ -1,40 +1,82 @@
 import { Routes, Route } from "react-router-dom";
 
+import { useEffect } from "react";
+
+import { useDispatch } from "react-redux";
+
 import Navbar from "./components/Navbar";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+
 import ProtectedRoute from "./components/ProtectedRoute";
+
+import { restoreUser } from "./features/auth/authSlice";
+
+import api from "./api/api";
 
 function App() {
 
-  return (
+    const dispatch = useDispatch();
 
-    <div>
+    useEffect(() => {
 
-      <Navbar />
+        const restoreSession = async () => {
 
-      <Routes>
+            try {
 
-        {/* <Route path="/" element={<HomePage />} /> */}
-        <Route
-         path="/"
-         element={
-        <ProtectedRoute>
-            <HomePage />
-        </ProtectedRoute>
-    }
-/>
+                const response = await api.get(
+                    "/auth/me"
+                );
 
-        <Route path="/login" element={<LoginPage />} />
+                dispatch(
+                    restoreUser({
+                        email: response.data
+                    })
+                );
 
-        <Route path="/register" element={<RegisterPage />} />
+            } catch (error) {
 
-      </Routes>
+                console.log("No active session");
+            }
+        };
 
-    </div>
-  );
+        restoreSession();
+
+    }, [dispatch]);
+
+    return (
+
+        <div>
+
+            <Navbar />
+
+            <Routes>
+
+                <Route
+                    path="/"
+                    element={
+                        <ProtectedRoute>
+                            <HomePage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/login"
+                    element={<LoginPage />}
+                />
+
+                <Route
+                    path="/register"
+                    element={<RegisterPage />}
+                />
+
+            </Routes>
+
+        </div>
+    );
 }
 
 export default App;
