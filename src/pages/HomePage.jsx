@@ -68,28 +68,48 @@ const HomePage = () => {
 
     return (
 
-        <div className="p-10">
+        <div className="p-10 bg-gray-100 min-h-screen">
 
-            <h1 className="text-4xl font-bold mb-8">
+            <h1 className="text-5xl font-bold mb-10">
                 Products
             </h1>
 
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
                 {products.map((product) => (
 
                     <div
                         key={product.productId}
-                        className="border p-4 rounded shadow"
+                        className="bg-white rounded-lg shadow-lg overflow-hidden hover:scale-105 transition duration-300"
                     >
 
-                        <h2 className="text-2xl font-bold">
-                            {product.productName}
-                        </h2>
+                        <img
+                            src={product.imageUrl}
+                            alt={product.productName}
+                            className="w-full h-52 object-cover"
+                        />
 
-                        <p className="mt-2">
-                            ${product.price}
-                        </p>
+                        <div className="p-5">
+
+                            <h2 className="text-2xl font-bold">
+                                {product.productName}
+                            </h2>
+
+                            <p className="text-gray-600 mt-3">
+                                {product.description}
+                            </p>
+
+                            <p className="mt-4 text-3xl font-bold text-green-700">
+                                ${product.price}
+                            </p>
+
+                            <button
+                                className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded font-bold"
+                            >
+                                Add To Cart
+                            </button>
+
+                        </div>
 
                     </div>
                 ))}
