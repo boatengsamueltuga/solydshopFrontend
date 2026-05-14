@@ -31,6 +31,12 @@ const RegisterPage = () => {
             console.log(response.data);
 
             alert("Registration successful");
+            
+            setFormData({
+            name: "",
+            email: "",
+            password: ""
+});
 
         } catch (error) {
 
