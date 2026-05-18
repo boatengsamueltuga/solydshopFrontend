@@ -45,11 +45,13 @@ const LoginPage = () => {
                 formData
             );
 
+            const userResponse = await api.get(
+             "/auth/me"
+                 );
+
             dispatch(
-                loginSuccess({
-                    email: formData.email
-                })
-            );
+            loginSuccess(userResponse.data)
+             );
 
             console.log(response.data);
             alert("Login successful");

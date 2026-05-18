@@ -24,6 +24,11 @@ const HomePage = () => {
         (state) => state.product
     );
 
+    // Added authenticated user access
+    const { user } = useSelector(
+        (state) => state.auth
+    );
+
     useEffect(() => {
 
         const fetchProducts = async () => {
@@ -55,6 +60,40 @@ const HomePage = () => {
         fetchProducts();
 
     }, [dispatch]);
+
+       // Added add-to-cart handler
+    const handleAddToCart = async (productId) => {
+
+        try {
+
+            // Added manual XSRF token extraction
+            const xsrfToken = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("XSRF-TOKEN="))
+                ?.split("=")[1];
+
+            await api.post(
+                `/cart/${user.userId}/items`,
+                {
+                    productId: productId,
+                    quantity: 1
+                },
+                {
+                    headers: {
+                        "X-XSRF-TOKEN": xsrfToken
+                    }
+                }
+            );
+
+            alert("Product added to cart");
+
+        } catch (error) {
+
+            console.log(error);
+
+            alert("Failed to add product to cart");
+        }
+    };
 
     if (loading) {
 
@@ -104,6 +143,9 @@ const HomePage = () => {
                             </p>
 
                             <button
+                                onClick={() =>
+                                    handleAddToCart(product.productId)
+                                }
                                 className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded font-bold"
                             >
                                 Add To Cart

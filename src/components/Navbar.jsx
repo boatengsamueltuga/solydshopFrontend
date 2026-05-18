@@ -53,6 +53,14 @@ const Navbar = () => {
                     Home
                 </Link>
 
+                {/* Added Cart Link */}
+                {isAuthenticated && (
+
+                    <Link to="/cart">
+                        Cart
+                    </Link>
+                )}
+
                 {!isAuthenticated && (
                     <>
                         <Link to="/login">

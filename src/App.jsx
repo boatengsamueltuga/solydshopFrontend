@@ -10,6 +10,9 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
+// Added CartPage import
+import CartPage from "./pages/CartPage";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import { restoreUser } from "./features/auth/authSlice";
@@ -31,9 +34,7 @@ function App() {
                 );
 
                 dispatch(
-                    restoreUser({
-                        email: response.data
-                    })
+                    restoreUser(response.data)
                 );
 
             } catch (error) {
@@ -59,6 +60,16 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <HomePage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Added Cart Route */}
+                <Route
+                    path="/cart"
+                    element={
+                        <ProtectedRoute>
+                            <CartPage />
                         </ProtectedRoute>
                     }
                 />
