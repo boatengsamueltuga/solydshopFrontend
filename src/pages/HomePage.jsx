@@ -61,7 +61,7 @@ const HomePage = () => {
 
     }, [dispatch]);
 
-       // Added add-to-cart handler
+    // Added add-to-cart handler
     const handleAddToCart = async (productId) => {
 
         try {
@@ -142,13 +142,25 @@ const HomePage = () => {
                                 ${product.price}
                             </p>
 
+                            {/* Added stock display */}
+                            <p className="mt-2 text-lg font-semibold text-gray-700">
+                                Stock: {product.quantity}
+                            </p>
+
                             <button
                                 onClick={() =>
                                     handleAddToCart(product.productId)
                                 }
-                                className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded font-bold"
+                                disabled={product.quantity === 0}
+                                className={`mt-5 w-full p-3 rounded font-bold text-white ${
+                                    product.quantity === 0
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-700"
+                                }`}
                             >
-                                Add To Cart
+                                {product.quantity === 0
+                                    ? "Out Of Stock"
+                                    : "Add To Cart"}
                             </button>
 
                         </div>

@@ -17,7 +17,11 @@ const Navbar = () => {
 
     const dispatch = useDispatch();
 
-    const { isAuthenticated } = useSelector(
+    // Get authentication state and current user
+    const {
+        isAuthenticated,
+        user
+    } = useSelector(
         (state) => state.auth
     );
 
@@ -53,7 +57,7 @@ const Navbar = () => {
                     Home
                 </Link>
 
-                {/* Added Cart Link */}
+                {/* Cart Link */}
                 {isAuthenticated && (
 
                     <Link to="/cart">
@@ -61,11 +65,19 @@ const Navbar = () => {
                     </Link>
                 )}
 
-                {/* Added Orders Link */}
+                {/* Orders Link */}
                 {isAuthenticated && (
 
                     <Link to="/orders">
                         Orders
+                    </Link>
+                )}
+
+                {/* Show seller dashboard only for sellers */}
+                {user?.roles?.includes("ROLE_SELLER") && (
+
+                    <Link to="/seller/dashboard">
+                        Seller Dashboard
                     </Link>
                 )}
 
