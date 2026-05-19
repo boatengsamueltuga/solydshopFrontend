@@ -61,6 +61,14 @@ const Navbar = () => {
                     </Link>
                 )}
 
+                {/* Added Orders Link */}
+                {isAuthenticated && (
+
+                    <Link to="/orders">
+                        Orders
+                    </Link>
+                )}
+
                 {!isAuthenticated && (
                     <>
                         <Link to="/login">

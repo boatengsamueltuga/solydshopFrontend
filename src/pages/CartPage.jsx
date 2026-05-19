@@ -136,6 +136,34 @@ const CartPage = () => {
         }
     };
 
+        // Added checkout handler
+    const handleCheckout = async () => {
+
+        try {
+
+            await api.post(
+                `/order/${user.userId}/checkout`,
+                {},
+                {
+                    headers: {
+                        "X-XSRF-TOKEN": getXsrfToken()
+                    }
+                }
+            );
+
+            alert("Checkout successful");
+
+            // Refresh cart after checkout
+            fetchCart();
+
+        } catch (error) {
+
+            console.log(error);
+
+            alert("Checkout failed");
+        }
+    }; 
+
     if (loading) {
 
         return (
@@ -238,13 +266,21 @@ const CartPage = () => {
                         </div>
                     ))}
 
-                    <div className="bg-white p-6 rounded-lg shadow mt-10">
+                    <div className="bg-white p-6 rounded-lg shadow mt-10 flex justify-between items-center">
 
-                        <h2 className="text-3xl font-bold">
-                            Total: ${cart.totalPrice}
-                        </h2>
+    <h2 className="text-3xl font-bold">
+        Total: ${cart.totalPrice}
+    </h2>
 
-                    </div>
+    {/* Added checkout button */}
+    <button
+        onClick={handleCheckout}
+        className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded font-bold text-xl"
+    >
+        Checkout
+    </button>
+
+</div>
 
                 </div>
             )}

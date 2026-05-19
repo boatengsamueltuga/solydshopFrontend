@@ -13,6 +13,9 @@ import RegisterPage from "./pages/RegisterPage";
 // Added CartPage import
 import CartPage from "./pages/CartPage";
 
+// Added OrdersPage import
+import OrdersPage from "./pages/OrdersPage";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import { restoreUser } from "./features/auth/authSlice";
@@ -70,6 +73,16 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <CartPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Added Orders Route */}
+                <Route
+                    path="/orders"
+                    element={
+                        <ProtectedRoute>
+                            <OrdersPage />
                         </ProtectedRoute>
                     }
                 />
