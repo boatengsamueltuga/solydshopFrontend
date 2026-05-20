@@ -327,7 +327,7 @@ const CartPage = () => {
                     <div className="bg-white p-6 rounded-lg shadow mt-10 flex justify-between items-center">
 
                         <h2 className="text-3xl font-bold">
-                            Total: ${cart.totalPrice}
+                            Total: ${cart?.totalPrice || 0}
                         </h2>
 
                         {/* Checkout button */}

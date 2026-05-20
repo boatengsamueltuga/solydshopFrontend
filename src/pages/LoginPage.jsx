@@ -3,7 +3,9 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+
 import api from "../api/api";
+
 import toast from "react-hot-toast";
 
 import {
@@ -75,13 +77,6 @@ const LoginPage = () => {
             );
 
             console.log(error);
-
-              toast.error(
-              error.response?.data?.message ||
-              error.response?.data ||
-              error.message ||
-              "Login failed"
-);
         }
     };
 
