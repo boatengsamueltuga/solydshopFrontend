@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 import api from "../api/api";
+import Loader from "../components/Loader";
+import toast from "react-hot-toast";
 
 const SellerDashboardPage = () => {
 
@@ -10,6 +12,9 @@ const SellerDashboardPage = () => {
     const [categories, setCategories] = useState([]);
 
     const [loading, setLoading] = useState(true);
+
+    // Action loader for create/update/delete/upload
+    const [actionLoading, setActionLoading] = useState(false);
 
     // Track product being edited
     const [editingProductId, setEditingProductId] = useState(null);
@@ -53,7 +58,7 @@ const SellerDashboardPage = () => {
 
             console.log(error);
 
-            alert("Failed to load categories");
+            toast.error("Failed to load categories");
         }
     };
 
@@ -72,7 +77,7 @@ const SellerDashboardPage = () => {
 
             console.log(error);
 
-            alert("Failed to load seller products");
+            toast.error("Failed to load seller products");
 
         } finally {
 
@@ -84,7 +89,6 @@ const SellerDashboardPage = () => {
 
         fetchProducts();
 
-        // Load categories
         fetchCategories();
 
     }, []);
@@ -111,6 +115,8 @@ const SellerDashboardPage = () => {
     const handleSubmit = async (e) => {
 
         e.preventDefault();
+
+        setActionLoading(true);
 
         try {
 
@@ -163,7 +169,7 @@ const SellerDashboardPage = () => {
                     }
                 );
 
-                alert("Product updated successfully");
+                toast.success("Product updated successfully");
 
             } else {
 
@@ -178,7 +184,7 @@ const SellerDashboardPage = () => {
                     }
                 );
 
-                alert("Product created successfully");
+                toast.success("Product created successfully");
             }
 
             // Reset form fields
@@ -199,13 +205,17 @@ const SellerDashboardPage = () => {
             setEditingProductId(null);
 
             // Reload seller products
-            fetchProducts();
+            await fetchProducts();
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Operation failed");
+            toast.error("Operation failed");
+
+        } finally {
+
+            setActionLoading(false);
         }
     };
 
@@ -228,6 +238,8 @@ const SellerDashboardPage = () => {
     // Delete product
     const handleDelete = async (productId) => {
 
+        setActionLoading(true);
+
         try {
 
             await api.delete(
@@ -239,25 +251,35 @@ const SellerDashboardPage = () => {
                 }
             );
 
-            alert("Product deleted");
+            toast.success("Product deleted");
 
-            fetchProducts();
+            await fetchProducts();
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Failed to delete product");
+            toast.error("Failed to delete product");
+
+        } finally {
+
+            setActionLoading(false);
         }
     };
 
+    // Dashboard loading state
     if (loading) {
 
         return (
 
-            <h1 className="text-3xl p-10">
-                Loading dashboard...
-            </h1>
+            <div className="min-h-screen flex flex-col justify-center items-center">
+
+                <Loader />
+                <p className="text-2xl font-semibold mt-4">
+                    Loading dashboard...
+                </p>
+
+            </div>
         );
     }
 
@@ -268,6 +290,20 @@ const SellerDashboardPage = () => {
             <h1 className="text-5xl font-bold mb-10">
                 Seller Dashboard
             </h1>
+
+            {/* Dashboard action loader */}
+            {actionLoading && (
+
+                <div className="mb-6 flex items-center gap-4">
+
+                    <Loader />
+
+                    <p className="text-xl font-semibold text-blue-600">
+                        Processing product changes...
+                    </p>
+
+                </div>
+            )}
 
             {/* Product Form */}
             <div className="bg-white p-8 rounded-lg shadow mb-12">
@@ -291,7 +327,8 @@ const SellerDashboardPage = () => {
                         placeholder="Product Name"
                         value={formData.productName}
                         onChange={handleChange}
-                        className="p-4 border rounded"
+                        disabled={actionLoading}
+                        className="p-4 border rounded disabled:opacity-50"
                     />
 
                     {/* Image upload input */}
@@ -299,7 +336,8 @@ const SellerDashboardPage = () => {
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
-                        className="p-4 border rounded"
+                        disabled={actionLoading}
+                        className="p-4 border rounded disabled:opacity-50"
                     />
 
                     {/* Selected image preview */}
@@ -318,7 +356,8 @@ const SellerDashboardPage = () => {
                         placeholder="Price"
                         value={formData.price}
                         onChange={handleChange}
-                        className="p-4 border rounded"
+                        disabled={actionLoading}
+                        className="p-4 border rounded disabled:opacity-50"
                     />
 
                     <input
@@ -327,7 +366,8 @@ const SellerDashboardPage = () => {
                         placeholder="Quantity"
                         value={formData.quantity}
                         onChange={handleChange}
-                        className="p-4 border rounded"
+                        disabled={actionLoading}
+                        className="p-4 border rounded disabled:opacity-50"
                     />
 
                     {/* Category dropdown */}
@@ -335,7 +375,8 @@ const SellerDashboardPage = () => {
                         name="categoryId"
                         value={formData.categoryId}
                         onChange={handleChange}
-                        className="p-4 border rounded"
+                        disabled={actionLoading}
+                        className="p-4 border rounded disabled:opacity-50"
                     >
 
                         <option value="">
@@ -359,16 +400,24 @@ const SellerDashboardPage = () => {
                         placeholder="Description"
                         value={formData.description}
                         onChange={handleChange}
-                        className="p-4 border rounded md:col-span-2"
+                        disabled={actionLoading}
+                        className="p-4 border rounded md:col-span-2 disabled:opacity-50"
                     />
 
                     <button
                         type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded font-bold md:col-span-2"
+                        disabled={actionLoading}
+                        className={`text-white p-4 rounded font-bold md:col-span-2 ${
+                            actionLoading
+                                ? "bg-gray-500 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-700"
+                        }`}
                     >
-                        {editingProductId
-                            ? "Update Product"
-                            : "Create Product"}
+                        {actionLoading
+                            ? "Processing..."
+                            : editingProductId
+                                ? "Update Product"
+                                : "Create Product"}
                     </button>
 
                 </form>
@@ -420,7 +469,8 @@ const SellerDashboardPage = () => {
                                     onClick={() =>
                                         handleEdit(product)
                                     }
-                                    className="mt-5 w-full bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded font-bold"
+                                    disabled={actionLoading}
+                                    className="mt-5 w-full bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded font-bold disabled:opacity-50"
                                 >
                                     Edit Product
                                 </button>
@@ -430,7 +480,8 @@ const SellerDashboardPage = () => {
                                     onClick={() =>
                                         handleDelete(product.productId)
                                     }
-                                    className="mt-5 w-full bg-red-600 hover:bg-red-700 text-white p-3 rounded font-bold"
+                                    disabled={actionLoading}
+                                    className="mt-5 w-full bg-red-600 hover:bg-red-700 text-white p-3 rounded font-bold disabled:opacity-50"
                                 >
                                     Delete Product
                                 </button>

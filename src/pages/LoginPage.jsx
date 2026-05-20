@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import api from "../api/api";
+import toast from "react-hot-toast";
 
 import {
     loginStart,
@@ -10,14 +12,17 @@ import {
     loginFailure
 } from "../features/auth/authSlice";
 
-import api from "../api/api";
 
 const LoginPage = () => {
 
     const dispatch = useDispatch();
-    const { isAuthenticated } = useSelector(
-    (state) => state.auth
-);
+
+    const {
+        isAuthenticated,
+        loading
+    } = useSelector(
+        (state) => state.auth
+    );
 
     const [formData, setFormData] = useState({
         email: "",
@@ -40,26 +45,25 @@ const LoginPage = () => {
 
         try {
 
-            const response = await api.post(
+            await api.post(
                 "/auth/login",
                 formData
             );
 
             const userResponse = await api.get(
-             "/auth/me"
-                 );
+                "/auth/me"
+            );
 
             dispatch(
-            loginSuccess(userResponse.data)
-             );
+                loginSuccess(userResponse.data)
+            );
 
-            console.log(response.data);
-            alert("Login successful");
+            toast.success("Login successful");
 
             setFormData({
-             email: "",
-             password: ""
-             });
+                email: "",
+                password: ""
+            });
 
         } catch (error) {
 
@@ -72,24 +76,26 @@ const LoginPage = () => {
 
             console.log(error);
 
-            alert(
-                error.response?.data?.message ||
-                error.response?.data ||
-                error.message ||
-                "Login failed"
-            );
+              toast.error(
+              error.response?.data?.message ||
+              error.response?.data ||
+              error.message ||
+              "Login failed"
+);
         }
     };
 
+    // Redirect authenticated users
     if (isAuthenticated) {
-    return <Navigate to="/" />;
-   }
+
+        return <Navigate to="/" />;
+    }
 
     return (
 
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center min-h-screen bg-gray-100">
 
-            <div className="w-[400px] bg-gray-900 text-white p-8 rounded-lg">
+            <div className="w-[400px] bg-gray-900 text-white p-8 rounded-lg shadow-lg">
 
                 <h1 className="text-4xl font-bold mb-6 text-center">
                     Login
@@ -106,7 +112,8 @@ const LoginPage = () => {
                         placeholder="Email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="p-3 rounded bg-gray-800 outline-none"
+                        disabled={loading}
+                        className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
                     />
 
                     <input
@@ -115,14 +122,22 @@ const LoginPage = () => {
                         placeholder="Password"
                         value={formData.password}
                         onChange={handleChange}
-                        className="p-3 rounded bg-gray-800 outline-none"
+                        disabled={loading}
+                        className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
                     />
 
                     <button
                         type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold"
+                        disabled={loading}
+                        className={`p-3 rounded font-bold transition ${
+                            loading
+                                ? "bg-gray-500 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-700"
+                        }`}
                     >
-                        Login
+                        {loading
+                            ? "Logging in..."
+                            : "Login"}
                     </button>
 
                 </form>

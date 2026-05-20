@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-
 import { useSelector } from "react-redux";
-
 import api from "../api/api";
+import Loader from "../components/Loader";
+import toast from "react-hot-toast";
 
 const CartPage = () => {
 
     const [cart, setCart] = useState(null);
 
     const [loading, setLoading] = useState(true);
+
+    // Action loader for cart updates
+    const [actionLoading, setActionLoading] = useState(false);
 
     const [error, setError] = useState("");
 
@@ -17,7 +20,7 @@ const CartPage = () => {
         (state) => state.auth
     );
 
-    // Added reusable XSRF token helper
+    // Reusable XSRF token helper
     const getXsrfToken = () => {
 
         return document.cookie
@@ -26,7 +29,7 @@ const CartPage = () => {
             ?.split("=")[1];
     };
 
-    // Added reusable cart fetch
+    // Fetch cart
     const fetchCart = async () => {
 
         try {
@@ -41,7 +44,7 @@ const CartPage = () => {
 
             console.log(error);
 
-            setError("Failed to load cart");
+            toast.error("Failed to load cart");
 
         } finally {
 
@@ -58,8 +61,10 @@ const CartPage = () => {
 
     }, [user]);
 
-    // Added increase quantity handler
+    // Increase quantity
     const handleIncreaseQuantity = async (productId) => {
+
+        setActionLoading(true);
 
         try {
 
@@ -76,18 +81,24 @@ const CartPage = () => {
                 }
             );
 
-            fetchCart();
+            await fetchCart();
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Failed to increase quantity");
+            toast.error("Failed to increase quantity");
+
+        } finally {
+
+            setActionLoading(false);
         }
     };
 
-    // Added decrease quantity handler
+    // Decrease quantity
     const handleDecreaseQuantity = async (productId) => {
+
+        setActionLoading(true);
 
         try {
 
@@ -101,18 +112,24 @@ const CartPage = () => {
                 }
             );
 
-            fetchCart();
+            await fetchCart();
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Failed to decrease quantity");
+            toast.error("Failed to decrease quantity");
+
+        } finally {
+
+            setActionLoading(false);
         }
     };
 
-    // Added remove item handler
+    // Remove item
     const handleRemoveItem = async (productId) => {
+
+        setActionLoading(true);
 
         try {
 
@@ -125,19 +142,24 @@ const CartPage = () => {
                 }
             );
 
-            // Refresh cart after delete
-            fetchCart();
+            await fetchCart();
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Failed to remove item");
+            toast.error("Failed to remove item");
+
+        } finally {
+
+            setActionLoading(false);
         }
     };
 
-        // Added checkout handler
+    // Checkout
     const handleCheckout = async () => {
+
+        setActionLoading(true);
 
         try {
 
@@ -151,29 +173,40 @@ const CartPage = () => {
                 }
             );
 
-            alert("Checkout successful");
+            toast.success("Checkout successful");
 
-            // Refresh cart after checkout
-            fetchCart();
+            await fetchCart();
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Checkout failed");
-        }
-    }; 
+            toast.error("Checkout failed");
 
+        } finally {
+
+            setActionLoading(false);
+        }
+    };
+
+    // Page loading state
     if (loading) {
 
         return (
 
-            <h1 className="text-3xl p-10">
-                Loading cart...
-            </h1>
+            <div className="min-h-screen flex flex-col justify-center items-center">
+
+                <Loader />
+
+                <p className="text-2xl font-semibold mt-4">
+                    Loading cart...
+                </p>
+
+            </div>
         );
     }
 
+    // Error state
     if (error) {
 
         return (
@@ -192,11 +225,33 @@ const CartPage = () => {
                 My Cart
             </h1>
 
+            {/* Cart action loader */}
+            {actionLoading && (
+
+                <div className="mb-6 flex items-center gap-4">
+
+                    <Loader />
+
+                    <p className="text-xl font-semibold text-blue-600">
+                        Updating cart...
+                    </p>
+
+                </div>
+            )}
+
             {cart?.items?.length === 0 ? (
 
-                <h2 className="text-2xl">
-                    Cart is empty
-                </h2>
+                <div className="bg-white p-10 rounded-lg shadow text-center">
+
+                    <h2 className="text-3xl font-bold text-gray-700">
+                        Cart is empty
+                    </h2>
+
+                    <p className="text-gray-500 mt-4 text-lg">
+                        Add products to your cart to continue shopping.
+                    </p>
+
+                </div>
 
             ) : (
 
@@ -222,7 +277,8 @@ const CartPage = () => {
                                         onClick={() =>
                                             handleDecreaseQuantity(item.productId)
                                         }
-                                        className="bg-gray-300 px-4 py-2 rounded font-bold"
+                                        disabled={actionLoading}
+                                        className="bg-gray-300 px-4 py-2 rounded font-bold disabled:opacity-50"
                                     >
                                         -
                                     </button>
@@ -236,7 +292,8 @@ const CartPage = () => {
                                         onClick={() =>
                                             handleIncreaseQuantity(item.productId)
                                         }
-                                        className="bg-gray-300 px-4 py-2 rounded font-bold"
+                                        disabled={actionLoading}
+                                        className="bg-gray-300 px-4 py-2 rounded font-bold disabled:opacity-50"
                                     >
                                         +
                                     </button>
@@ -251,12 +308,13 @@ const CartPage = () => {
                                     ${item.price}
                                 </p>
 
-                                {/* Added remove button */}
+                                {/* Remove button */}
                                 <button
                                     onClick={() =>
                                         handleRemoveItem(item.productId)
                                     }
-                                    className="mt-4 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded font-bold"
+                                    disabled={actionLoading}
+                                    className="mt-4 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded font-bold disabled:opacity-50"
                                 >
                                     Remove
                                 </button>
@@ -268,19 +326,26 @@ const CartPage = () => {
 
                     <div className="bg-white p-6 rounded-lg shadow mt-10 flex justify-between items-center">
 
-    <h2 className="text-3xl font-bold">
-        Total: ${cart.totalPrice}
-    </h2>
+                        <h2 className="text-3xl font-bold">
+                            Total: ${cart.totalPrice}
+                        </h2>
 
-    {/* Added checkout button */}
-    <button
-        onClick={handleCheckout}
-        className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded font-bold text-xl"
-    >
-        Checkout
-    </button>
+                        {/* Checkout button */}
+                        <button
+                            onClick={handleCheckout}
+                            disabled={actionLoading}
+                            className={`text-white px-8 py-3 rounded font-bold text-xl ${
+                                actionLoading
+                                    ? "bg-gray-500 cursor-not-allowed"
+                                    : "bg-green-600 hover:bg-green-700"
+                            }`}
+                        >
+                            {actionLoading
+                                ? "Processing..."
+                                : "Checkout"}
+                        </button>
 
-</div>
+                    </div>
 
                 </div>
             )}

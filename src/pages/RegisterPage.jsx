@@ -1,7 +1,14 @@
 import { useState } from "react";
+
 import api from "../api/api";
 
+import Loader from "../components/Loader";
+import toast from "react-hot-toast";
+
 const RegisterPage = () => {
+
+    // Registration loading state
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -21,6 +28,8 @@ const RegisterPage = () => {
 
         e.preventDefault();
 
+        setLoading(true);
+
         try {
 
             const response = await api.post(
@@ -30,31 +39,35 @@ const RegisterPage = () => {
 
             console.log(response.data);
 
-            alert("Registration successful");
-            
+            toast.success("Registration successful");
+
             setFormData({
-            name: "",
-            email: "",
-            password: ""
-});
+                name: "",
+                email: "",
+                password: ""
+            });
 
         } catch (error) {
 
             console.log(error);
 
-            alert(
-    error.response?.data?.message ||
-    error.response?.data ||
-    "Registration failed"
+                 toast.error(
+                 error.response?.data?.message ||
+                 error.response?.data ||
+                 "Registration failed"
 );
+
+        } finally {
+
+            setLoading(false);
         }
     };
 
     return (
 
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center min-h-screen bg-gray-100">
 
-            <div className="w-[400px] bg-gray-900 text-white p-8 rounded-lg">
+            <div className="w-[400px] bg-gray-900 text-white p-8 rounded-lg shadow-lg">
 
                 <h1 className="text-4xl font-bold mb-6 text-center">
                     Register
@@ -71,7 +84,8 @@ const RegisterPage = () => {
                         placeholder="Name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="p-3 rounded bg-gray-800 outline-none"
+                        disabled={loading}
+                        className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
                     />
 
                     <input
@@ -80,7 +94,8 @@ const RegisterPage = () => {
                         placeholder="Email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="p-3 rounded bg-gray-800 outline-none"
+                        disabled={loading}
+                        className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
                     />
 
                     <input
@@ -89,14 +104,26 @@ const RegisterPage = () => {
                         placeholder="Password"
                         value={formData.password}
                         onChange={handleChange}
-                        className="p-3 rounded bg-gray-800 outline-none"
+                        disabled={loading}
+                        className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
                     />
 
                     <button
                         type="submit"
-                        className="bg-green-600 hover:bg-green-700 p-3 rounded font-bold"
+                        disabled={loading}
+                        className={`p-3 rounded font-bold transition flex justify-center items-center gap-3 ${
+                            loading
+                                ? "bg-gray-500 cursor-not-allowed"
+                                : "bg-green-600 hover:bg-green-700"
+                        }`}
                     >
-                        Register
+
+                        {loading && <Loader />}
+
+                        {loading
+                            ? "Registering..."
+                            : "Register"}
+
                     </button>
 
                 </form>

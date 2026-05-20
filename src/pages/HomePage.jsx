@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import api from "../api/api";
 
+import Loader from "../components/Loader";
+import toast from "react-hot-toast";
+
 import {
     fetchProductsStart,
     fetchProductsSuccess,
@@ -151,13 +154,13 @@ const HomePage = () => {
                 }
             );
 
-            alert("Product added to cart");
+            toast.success("Product added to cart");
 
         } catch (error) {
 
             console.log(error);
 
-            alert("Failed to add product to cart");
+            toast.error("Failed to add product to cart");
         }
     };
 
@@ -229,9 +232,14 @@ const HomePage = () => {
             {/* Loading indicator */}
             {loading && (
 
-                <p className="text-xl font-semibold mb-6 text-blue-600">
-                    Searching products...
-                </p>
+                <div className="mb-6 flex items-center gap-4">
+
+                    <Loader />
+                    <p className="text-xl font-semibold text-blue-600">
+                        Searching products...
+                    </p>
+
+                </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
