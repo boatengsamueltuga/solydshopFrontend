@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -15,58 +15,124 @@ const HomePage = () => {
     const dispatch = useDispatch();
 
     const {
-
         products,
         loading,
         error
-
     } = useSelector(
         (state) => state.product
     );
 
-    // Added authenticated user access
+    // Get authenticated user
     const { user } = useSelector(
         (state) => state.auth
     );
 
-    useEffect(() => {
+    // Search keyword
+    const [keyword, setKeyword] = useState("");
 
-        const fetchProducts = async () => {
+    // Category filter
+    const [categoryId, setCategoryId] = useState("");
 
-            dispatch(fetchProductsStart());
+    // Store categories
+    const [categories, setCategories] = useState([]);
 
-            try {
+    // Fetch categories
+    const fetchCategories = async () => {
 
-                const response = await api.get(
-                    "/public/products"
-                );
+        try {
 
-                dispatch(
-                    fetchProductsSuccess(
-                        response.data.content
-                    )
-                );
+            const response = await api.get(
+                "/public/categories"
+            );
 
-            } catch (error) {
+            setCategories(
+                response.data.content
+            );
 
-                dispatch(
-                    fetchProductsFailure(
-                        error.message
-                    )
-                );
+        } catch (error) {
+
+            console.log(error);
+        }
+    };
+
+    // Fetch products with filters
+    const fetchProducts = async (
+        searchKeyword = keyword,
+        selectedCategoryId = categoryId
+    ) => {
+
+        dispatch(fetchProductsStart());
+
+        try {
+
+            let url = "/public/products?";
+
+            // Add keyword filter
+            if (searchKeyword.trim() !== "") {
+
+                url += `keyword=${searchKeyword}&`;
             }
-        };
+
+            // Add category filter
+            if (selectedCategoryId !== "") {
+
+                url += `categoryId=${selectedCategoryId}`;
+            }
+
+            const response = await api.get(url);
+
+            dispatch(
+                fetchProductsSuccess(
+                    response.data.content
+                )
+            );
+
+        } catch (error) {
+
+            dispatch(
+                fetchProductsFailure(
+                    error.message
+                )
+            );
+        }
+    };
+
+    // Initial load
+    useEffect(() => {
 
         fetchProducts();
 
-    }, [dispatch]);
+        fetchCategories();
 
-    // Added add-to-cart handler
+    }, []);
+
+    // Debounced realtime search
+    useEffect(() => {
+
+        const timeout = setTimeout(() => {
+
+            fetchProducts();
+
+        }, 400);
+
+        return () => clearTimeout(timeout);
+
+    }, [keyword, categoryId]);
+
+    // Handle Enter key search
+    const handleKeyDown = (e) => {
+
+        if (e.key === "Enter") {
+
+            fetchProducts();
+        }
+    };
+
+    // Add product to cart
     const handleAddToCart = async (productId) => {
 
         try {
 
-            // Added manual XSRF token extraction
             const xsrfToken = document.cookie
                 .split("; ")
                 .find(row => row.startsWith("XSRF-TOKEN="))
@@ -95,11 +161,6 @@ const HomePage = () => {
         }
     };
 
-    if (loading) {
-
-        return <h1>Loading products...</h1>;
-    }
-
     if (error) {
 
         return <h1>{error}</h1>;
@@ -112,6 +173,66 @@ const HomePage = () => {
             <h1 className="text-5xl font-bold mb-10">
                 Products
             </h1>
+
+            {/* Search and filter section */}
+            <div className="flex flex-col md:flex-row gap-5 mb-10">
+
+                {/* Search input */}
+                <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={keyword}
+                    onChange={(e) =>
+                        setKeyword(e.target.value)
+                    }
+                    onKeyDown={handleKeyDown}
+                    className="p-4 border rounded w-full md:w-1/2"
+                />
+
+                {/* Category filter */}
+                <select
+                    value={categoryId}
+                    onChange={(e) =>
+                        setCategoryId(e.target.value)
+                    }
+                    className="p-4 border rounded w-full md:w-1/4"
+                >
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    {categories.map((category) => (
+
+                        <option
+                            key={category.categoryId}
+                            value={category.categoryId}
+                        >
+                            {category.categoryName}
+                        </option>
+                    ))}
+
+                </select>
+
+                {/* Search button */}
+                <button
+                    onClick={() =>
+                        fetchProducts()
+                    }
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded font-bold"
+                >
+                    Search
+                </button>
+
+            </div>
+
+            {/* Loading indicator */}
+            {loading && (
+
+                <p className="text-xl font-semibold mb-6 text-blue-600">
+                    Searching products...
+                </p>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
@@ -142,7 +263,7 @@ const HomePage = () => {
                                 ${product.price}
                             </p>
 
-                            {/* Added stock display */}
+                            {/* Stock display */}
                             <p className="mt-2 text-lg font-semibold text-gray-700">
                                 Stock: {product.quantity}
                             </p>
