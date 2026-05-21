@@ -242,7 +242,7 @@ const HomePage = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                 {products.map((product) => (
 
@@ -254,12 +254,12 @@ const HomePage = () => {
                         <img
                             src={product.imageUrl}
                             alt={product.productName}
-                            className="w-full h-52 object-cover"
+                            className="w-full h-44 object-cover"
                         />
 
-                        <div className="p-5">
+                        <div className="p-4">
 
-                            <h2 className="text-2xl font-bold">
+                            <h2 className="text-xl font-bold">
                                 {product.productName}
                             </h2>
 
@@ -267,7 +267,7 @@ const HomePage = () => {
                                 {product.description}
                             </p>
 
-                            <p className="mt-4 text-3xl font-bold text-green-700">
+                            <p className="mt-4 text-2xl font-bold text-green-700">
                                 ${product.price}
                             </p>
 

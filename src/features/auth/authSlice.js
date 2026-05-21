@@ -3,8 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
 
     user: null,
+
     isAuthenticated: false,
+
     loading: false,
+
+    isInitialized: false,
+
     error: null
 };
 
@@ -56,6 +61,11 @@ const authSlice = createSlice({
 
             state.user = action.payload;
         },
+
+        setInitialized: (state) => {
+
+            state.isInitialized = true;
+        },
     }
 });
 
@@ -65,7 +75,8 @@ export const {
     loginSuccess,
     restoreUser,
     loginFailure,
-    logoutSuccess
+    logoutSuccess,
+    setInitialized
 
 } = authSlice.actions;
 

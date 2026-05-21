@@ -21,7 +21,10 @@ import SellerDashboardPage from "./pages/SellerDashboardPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import { restoreUser } from "./features/auth/authSlice";
+import {
+    restoreUser,
+    setInitialized
+} from "./features/auth/authSlice";
 
 import api from "./api/api";
 
@@ -46,6 +49,12 @@ function App() {
             } catch (error) {
 
                 console.log("No active session");
+
+            } finally {
+
+                dispatch(
+                    setInitialized()
+                );
             }
         };
 
@@ -90,13 +99,13 @@ function App() {
                     }
                 />
 
-                {/* Added Seller Dashboard Route */}
-                <Route
+                     {/* Added Seller Dashboard Route */}
+                   <Route
                     path="/seller/dashboard"
                     element={
-                        <ProtectedRoute>
-                            <SellerDashboardPage />
-                        </ProtectedRoute>
+                    <ProtectedRoute allowedRoles={["ROLE_SELLER"]}>
+                    <SellerDashboardPage />
+                   </ProtectedRoute>
                     }
                 />
 

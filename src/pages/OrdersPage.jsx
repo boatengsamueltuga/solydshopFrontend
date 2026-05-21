@@ -33,7 +33,7 @@ const OrdersPage = () => {
 
                 console.log(error);
 
-                setError("Failed to load orders");
+                setError("Unable to load orders");
 
             } finally {
 

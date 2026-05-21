@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import api from "../api/api";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
+import Button from "@mui/material/Button";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const SellerDashboardPage = () => {
 
@@ -57,8 +59,6 @@ const SellerDashboardPage = () => {
         } catch (error) {
 
             console.log(error);
-
-            toast.error("Failed to load categories");
         }
     };
 
@@ -76,8 +76,6 @@ const SellerDashboardPage = () => {
         } catch (error) {
 
             console.log(error);
-
-            toast.error("Failed to load seller products");
 
         } finally {
 
@@ -211,8 +209,6 @@ const SellerDashboardPage = () => {
 
             console.log(error);
 
-            toast.error("Operation failed");
-
         } finally {
 
             setActionLoading(false);
@@ -259,8 +255,6 @@ const SellerDashboardPage = () => {
 
             console.log(error);
 
-            toast.error("Failed to delete product");
-
         } finally {
 
             setActionLoading(false);
@@ -275,6 +269,7 @@ const SellerDashboardPage = () => {
             <div className="min-h-screen flex flex-col justify-center items-center">
 
                 <Loader />
+
                 <p className="text-2xl font-semibold mt-4">
                     Loading dashboard...
                 </p>
@@ -331,25 +326,50 @@ const SellerDashboardPage = () => {
                         className="p-4 border rounded disabled:opacity-50"
                     />
 
-                    {/* Image upload input */}
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        disabled={actionLoading}
-                        className="p-4 border rounded disabled:opacity-50"
-                    />
+                     {/* Image upload section */}
+                        <div className="md:col-span-2">
 
-                    {/* Selected image preview */}
-                    {selectedFile && (
+                            <Button
+                                component="label"
+                                variant="contained"
+                                startIcon={<CloudUploadIcon />}
+                                disabled={actionLoading}
+                            >
+                                Upload Product Image
 
-                        <img
-                            src={URL.createObjectURL(selectedFile)}
-                            alt="Preview"
-                            className="w-full h-64 object-cover rounded md:col-span-2"
-                        />
-                    )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    hidden
+                                    onChange={handleFileChange}
+                                />
 
+                            </Button>
+
+                        </div>
+
+                       {/* Product image preview */}
+                      <div className="md:col-span-2 flex justify-center">
+
+                            {(selectedFile || formData.imageUrl) && (
+
+                                <div className="w-72 h-48 border rounded-lg overflow-hidden bg-gray-100">
+
+                                    <img
+                                        src={
+                                            selectedFile
+                                                ? URL.createObjectURL(selectedFile)
+                                                : formData.imageUrl
+                                        }
+                                        alt="Preview"
+                                        className="w-full h-full object-cover"
+                                    />
+
+                                </div>
+                            )}
+
+                        </div>
+                        
                     <input
                         type="number"
                         name="price"

@@ -1,0 +1,44 @@
+Folder PATH listing for volume Windows-SSD
+Volume serial number is D4CF-C0C5
+C:\USERS\BOATE\ONEDRIVE\DESKTOP\SOLYSHOPFRONTEND1\SOLYDSHOP_FRONTEND\SRC
+¦   App.jsx
+¦   index.css
+¦   main.jsx
+¦   
++---api
+¦       api.js
+¦       
++---app
+¦       store.js
+¦       
++---assets
+¦       hero.png
+¦       react.svg
+¦       vite.svg
+¦       
++---components
+¦       Loader.jsx
+¦       Navbar.jsx
+¦       ProtectedRoute.jsx
+¦       
++---features
+¦   +---auth
+¦   ¦       authSlice.js
+¦   ¦       
+¦   +---product
+¦           productSlice.js
+¦           
++---hooks
++---layouts
++---pages
+¦       CartPage.jsx
+¦       HomePage.jsx
+¦       LoginPage.jsx
+¦       OrdersPage.jsx
+¦       RegisterPage.jsx
+¦       SellerDashboardPage.jsx
+¦       
++---routes
++---services
++---styles
++---utils

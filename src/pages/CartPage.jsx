@@ -44,7 +44,7 @@ const CartPage = () => {
 
             console.log(error);
 
-            toast.error("Failed to load cart");
+            //toast.error("Failed to load cart");
 
         } finally {
 
