@@ -25,7 +25,15 @@ const AdminDashboardPage = () => {
 
     const [products, setProducts] = useState([]);
 
+    const [categories, setCategories] = useState([]);
+
     const [loading, setLoading] = useState(true);
+
+    /*
+    ---------------------------------------------------------------
+    | Fetch Products
+    ---------------------------------------------------------------
+    */
 
     const fetchProducts = async () => {
 
@@ -51,9 +59,39 @@ const AdminDashboardPage = () => {
         }
     };
 
+    /*
+    ---------------------------------------------------------------
+    | Fetch Categories
+    ---------------------------------------------------------------
+    */
+
+    const fetchCategories = async () => {
+
+        try {
+
+            const response = await api.get(
+                "/public/categories"
+            );
+
+            setCategories(
+                response.data.content
+            );
+
+        } catch (error) {
+
+            console.log(error);
+
+            toast.error(
+                "Failed to load categories"
+            );
+        }
+    };
+
     useEffect(() => {
 
         fetchProducts();
+
+        fetchCategories();
 
     }, []);
 
@@ -95,6 +133,51 @@ const AdminDashboardPage = () => {
             );
         }
     };
+
+    /*
+    ---------------------------------------------------------------
+    | Delete Category
+    ---------------------------------------------------------------
+    */
+
+    const handleDeleteCategory = async (categoryId) => {
+
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this category?"
+        );
+
+        if (!confirmed) {
+
+            return;
+        }
+
+        try {
+
+            await api.delete(
+                `/admin/categories/${categoryId}`
+            );
+
+            toast.success(
+                "Category deleted successfully"
+            );
+
+            fetchCategories();
+
+        } catch (error) {
+
+            console.log(error);
+
+            toast.error(
+                "Failed to delete category"
+            );
+        }
+    };
+
+    /*
+    ---------------------------------------------------------------
+    | Product Table Columns
+    ---------------------------------------------------------------
+    */
 
     const columns = [
 
@@ -157,6 +240,58 @@ const AdminDashboardPage = () => {
                         onClick={() =>
                             handleDeleteProduct(
                                 params.row.productId
+                            )
+                        }
+                    >
+                        Delete
+                    </Button>
+
+                </div>
+            )
+        }
+    ];
+
+    /*
+    ---------------------------------------------------------------
+    | Category Table Columns
+    ---------------------------------------------------------------
+    */
+
+    const categoryColumns = [
+
+        {
+            field: "categoryId",
+            headerName: "ID",
+            width: 120
+        },
+
+        {
+            field: "categoryName",
+            headerName: "Category Name",
+            width: 300
+        },
+
+        {
+            field: "actions",
+            headerName: "Actions",
+            width: 250,
+            renderCell: (params) => (
+
+                <div className="flex gap-3 mt-2">
+
+                    <Button
+                        variant="contained"
+                        color="warning"
+                    >
+                        Edit
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() =>
+                            handleDeleteCategory(
+                                params.row.categoryId
                             )
                         }
                     >
@@ -239,7 +374,7 @@ const AdminDashboardPage = () => {
                             </p>
 
                             <h2 className="text-4xl font-bold mt-3">
-                                0
+                                {categories.length}
                             </h2>
 
                         </div>
@@ -352,6 +487,36 @@ const AdminDashboardPage = () => {
                         columns={columns}
                         getRowId={(row) => row.productId}
                         pageSizeOptions={[5, 10, 20]}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 5
+                                }
+                            }
+                        }}
+                    />
+
+                </div>
+
+            </div>
+
+            {/* Admin Categories Section */}
+            <div className="mt-20">
+
+                <h2 className="text-4xl font-bold mb-8 text-gray-900">
+                    All Categories
+                </h2>
+
+                <div
+                    className="bg-white rounded-xl shadow"
+                    style={{ height: 450, width: "100%" }}
+                >
+
+                    <DataGrid
+                        rows={categories}
+                        columns={categoryColumns}
+                        getRowId={(row) => row.categoryId}
+                        pageSizeOptions={[5, 10]}
                         initialState={{
                             pagination: {
                                 paginationModel: {
