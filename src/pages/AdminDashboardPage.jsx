@@ -15,6 +15,12 @@ import {
     Button
 } from "@mui/material";
 
+import {
+    Dialog,
+    DialogPanel,
+    DialogTitle
+} from "@headlessui/react";
+
 import api from "../api/api";
 
 import Loader from "../components/Loader";
@@ -23,11 +29,29 @@ import toast from "react-hot-toast";
 
 const AdminDashboardPage = () => {
 
+    /*
+    ---------------------------------------------------------------
+    | State Management
+    ---------------------------------------------------------------
+    */
+
     const [products, setProducts] = useState([]);
 
     const [categories, setCategories] = useState([]);
 
     const [loading, setLoading] = useState(true);
+
+    /*
+    ---------------------------------------------------------------
+    | Create Category Dialog State
+    ---------------------------------------------------------------
+    */
+
+    const [isCreateCategoryOpen, setIsCreateCategoryOpen] =
+        useState(false);
+
+    const [categoryName, setCategoryName] =
+        useState("");
 
     /*
     ---------------------------------------------------------------
@@ -51,7 +75,9 @@ const AdminDashboardPage = () => {
 
             console.log(error);
 
-            toast.error("Failed to load products");
+            toast.error(
+                "Failed to load products"
+            );
 
         } finally {
 
@@ -86,6 +112,12 @@ const AdminDashboardPage = () => {
             );
         }
     };
+
+    /*
+    ---------------------------------------------------------------
+    | Initial Dashboard Data Loading
+    ---------------------------------------------------------------
+    */
 
     useEffect(() => {
 
@@ -175,6 +207,70 @@ const AdminDashboardPage = () => {
 
     /*
     ---------------------------------------------------------------
+    | Create Category
+    ---------------------------------------------------------------
+    */
+
+    const handleCreateCategory = async () => {
+
+        if (!categoryName.trim()) {
+
+            toast.error(
+                "Category name is required"
+            );
+
+            return;
+        }
+
+        try {
+
+            await api.post(
+                "/admin/categories",
+                {
+                    categoryName
+                }
+            );
+
+            toast.success(
+                "Category created successfully"
+            );
+
+            /*
+            -------------------------------------------------------
+            | Refresh Categories
+            -------------------------------------------------------
+            */
+
+            fetchCategories();
+
+            /*
+            -------------------------------------------------------
+            | Reset Form
+            -------------------------------------------------------
+            */
+
+            setCategoryName("");
+
+            /*
+            -------------------------------------------------------
+            | Close Dialog
+            -------------------------------------------------------
+            */
+
+            setIsCreateCategoryOpen(false);
+
+        } catch (error) {
+
+            console.log(error);
+
+            toast.error(
+                "Failed to create category"
+            );
+        }
+    };
+
+    /*
+    ---------------------------------------------------------------
     | Product Table Columns
     ---------------------------------------------------------------
     */
@@ -185,6 +281,7 @@ const AdminDashboardPage = () => {
             field: "image",
             headerName: "Image",
             width: 120,
+
             renderCell: (params) => (
 
                 <img
@@ -205,6 +302,7 @@ const AdminDashboardPage = () => {
             field: "price",
             headerName: "Price",
             width: 120,
+
             renderCell: (params) => (
 
                 <span className="font-bold text-green-700">
@@ -223,6 +321,7 @@ const AdminDashboardPage = () => {
             field: "actions",
             headerName: "Actions",
             width: 250,
+
             renderCell: (params) => (
 
                 <div className="flex gap-3 mt-2">
@@ -275,6 +374,7 @@ const AdminDashboardPage = () => {
             field: "actions",
             headerName: "Actions",
             width: 250,
+
             renderCell: (params) => (
 
                 <div className="flex gap-3 mt-2">
@@ -302,6 +402,12 @@ const AdminDashboardPage = () => {
             )
         }
     ];
+
+    /*
+    ---------------------------------------------------------------
+    | Loading Screen
+    ---------------------------------------------------------------
+    */
 
     if (loading) {
 
@@ -336,7 +442,7 @@ const AdminDashboardPage = () => {
 
             </div>
 
-            {/* Dashboard Stats */}
+            {/* Dashboard Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-14">
 
                 {/* Products Card */}
@@ -442,24 +548,33 @@ const AdminDashboardPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
+                    {/* Manage Products */}
                     <button className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl font-bold text-xl shadow">
 
                         Manage Products
 
                     </button>
 
-                    <button className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl font-bold text-xl shadow">
+                    {/* Create Category */}
+                    <Button
+                        variant="contained"
+                        color="success"
+                        size="large"
+                        onClick={() =>
+                            setIsCreateCategoryOpen(true)
+                        }
+                    >
+                        Create Category
+                    </Button>
 
-                        Manage Categories
-
-                    </button>
-
+                    {/* Manage Orders */}
                     <button className="bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-xl font-bold text-xl shadow">
 
                         Manage Orders
 
                     </button>
 
+                    {/* Manage Users */}
                     <button className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl font-bold text-xl shadow">
 
                         Manage Users
@@ -529,6 +644,75 @@ const AdminDashboardPage = () => {
                 </div>
 
             </div>
+
+            {/* Create Category Dialog */}
+            <Dialog
+                open={isCreateCategoryOpen}
+                onClose={() => {
+
+                    setCategoryName("");
+
+                    setIsCreateCategoryOpen(false);
+                }}
+                className="relative z-50"
+            >
+
+                {/* Backdrop */}
+                <div className="fixed inset-0 bg-black/40" />
+
+                {/* Modal Container */}
+                <div className="fixed inset-0 flex items-center justify-center p-4">
+
+                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+
+                        <DialogTitle className="text-3xl font-bold mb-6">
+
+                            Create Category
+
+                        </DialogTitle>
+
+                        {/* Category Name Input */}
+                        <input
+                            type="text"
+                            placeholder="Enter category name"
+                            value={categoryName}
+                            onChange={(e) =>
+                                setCategoryName(
+                                    e.target.value
+                                )
+                            }
+                            className="w-full border border-gray-300 rounded-lg p-4 text-lg mb-6"
+                        />
+
+                        {/* Dialog Actions */}
+                        <div className="flex justify-end gap-4">
+
+                            <button
+                                 onClick={() => {
+
+                                    setCategoryName("");
+
+                                    setIsCreateCategoryOpen(false);
+                                }}
+                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={handleCreateCategory}
+                                className="px-6 py-3 rounded-lg bg-green-600 text-white font-semibold"
+                            >
+                                Create
+                            </button>
+
+                        </div>
+
+                    </DialogPanel>
+
+                </div>
+
+            </Dialog>
 
         </div>
     );
