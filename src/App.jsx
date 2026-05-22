@@ -19,6 +19,9 @@ import OrdersPage from "./pages/OrdersPage";
 // Added SellerDashboardPage import
 import SellerDashboardPage from "./pages/SellerDashboardPage";
 
+// Added AdminDashboardPage import
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import {
@@ -99,13 +102,23 @@ function App() {
                     }
                 />
 
-                     {/* Added Seller Dashboard Route */}
-                   <Route
+                {/* Added Seller Dashboard Route */}
+                <Route
                     path="/seller/dashboard"
                     element={
-                    <ProtectedRoute allowedRoles={["ROLE_SELLER"]}>
-                    <SellerDashboardPage />
-                   </ProtectedRoute>
+                        <ProtectedRoute allowedRoles={["ROLE_SELLER"]}>
+                            <SellerDashboardPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Added Admin Dashboard Route */}
+                <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={["ROLE_ADMIN"]}>
+                            <AdminDashboardPage />
+                        </ProtectedRoute>
                     }
                 />
 

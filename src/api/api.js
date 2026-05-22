@@ -25,8 +25,18 @@ api.interceptors.request.use(
 
     (config) => {
 
-        return config;
-    },
+    const token = document.cookie
+        .split("; ")
+        .find(row => row.startsWith("XSRF-TOKEN="))
+        ?.split("=")[1];
+
+    if (token) {
+
+        config.headers["X-XSRF-TOKEN"] = token;
+    }
+
+    return config;
+},
 
     (error) => {
 

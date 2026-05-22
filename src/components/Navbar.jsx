@@ -81,6 +81,14 @@ const Navbar = () => {
                     </Link>
                 )}
 
+                {/* Show admin dashboard only for admins */}
+                {user?.roles?.includes("ROLE_ADMIN") && (
+
+                    <Link to="/admin/dashboard">
+                        Admin Dashboard
+                    </Link>
+                )}
+
                 {!isAuthenticated && (
                     <>
                         <Link to="/login">
