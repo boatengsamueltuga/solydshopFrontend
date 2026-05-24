@@ -22,9 +22,7 @@ import {
 } from "@headlessui/react";
 
 import api from "../api/api";
-
 import Loader from "../components/Loader";
-
 import toast from "react-hot-toast";
 
 const AdminDashboardPage = () => {
@@ -52,6 +50,46 @@ const AdminDashboardPage = () => {
 
     const [categoryName, setCategoryName] =
         useState("");
+
+    /*
+    ---------------------------------------------------------------
+    | Edit Category Dialog State
+    ---------------------------------------------------------------
+    */
+
+    const [isEditCategoryOpen, setIsEditCategoryOpen] =
+        useState(false);
+
+    const [selectedCategoryId, setSelectedCategoryId] =
+        useState(null);
+
+    const [editCategoryName, setEditCategoryName] =
+        useState("");
+
+        /*
+    ---------------------------------------------------------------
+    | Create Product Dialog State
+    ---------------------------------------------------------------
+    */
+
+    const [isCreateProductOpen, setIsCreateProductOpen] =
+        useState(false);
+
+    const [productForm, setProductForm] =
+        useState({
+
+            productName: "",
+
+            description: "",
+
+            imageUrl: "",
+
+            price: "",
+
+            quantity: "",
+
+            categoryId: ""
+        });
 
     /*
     ---------------------------------------------------------------
@@ -235,27 +273,9 @@ const AdminDashboardPage = () => {
                 "Category created successfully"
             );
 
-            /*
-            -------------------------------------------------------
-            | Refresh Categories
-            -------------------------------------------------------
-            */
-
             fetchCategories();
 
-            /*
-            -------------------------------------------------------
-            | Reset Form
-            -------------------------------------------------------
-            */
-
             setCategoryName("");
-
-            /*
-            -------------------------------------------------------
-            | Close Dialog
-            -------------------------------------------------------
-            */
 
             setIsCreateCategoryOpen(false);
 
@@ -265,6 +285,73 @@ const AdminDashboardPage = () => {
 
             toast.error(
                 "Failed to create category"
+            );
+        }
+    };
+
+    /*
+    ---------------------------------------------------------------
+    | Open Edit Category Dialog
+    ---------------------------------------------------------------
+    */
+
+    const openEditCategoryDialog = (category) => {
+
+        setSelectedCategoryId(
+            category.categoryId
+        );
+
+        setEditCategoryName(
+            category.categoryName
+        );
+
+        setIsEditCategoryOpen(true);
+    };
+
+    /*
+    ---------------------------------------------------------------
+    | Update Category
+    ---------------------------------------------------------------
+    */
+
+    const handleUpdateCategory = async () => {
+
+        if (!editCategoryName.trim()) {
+
+            toast.error(
+                "Category name is required"
+            );
+
+            return;
+        }
+
+        try {
+
+            await api.put(
+                `/admin/categories/${selectedCategoryId}`,
+                {
+                    categoryName: editCategoryName
+                }
+            );
+
+            toast.success(
+                "Category updated successfully"
+            );
+
+            fetchCategories();
+
+            setSelectedCategoryId(null);
+
+            setEditCategoryName("");
+
+            setIsEditCategoryOpen(false);
+
+        } catch (error) {
+
+            console.log(error);
+
+            toast.error(
+                "Failed to update category"
             );
         }
     };
@@ -382,6 +469,11 @@ const AdminDashboardPage = () => {
                     <Button
                         variant="contained"
                         color="warning"
+                        onClick={() =>
+                            openEditCategoryDialog(
+                                params.row
+                            )
+                        }
                     >
                         Edit
                     </Button>
@@ -445,7 +537,6 @@ const AdminDashboardPage = () => {
             {/* Dashboard Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-14">
 
-                {/* Products Card */}
                 <div className="bg-white rounded-xl shadow p-6">
 
                     <div className="flex justify-between items-center">
@@ -468,7 +559,6 @@ const AdminDashboardPage = () => {
 
                 </div>
 
-                {/* Categories Card */}
                 <div className="bg-white rounded-xl shadow p-6">
 
                     <div className="flex justify-between items-center">
@@ -491,7 +581,6 @@ const AdminDashboardPage = () => {
 
                 </div>
 
-                {/* Orders Card */}
                 <div className="bg-white rounded-xl shadow p-6">
 
                     <div className="flex justify-between items-center">
@@ -514,7 +603,6 @@ const AdminDashboardPage = () => {
 
                 </div>
 
-                {/* Users Card */}
                 <div className="bg-white rounded-xl shadow p-6">
 
                     <div className="flex justify-between items-center">
@@ -548,14 +636,17 @@ const AdminDashboardPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-                    {/* Manage Products */}
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl font-bold text-xl shadow">
+                    <Button
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            onClick={() =>
+                                setIsCreateProductOpen(true)
+                            }
+                        >
+                            Create Product
+                        </Button>
 
-                        Manage Products
-
-                    </button>
-
-                    {/* Create Category */}
                     <Button
                         variant="contained"
                         color="success"
@@ -567,14 +658,12 @@ const AdminDashboardPage = () => {
                         Create Category
                     </Button>
 
-                    {/* Manage Orders */}
                     <button className="bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-xl font-bold text-xl shadow">
 
                         Manage Orders
 
                     </button>
 
-                    {/* Manage Users */}
                     <button className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl font-bold text-xl shadow">
 
                         Manage Users
@@ -657,10 +746,8 @@ const AdminDashboardPage = () => {
                 className="relative z-50"
             >
 
-                {/* Backdrop */}
                 <div className="fixed inset-0 bg-black/40" />
 
-                {/* Modal Container */}
                 <div className="fixed inset-0 flex items-center justify-center p-4">
 
                     <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
@@ -671,7 +758,6 @@ const AdminDashboardPage = () => {
 
                         </DialogTitle>
 
-                        {/* Category Name Input */}
                         <input
                             type="text"
                             placeholder="Enter category name"
@@ -684,11 +770,10 @@ const AdminDashboardPage = () => {
                             className="w-full border border-gray-300 rounded-lg p-4 text-lg mb-6"
                         />
 
-                        {/* Dialog Actions */}
                         <div className="flex justify-end gap-4">
 
                             <button
-                                 onClick={() => {
+                                onClick={() => {
 
                                     setCategoryName("");
 
@@ -704,6 +789,251 @@ const AdminDashboardPage = () => {
                                 className="px-6 py-3 rounded-lg bg-green-600 text-white font-semibold"
                             >
                                 Create
+                            </button>
+
+                        </div>
+
+                    </DialogPanel>
+
+                </div>
+
+            </Dialog>
+
+            {/* Edit Category Dialog */}
+            <Dialog
+                open={isEditCategoryOpen}
+                onClose={() => {
+
+                    setSelectedCategoryId(null);
+
+                    setEditCategoryName("");
+
+                    setIsEditCategoryOpen(false);
+                }}
+                className="relative z-50"
+            >
+
+                <div className="fixed inset-0 bg-black/40" />
+
+                <div className="fixed inset-0 flex items-center justify-center p-4">
+
+                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+
+                        <DialogTitle className="text-3xl font-bold mb-6">
+
+                            Edit Category
+
+                        </DialogTitle>
+
+                        <input
+                            type="text"
+                            placeholder="Enter category name"
+                            value={editCategoryName}
+                            onChange={(e) =>
+                                setEditCategoryName(
+                                    e.target.value
+                                )
+                            }
+                            className="w-full border border-gray-300 rounded-lg p-4 text-lg mb-6"
+                        />
+
+                        <div className="flex justify-end gap-4">
+
+                            <button
+                                onClick={() => {
+
+                                    setSelectedCategoryId(null);
+
+                                    setEditCategoryName("");
+
+                                    setIsEditCategoryOpen(false);
+                                }}
+                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={handleUpdateCategory}
+                                className="px-6 py-3 rounded-lg bg-yellow-500 text-white font-semibold"
+                            >
+                                Update
+                            </button>
+
+                        </div>
+
+                    </DialogPanel>
+
+                </div>
+
+            </Dialog>
+
+                        {/* Create Product Dialog */}
+            <Dialog
+                open={isCreateProductOpen}
+                onClose={() => {
+
+                    setProductForm({
+
+                        productName: "",
+
+                        description: "",
+
+                        imageUrl: "",
+
+                        price: "",
+
+                        quantity: "",
+
+                        categoryId: ""
+                    });
+
+                    setIsCreateProductOpen(false);
+                }}
+                className="relative z-50"
+            >
+
+                {/* Backdrop */}
+                <div className="fixed inset-0 bg-black/40" />
+
+                {/* Modal Container */}
+                <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+
+                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl">
+
+                        <DialogTitle className="text-3xl font-bold mb-8">
+
+                            Create Product
+
+                        </DialogTitle>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            {/* Product Name */}
+                            <input
+                                type="text"
+                                placeholder="Product Name"
+                                value={productForm.productName}
+                                onChange={(e) =>
+                                    setProductForm({
+                                        ...productForm,
+                                        productName: e.target.value
+                                    })
+                                }
+                                className="border border-gray-300 rounded-lg p-4"
+                            />
+
+                            {/* Price */}
+                            <input
+                                type="number"
+                                placeholder="Price"
+                                value={productForm.price}
+                                onChange={(e) =>
+                                    setProductForm({
+                                        ...productForm,
+                                        price: e.target.value
+                                    })
+                                }
+                                className="border border-gray-300 rounded-lg p-4"
+                            />
+
+                            {/* Quantity */}
+                            <input
+                                type="number"
+                                placeholder="Quantity"
+                                value={productForm.quantity}
+                                onChange={(e) =>
+                                    setProductForm({
+                                        ...productForm,
+                                        quantity: e.target.value
+                                    })
+                                }
+                                className="border border-gray-300 rounded-lg p-4"
+                            />
+
+                           {/* Upload Image Button */}
+                                <button
+                                    className="border border-gray-300 rounded-lg p-4 bg-gray-100 hover:bg-gray-200 text-left"
+                                >
+                                    Upload Product Image
+                                </button>
+
+                            {/* Category Dropdown */}
+                            <select
+                                value={productForm.categoryId}
+                                onChange={(e) =>
+                                    setProductForm({
+                                        ...productForm,
+                                        categoryId: e.target.value
+                                    })
+                                }
+                                className="border border-gray-300 rounded-lg p-4"
+                            >
+
+                                <option value="">
+                                    Select Category
+                                </option>
+
+                                {categories.map((category) => (
+
+                                    <option
+                                        key={category.categoryId}
+                                        value={category.categoryId}
+                                    >
+                                        {category.categoryName}
+                                    </option>
+
+                                ))}
+
+                            </select>
+
+                        </div>
+
+                        {/* Description */}
+                        <textarea
+                            placeholder="Product Description"
+                            value={productForm.description}
+                            onChange={(e) =>
+                                setProductForm({
+                                    ...productForm,
+                                    description: e.target.value
+                                })
+                            }
+                            className="w-full border border-gray-300 rounded-lg p-4 mt-6 h-40"
+                        />
+
+                        {/* Dialog Actions */}
+                        <div className="flex justify-end gap-4 mt-8">
+
+                            <button
+                                onClick={() => {
+
+                                    setProductForm({
+
+                                        productName: "",
+
+                                        description: "",
+
+                                        imageUrl: "",
+
+                                        price: "",
+
+                                        quantity: "",
+
+                                        categoryId: ""
+                                    });
+
+                                    setIsCreateProductOpen(false);
+                                }}
+                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                className="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold"
+                            >
+                                Create Product
                             </button>
 
                         </div>
