@@ -356,6 +356,88 @@ const AdminDashboardPage = () => {
         }
     };
 
+        /*
+    ---------------------------------------------------------------
+    | Create Product
+    ---------------------------------------------------------------
+    */
+
+    const handleCreateProduct = async () => {
+
+        if (
+            !productForm.productName ||
+            !productForm.description ||
+            !productForm.imageUrl ||
+            !productForm.price ||
+            !productForm.quantity ||
+            !productForm.categoryId
+        ) {
+
+            toast.error(
+                "All product fields are required"
+            );
+
+            return;
+        }
+
+        try {
+
+            await api.post(
+                "/admin/products",
+                {
+                    productName:
+                        productForm.productName,
+
+                    description:
+                        productForm.description,
+
+                    imageUrl:
+                        productForm.imageUrl,
+
+                    price:
+                        Number(productForm.price),
+
+                    quantity:
+                        Number(productForm.quantity),
+
+                    categoryId:
+                        Number(productForm.categoryId)
+                }
+            );
+
+            toast.success(
+                "Product created successfully"
+            );
+
+            await fetchProducts();
+
+            setProductForm({
+
+                productName: "",
+
+                description: "",
+
+                imageUrl: "",
+
+                price: "",
+
+                quantity: "",
+
+                categoryId: ""
+            });
+
+            setIsCreateProductOpen(false);
+
+        } catch (error) {
+
+            console.log(error);
+
+            toast.error(
+                "Failed to create product"
+            );
+        }
+    };
+
     /*
     ---------------------------------------------------------------
     | Product Table Columns
@@ -951,13 +1033,111 @@ const AdminDashboardPage = () => {
                                 className="border border-gray-300 rounded-lg p-4"
                             />
 
-                           {/* Upload Image Button */}
+                           {/* Upload Product Image */}
+                            <div>
+
+                                <input
+                                    type="file"
+                                    id="productImageInput"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={async (e) => {
+
+                                        const file = e.target.files[0];
+
+                                        if (!file) {
+
+                                            return;
+                                        }
+
+                                        try {
+
+                                            const formData =
+                                                new FormData();
+
+                                            formData.append(
+                                                "file",
+                                                file
+                                            );
+
+                                            const response =
+                                                await api.post(
+                                                    "/upload",
+                                                    formData,
+                                                    {
+                                                        headers: {
+                                                            "X-XSRF-TOKEN":
+                                                                document.cookie
+                                                                    .split("; ")
+                                                                    .find(row =>
+                                                                        row.startsWith(
+                                                                            "XSRF-TOKEN="
+                                                                        )
+                                                                    )
+                                                                    ?.split("=")[1]
+                                                        }
+                                                    }
+                                                );
+
+                                            const imageUrl =
+                                                response.data;
+
+                                            setProductForm({
+
+                                                ...productForm,
+
+                                                imageUrl
+                                            });
+
+                                            toast.success(
+                                                "Image uploaded successfully"
+                                            );
+
+                                        } catch (error) {
+
+                                            console.log(error);
+
+                                            toast.error(
+                                                "Image upload failed"
+                                            );
+                                        }
+                                    }}
+                                />
+
                                 <button
-                                    className="border border-gray-300 rounded-lg p-4 bg-gray-100 hover:bg-gray-200 text-left"
+                                    type="button"
+                                    className="border border-gray-300 rounded-lg p-4 bg-gray-100 hover:bg-gray-200 text-left w-full"
+                                    onClick={() =>
+                                        document
+                                            .getElementById(
+                                                "productImageInput"
+                                            )
+                                            .click()
+                                    }
                                 >
                                     Upload Product Image
                                 </button>
 
+                            </div>
+                              {/* Uploaded Product Image Preview */}
+                                    {
+                                        productForm.imageUrl && (
+
+                                            <div className="md:col-span-2 flex justify-center">
+
+                                                <div className="w-72 h-48 border rounded-lg overflow-hidden bg-gray-100">
+
+                                                    <img
+                                                        src={productForm.imageUrl}
+                                                        alt="Preview"
+                                                        className="w-full h-full object-cover"
+                                                    />
+
+                                                </div>
+
+                                            </div>
+                                        )
+                                    }
                             {/* Category Dropdown */}
                             <select
                                 value={productForm.categoryId}
@@ -1031,7 +1211,8 @@ const AdminDashboardPage = () => {
                             </button>
 
                             <button
-                                className="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold"
+                            onClick={handleCreateProduct}
+                            className="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold"
                             >
                                 Create Product
                             </button>
