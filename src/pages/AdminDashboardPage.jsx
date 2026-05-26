@@ -91,6 +91,15 @@ const AdminDashboardPage = () => {
             categoryId: ""
         });
 
+
+           /*
+    ---------------------------------------------------------------
+    | Edit Product State
+    ---------------------------------------------------------------
+    */
+
+    const [editingProductId, setEditingProductId] =
+        useState(null); 
     /*
     ---------------------------------------------------------------
     | Fetch Products
@@ -381,33 +390,65 @@ const AdminDashboardPage = () => {
         }
 
         try {
+                if (editingProductId) {
 
-            await api.post(
-                "/admin/products",
-                {
-                    productName:
-                        productForm.productName,
+                await api.put(
+                    `/admin/products/${editingProductId}`,
+                    {
+                        productName:
+                            productForm.productName,
 
-                    description:
-                        productForm.description,
+                        description:
+                            productForm.description,
 
-                    imageUrl:
-                        productForm.imageUrl,
+                        imageUrl:
+                            productForm.imageUrl,
 
-                    price:
-                        Number(productForm.price),
+                        price:
+                            Number(productForm.price),
 
-                    quantity:
-                        Number(productForm.quantity),
+                        quantity:
+                            Number(productForm.quantity),
 
-                    categoryId:
-                        Number(productForm.categoryId)
-                }
-            );
+                        categoryId:
+                            Number(productForm.categoryId)
+                    }
+                );
 
-            toast.success(
-                "Product created successfully"
-            );
+                toast.success(
+                    "Product updated successfully"
+                );
+
+            } else {
+
+                await api.post(
+                    "/admin/products",
+                    {
+                        productName:
+                            productForm.productName,
+
+                        description:
+                            productForm.description,
+
+                        imageUrl:
+                            productForm.imageUrl,
+
+                        price:
+                            Number(productForm.price),
+
+                        quantity:
+                            Number(productForm.quantity),
+
+                        categoryId:
+                            Number(productForm.categoryId)
+                    }
+                );
+
+                toast.success(
+                    "Product created successfully"
+                );
+            }
+                    
 
             await fetchProducts();
 
@@ -425,7 +466,7 @@ const AdminDashboardPage = () => {
 
                 categoryId: ""
             });
-
+            setEditingProductId(null);
             setIsCreateProductOpen(false);
 
         } catch (error) {
@@ -438,6 +479,41 @@ const AdminDashboardPage = () => {
         }
     };
 
+        /*
+    ---------------------------------------------------------------
+    | Open Edit Product Dialog
+    ---------------------------------------------------------------
+    */
+
+    const handleEditProduct = (product) => {
+
+        setEditingProductId(
+            product.productId
+        );
+
+        setProductForm({
+
+            productName:
+                product.productName,
+
+            description:
+                product.description,
+
+            imageUrl:
+                product.imageUrl,
+
+            price:
+                product.price,
+
+            quantity:
+                product.quantity,
+
+            categoryId:
+            String(product.categoryId)
+        });
+        console.log(product);
+        setIsCreateProductOpen(true);
+    };
     /*
     ---------------------------------------------------------------
     | Product Table Columns
@@ -496,11 +572,16 @@ const AdminDashboardPage = () => {
                 <div className="flex gap-3 mt-2">
 
                     <Button
-                        variant="contained"
-                        color="warning"
-                    >
-                        Edit
-                    </Button>
+                            variant="contained"
+                            color="warning"
+                            onClick={() =>
+                                handleEditProduct(
+                                    params.row
+                                )
+                            }
+                        >
+                            Edit
+                        </Button>
 
                     <Button
                         variant="contained"
@@ -970,6 +1051,7 @@ const AdminDashboardPage = () => {
                         categoryId: ""
                     });
 
+                    setEditingProductId(null);
                     setIsCreateProductOpen(false);
                 }}
                 className="relative z-50"
@@ -985,7 +1067,11 @@ const AdminDashboardPage = () => {
 
                         <DialogTitle className="text-3xl font-bold mb-8">
 
-                            Create Product
+                            {
+                                    editingProductId
+                                        ? "Edit Product"
+                                        : "Create Product"
+                                }
 
                         </DialogTitle>
 
@@ -1202,7 +1288,7 @@ const AdminDashboardPage = () => {
 
                                         categoryId: ""
                                     });
-
+                                     setEditingProductId(null);
                                     setIsCreateProductOpen(false);
                                 }}
                                 className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
@@ -1214,7 +1300,11 @@ const AdminDashboardPage = () => {
                             onClick={handleCreateProduct}
                             className="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold"
                             >
-                                Create Product
+                               {
+                                    editingProductId
+                                        ? "Update Product"
+                                        : "Create Product"
+                                }
                             </button>
 
                         </div>

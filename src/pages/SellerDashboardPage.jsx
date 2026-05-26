@@ -227,7 +227,7 @@ const SellerDashboardPage = () => {
             imageUrl: product.imageUrl,
             price: product.price,
             quantity: product.quantity,
-            categoryId: product.categoryId || ""
+            categoryId: String(product.categoryId || "")
         });
     };
 
