@@ -817,10 +817,10 @@ const navigate = useNavigate();
                         color="success"
                         size="large"
                         onClick={() =>
-                            setIsCreateCategoryOpen(true)
+                            navigate("/admin/categories")
                         }
                     >
-                        Create Category
+                        Manage Categories
                     </Button>
 
                     <button className="bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-xl font-bold text-xl shadow">
@@ -871,139 +871,7 @@ const navigate = useNavigate();
 
           
 
-            {/* Create Category Dialog */}
-            <Dialog
-                open={isCreateCategoryOpen}
-                onClose={() => {
 
-                    setCategoryName("");
-
-                    setIsCreateCategoryOpen(false);
-                }}
-                className="relative z-50"
-            >
-
-                <div className="fixed inset-0 bg-black/40" />
-
-                <div className="fixed inset-0 flex items-center justify-center p-4">
-
-                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
-
-                        <DialogTitle className="text-3xl font-bold mb-6">
-
-                            Create Category
-
-                        </DialogTitle>
-
-                        <input
-                            type="text"
-                            placeholder="Enter category name"
-                            value={categoryName}
-                            onChange={(e) =>
-                                setCategoryName(
-                                    e.target.value
-                                )
-                            }
-                            className="w-full border border-gray-300 rounded-lg p-4 text-lg mb-6"
-                        />
-
-                        <div className="flex justify-end gap-4">
-
-                            <button
-                                onClick={() => {
-
-                                    setCategoryName("");
-
-                                    setIsCreateCategoryOpen(false);
-                                }}
-                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={handleCreateCategory}
-                                className="px-6 py-3 rounded-lg bg-green-600 text-white font-semibold"
-                            >
-                                Create
-                            </button>
-
-                        </div>
-
-                    </DialogPanel>
-
-                </div>
-
-            </Dialog>
-
-            {/* Edit Category Dialog */}
-            <Dialog
-                open={isEditCategoryOpen}
-                onClose={() => {
-
-                    setSelectedCategoryId(null);
-
-                    setEditCategoryName("");
-
-                    setIsEditCategoryOpen(false);
-                }}
-                className="relative z-50"
-            >
-
-                <div className="fixed inset-0 bg-black/40" />
-
-                <div className="fixed inset-0 flex items-center justify-center p-4">
-
-                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
-
-                        <DialogTitle className="text-3xl font-bold mb-6">
-
-                            Edit Category
-
-                        </DialogTitle>
-
-                        <input
-                            type="text"
-                            placeholder="Enter category name"
-                            value={editCategoryName}
-                            onChange={(e) =>
-                                setEditCategoryName(
-                                    e.target.value
-                                )
-                            }
-                            className="w-full border border-gray-300 rounded-lg p-4 text-lg mb-6"
-                        />
-
-                        <div className="flex justify-end gap-4">
-
-                            <button
-                                onClick={() => {
-
-                                    setSelectedCategoryId(null);
-
-                                    setEditCategoryName("");
-
-                                    setIsEditCategoryOpen(false);
-                                }}
-                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={handleUpdateCategory}
-                                className="px-6 py-3 rounded-lg bg-yellow-500 text-white font-semibold"
-                            >
-                                Update
-                            </button>
-
-                        </div>
-
-                    </DialogPanel>
-
-                </div>
-
-            </Dialog>
 
         
 
