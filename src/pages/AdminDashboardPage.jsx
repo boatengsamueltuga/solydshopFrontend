@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
     FaBoxOpen,
@@ -26,7 +27,8 @@ import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 
 const AdminDashboardPage = () => {
-
+    
+const navigate = useNavigate();
     /*
     ---------------------------------------------------------------
     | State Management
@@ -799,16 +801,16 @@ const AdminDashboardPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-                    <Button
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            onClick={() =>
-                                setIsCreateProductOpen(true)
-                            }
-                        >
-                            Create Product
-                        </Button>
+              <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={() =>
+                        navigate("/admin/products")
+                    }
+                >
+                    Manage Products
+                </Button>
 
                     <Button
                         variant="contained"
@@ -867,35 +869,7 @@ const AdminDashboardPage = () => {
 
             </div>
 
-            {/* Admin Categories Section */}
-            <div className="mt-20">
-
-                <h2 className="text-4xl font-bold mb-8 text-gray-900">
-                    All Categories
-                </h2>
-
-                <div
-                    className="bg-white rounded-xl shadow"
-                    style={{ height: 450, width: "100%" }}
-                >
-
-                    <DataGrid
-                        rows={categories}
-                        columns={categoryColumns}
-                        getRowId={(row) => row.categoryId}
-                        pageSizeOptions={[5, 10]}
-                        initialState={{
-                            pagination: {
-                                paginationModel: {
-                                    pageSize: 5
-                                }
-                            }
-                        }}
-                    />
-
-                </div>
-
-            </div>
+          
 
             {/* Create Category Dialog */}
             <Dialog
@@ -1031,289 +1005,7 @@ const AdminDashboardPage = () => {
 
             </Dialog>
 
-                        {/* Create Product Dialog */}
-            <Dialog
-                open={isCreateProductOpen}
-                onClose={() => {
-
-                    setProductForm({
-
-                        productName: "",
-
-                        description: "",
-
-                        imageUrl: "",
-
-                        price: "",
-
-                        quantity: "",
-
-                        categoryId: ""
-                    });
-
-                    setEditingProductId(null);
-                    setIsCreateProductOpen(false);
-                }}
-                className="relative z-50"
-            >
-
-                {/* Backdrop */}
-                <div className="fixed inset-0 bg-black/40" />
-
-                {/* Modal Container */}
-                <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
-
-                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl">
-
-                        <DialogTitle className="text-3xl font-bold mb-8">
-
-                            {
-                                    editingProductId
-                                        ? "Edit Product"
-                                        : "Create Product"
-                                }
-
-                        </DialogTitle>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            {/* Product Name */}
-                            <input
-                                type="text"
-                                placeholder="Product Name"
-                                value={productForm.productName}
-                                onChange={(e) =>
-                                    setProductForm({
-                                        ...productForm,
-                                        productName: e.target.value
-                                    })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            />
-
-                            {/* Price */}
-                            <input
-                                type="number"
-                                placeholder="Price"
-                                value={productForm.price}
-                                onChange={(e) =>
-                                    setProductForm({
-                                        ...productForm,
-                                        price: e.target.value
-                                    })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            />
-
-                            {/* Quantity */}
-                            <input
-                                type="number"
-                                placeholder="Quantity"
-                                value={productForm.quantity}
-                                onChange={(e) =>
-                                    setProductForm({
-                                        ...productForm,
-                                        quantity: e.target.value
-                                    })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            />
-
-                           {/* Upload Product Image */}
-                            <div>
-
-                                <input
-                                    type="file"
-                                    id="productImageInput"
-                                    hidden
-                                    accept="image/*"
-                                    onChange={async (e) => {
-
-                                        const file = e.target.files[0];
-
-                                        if (!file) {
-
-                                            return;
-                                        }
-
-                                        try {
-
-                                            const formData =
-                                                new FormData();
-
-                                            formData.append(
-                                                "file",
-                                                file
-                                            );
-
-                                            const response =
-                                                await api.post(
-                                                    "/upload",
-                                                    formData,
-                                                    {
-                                                        headers: {
-                                                            "X-XSRF-TOKEN":
-                                                                document.cookie
-                                                                    .split("; ")
-                                                                    .find(row =>
-                                                                        row.startsWith(
-                                                                            "XSRF-TOKEN="
-                                                                        )
-                                                                    )
-                                                                    ?.split("=")[1]
-                                                        }
-                                                    }
-                                                );
-
-                                            const imageUrl =
-                                                response.data;
-
-                                            setProductForm({
-
-                                                ...productForm,
-
-                                                imageUrl
-                                            });
-
-                                            toast.success(
-                                                "Image uploaded successfully"
-                                            );
-
-                                        } catch (error) {
-
-                                            console.log(error);
-
-                                            toast.error(
-                                                "Image upload failed"
-                                            );
-                                        }
-                                    }}
-                                />
-
-                                <button
-                                    type="button"
-                                    className="border border-gray-300 rounded-lg p-4 bg-gray-100 hover:bg-gray-200 text-left w-full"
-                                    onClick={() =>
-                                        document
-                                            .getElementById(
-                                                "productImageInput"
-                                            )
-                                            .click()
-                                    }
-                                >
-                                    Upload Product Image
-                                </button>
-
-                            </div>
-                              {/* Uploaded Product Image Preview */}
-                                    {
-                                        productForm.imageUrl && (
-
-                                            <div className="md:col-span-2 flex justify-center">
-
-                                                <div className="w-72 h-48 border rounded-lg overflow-hidden bg-gray-100">
-
-                                                    <img
-                                                        src={productForm.imageUrl}
-                                                        alt="Preview"
-                                                        className="w-full h-full object-cover"
-                                                    />
-
-                                                </div>
-
-                                            </div>
-                                        )
-                                    }
-                            {/* Category Dropdown */}
-                            <select
-                                value={productForm.categoryId}
-                                onChange={(e) =>
-                                    setProductForm({
-                                        ...productForm,
-                                        categoryId: e.target.value
-                                    })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            >
-
-                                <option value="">
-                                    Select Category
-                                </option>
-
-                                {categories.map((category) => (
-
-                                    <option
-                                        key={category.categoryId}
-                                        value={category.categoryId}
-                                    >
-                                        {category.categoryName}
-                                    </option>
-
-                                ))}
-
-                            </select>
-
-                        </div>
-
-                        {/* Description */}
-                        <textarea
-                            placeholder="Product Description"
-                            value={productForm.description}
-                            onChange={(e) =>
-                                setProductForm({
-                                    ...productForm,
-                                    description: e.target.value
-                                })
-                            }
-                            className="w-full border border-gray-300 rounded-lg p-4 mt-6 h-40"
-                        />
-
-                        {/* Dialog Actions */}
-                        <div className="flex justify-end gap-4 mt-8">
-
-                            <button
-                                onClick={() => {
-
-                                    setProductForm({
-
-                                        productName: "",
-
-                                        description: "",
-
-                                        imageUrl: "",
-
-                                        price: "",
-
-                                        quantity: "",
-
-                                        categoryId: ""
-                                    });
-                                     setEditingProductId(null);
-                                    setIsCreateProductOpen(false);
-                                }}
-                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                            onClick={handleCreateProduct}
-                            className="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold"
-                            >
-                               {
-                                    editingProductId
-                                        ? "Update Product"
-                                        : "Create Product"
-                                }
-                            </button>
-
-                        </div>
-
-                    </DialogPanel>
-
-                </div>
-
-            </Dialog>
+        
 
         </div>
     );
