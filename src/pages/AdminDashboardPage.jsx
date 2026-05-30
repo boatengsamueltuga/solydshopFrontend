@@ -822,12 +822,16 @@ const navigate = useNavigate();
                     >
                         Manage Categories
                     </Button>
-
-                    <button className="bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-xl font-bold text-xl shadow">
-
+                   <Button
+                        variant="contained"
+                        color="warning"
+                        size="large"
+                        onClick={() =>
+                            navigate("/admin/orders")
+                        }
+                    >
                         Manage Orders
-
-                    </button>
+                    </Button>
 
                     <button className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl font-bold text-xl shadow">
 
