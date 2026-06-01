@@ -30,6 +30,18 @@ const AdminProductsPage = () => {
     const [editingProductId, setEditingProductId] =
         useState(null);
 
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    const [isViewProductOpen, setIsViewProductOpen] = useState(false);
+
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const [productForm, setProductForm] =
         useState({
 
@@ -164,6 +176,13 @@ const handleEditProduct = (product) => {
     setIsCreateProductOpen(true);
 };
 
+    const handleViewProduct = (product) => {
+
+        setSelectedProduct(product);
+
+        setIsViewProductOpen(true);
+    };
+
 const handleCreateProduct = async () => {
 
     if (
@@ -279,14 +298,14 @@ const columns = [
     {
         field: "image",
         headerName: "Image",
-        width: 120,
+        width: isMobile ? 70 : 120,
 
         renderCell: (params) => (
 
             <img
                 src={params.row.imageUrl}
                 alt={params.row.productName}
-                className="w-16 h-16 object-cover rounded"
+                className={`${isMobile ? "w-10 h-10" : "w-14 h-14"} object-cover rounded`}
             />
         )
     },
@@ -294,13 +313,21 @@ const columns = [
     {
         field: "productName",
         headerName: "Product Name",
-        width: 250
+        minWidth: isMobile ? 120 : 220,
+        flex: 1
     },
+
+    ...(!isMobile ? [{
+        field: "categoryName",
+        headerName: "Category",
+        minWidth: 180,
+        flex: 1
+    }] : []),
 
     {
         field: "price",
         headerName: "Price",
-        width: 120,
+        width: isMobile ? 80 : 120,
 
         renderCell: (params) => (
 
@@ -310,24 +337,48 @@ const columns = [
         )
     },
 
-    {
+    ...(!isMobile ? [{
         field: "quantity",
         headerName: "Stock",
-        width: 120
-    },
+        width: 100,
+    }] : []),
 
     {
         field: "actions",
         headerName: "Actions",
-        width: 250,
+        width: isMobile ? 130 : 220,
 
         renderCell: (params) => (
 
-            <div className="flex gap-3 mt-2">
+            <div className="flex gap-1 items-center">
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    sx={{
+                        minWidth: isMobile ? 40 : 60,
+                        fontSize: isMobile ? "10px" : "11px",
+                        padding: isMobile ? "3px 6px" : "4px 8px"
+                    }}
+                    onClick={() =>
+                        handleViewProduct(
+                            params.row
+                        )
+                    }
+                >
+                    View
+                </Button>
 
                 <Button
                     variant="contained"
                     color="warning"
+                    size="small"
+                    sx={{
+                        minWidth: isMobile ? 40 : 60,
+                        fontSize: isMobile ? "10px" : "11px",
+                        padding: isMobile ? "3px 6px" : "4px 8px"
+                    }}
                     onClick={() =>
                         handleEditProduct(
                             params.row
@@ -340,6 +391,12 @@ const columns = [
                 <Button
                     variant="contained"
                     color="error"
+                    size="small"
+                    sx={{
+                        minWidth: isMobile ? 40 : 70,
+                        fontSize: isMobile ? "10px" : "11px",
+                        padding: isMobile ? "3px 6px" : "4px 8px"
+                    }}
                     onClick={() =>
                         handleDeleteProduct(
                             params.row.productId
@@ -352,6 +409,7 @@ const columns = [
             </div>
         )
     }
+
 ];
 
     if (loading) {
@@ -371,17 +429,17 @@ const columns = [
     }
 return (
 
-    <div className="p-10 bg-gray-100 min-h-screen">
+    <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
+       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-10">
 
-        <div className="flex justify-between items-center mb-10">
-
-            <h1 className="text-5xl font-bold">
+           <h1 className="text-3xl md:text-5xl font-bold">
                 Product Management
             </h1>
 
             <Button
                 variant="contained"
                 color="primary"
+                size="small"
                 onClick={() =>
                     setIsCreateProductOpen(true)
                 }
@@ -391,17 +449,18 @@ return (
 
         </div>
 
-        <div
-            className="bg-white rounded-xl shadow"
+            <div
+            className="bg-white rounded-xl shadow overflow-x-auto"
             style={{
-                height: 600,
+                height: isMobile ? 450 : 600,
                 width: "100%"
             }}
-        >
+         >
 
-            <DataGrid
+           <DataGrid
                 rows={products}
                 columns={columns}
+                disableRowSelectionOnClick
                 getRowId={(row) => row.productId}
                 pageSizeOptions={[5, 10, 20]}
                 initialState={{
@@ -409,6 +468,16 @@ return (
                         paginationModel: {
                             pageSize: 5
                         }
+                    }
+                }}
+                sx={{
+                    "& .MuiDataGrid-columnHeaderTitle": {
+                        fontWeight: "bold",
+                        fontSize: isMobile ? "12px" : "16px"
+                    },
+                    "& .MuiDataGrid-cell": {
+                        fontSize: isMobile ? "12px" : "14px",
+                        padding: isMobile ? "4px 6px" : "8px 10px"
                     }
                 }}
             />
@@ -446,9 +515,9 @@ return (
                 {/* Modal Container */}
                 <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
 
-                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl">
+                    <DialogPanel className="bg-white rounded-2xl p-4 sm:p-8 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
 
-                        <DialogTitle className="text-3xl font-bold mb-8">
+                        <DialogTitle className="text-xl sm:text-3xl font-bold mb-4 sm:mb-8">
 
                             {
                                     editingProductId
@@ -648,11 +717,11 @@ return (
                                     description: e.target.value
                                 })
                             }
-                            className="w-full border border-gray-300 rounded-lg p-4 mt-6 h-40"
+                            className="w-full border border-gray-300 rounded-lg p-3 sm:p-4 mt-4 sm:mt-6 h-32 sm:h-40"
                         />
 
                         {/* Dialog Actions */}
-                        <div className="flex justify-end gap-4 mt-8">
+                        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-6 sm:mt-8">
 
                             <button
                                 onClick={() => {
@@ -699,7 +768,7 @@ return (
             </Dialog>
     </div>
 );
-   
+
 };
 
 export default AdminProductsPage;
