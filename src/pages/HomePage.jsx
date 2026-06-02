@@ -171,14 +171,14 @@ const HomePage = () => {
 
     return (
 
-        <div className="p-10 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
 
-            <h1 className="text-5xl font-bold mb-10">
+            <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10">
                 Products
             </h1>
 
             {/* Search and filter section */}
-            <div className="flex flex-col md:flex-row gap-5 mb-10">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-5 mb-6 md:mb-10">
 
                 {/* Search input */}
                 <input
@@ -222,7 +222,7 @@ const HomePage = () => {
                     onClick={() =>
                         fetchProducts()
                     }
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded font-bold"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded font-bold w-full md:w-auto"
                 >
                     Search
                 </button>
@@ -242,13 +242,13 @@ const HomePage = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
 
                 {products.map((product) => (
 
                     <div
                         key={product.productId}
-                        className="bg-white rounded-lg shadow-lg overflow-hidden hover:scale-105 transition duration-300"
+                        className="bg-white rounded-lg shadow-lg overflow-hidden hover:scale-105 transition duration-300 flex flex-col"
                     >
 
                         <img
@@ -257,13 +257,13 @@ const HomePage = () => {
                             className="w-full h-44 object-cover"
                         />
 
-                        <div className="p-4">
+                        <div className="p-4 flex flex-col flex-1">
 
-                            <h2 className="text-xl font-bold">
+                            <h2 className="text-lg md:text-xl font-bold line-clamp-2">
                                 {product.productName}
                             </h2>
 
-                            <p className="text-gray-600 mt-3">
+                            <p className="text-gray-600 mt-3 text-sm md:text-base line-clamp-3">
                                 {product.description}
                             </p>
 
