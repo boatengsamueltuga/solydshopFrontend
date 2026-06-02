@@ -28,10 +28,14 @@ const AdminOrdersPage = () => {
     const [newStatus, setNewStatus] =
     useState("");
 
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 480);
+    const [isCompact, setIsCompact] = useState(window.innerWidth < 1100);
 
     useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 480);
+            setIsCompact(window.innerWidth < 1100);
+        };
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
@@ -109,27 +113,28 @@ const AdminOrdersPage = () => {
     {
         field: "orderId",
         headerName: "Order ID",
-        width: isMobile ? 70 : 100
+        width: isMobile ? 70 : 90
     },
 
     {
         field: "customerName",
         headerName: "Customer",
-        minWidth: isMobile ? 120 : 160,
+        minWidth: isMobile ? 120 : 150,
         flex: 1
     },
 
-    ...(!isMobile ? [{
+    // Only show email on wide desktops (>= 1100px)
+    ...(!isCompact ? [{
         field: "customerEmail",
         headerName: "Customer Email",
         minWidth: 180,
-        flex: 1.5
+        flex: 1.2
     }] : []),
 
     {
         field: "totalAmount",
         headerName: "Total",
-        width: isMobile ? 80 : 120,
+        width: isMobile ? 80 : 110,
 
         renderCell: (params) => (
 
@@ -139,16 +144,17 @@ const AdminOrdersPage = () => {
         )
     },
 
+    // Hide status on mobile only
     ...(!isMobile ? [{
         field: "status",
         headerName: "Status",
-        width: 130
+        width: 120
     }] : []),
 
     {
         field: "actions",
         headerName: "Actions",
-        width: isMobile ? 80 : 110,
+        width: isMobile ? 80 : 100,
 
         renderCell: (params) => (
 
@@ -156,7 +162,7 @@ const AdminOrdersPage = () => {
                 variant="contained"
                 color="primary"
                 size="small"
-                sx={{ minWidth: isMobile ? 55 : 70, fontSize: isMobile ? "10px" : "13px" }}
+                sx={{ minWidth: isMobile ? 55 : 65, fontSize: isMobile ? "10px" : "13px" }}
                 onClick={() =>
                     handleViewOrder(params.row)
                 }
@@ -185,7 +191,7 @@ const AdminOrdersPage = () => {
 
     return (
 
-        <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full overflow-x-hidden">
 
             <div className="mb-6 md:mb-10">
 
@@ -196,9 +202,10 @@ const AdminOrdersPage = () => {
             </div>
 
             <div
-                className="bg-white rounded-xl shadow w-full overflow-x-auto min-w-0"
+                className="bg-white rounded-xl shadow overflow-x-auto min-w-0"
                 style={{
-                    height: isMobile ? 450 : 600
+                    height: isMobile ? 450 : 600,
+                    width: "100%"
                 }}
 >
 
@@ -206,6 +213,7 @@ const AdminOrdersPage = () => {
                     rows={orders}
                     columns={columns}
                     getRowId={(row) => row.orderId}
+                    disableRowSelectionOnClick
                     pageSizeOptions={[5, 10]}
                     initialState={{
                         pagination: {
