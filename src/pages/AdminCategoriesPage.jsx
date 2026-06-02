@@ -37,6 +37,14 @@ const AdminCategoriesPage = () => {
     const [editCategoryName, setEditCategoryName] =
         useState("");
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const fetchCategories = async () => {
 
         try {
@@ -199,30 +207,33 @@ const AdminCategoriesPage = () => {
 
     const categoryColumns = [
 
-        {
+        ...(!isMobile ? [{
             field: "categoryId",
             headerName: "ID",
-            width: 120
-        },
+            width: 80
+        }] : []),
 
         {
             field: "categoryName",
             headerName: "Category Name",
-            width: 300
+            minWidth: 150,
+            flex: 1
         },
 
         {
             field: "actions",
             headerName: "Actions",
-            width: 250,
+            width: isMobile ? 150 : 220,
 
             renderCell: (params) => (
 
-                <div className="flex gap-3 mt-2">
+                <div className="flex gap-2 mt-2">
 
                     <Button
                         variant="contained"
                         color="warning"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 40 : 60, fontSize: isMobile ? "10px" : "13px" }}
                         onClick={() =>
                             openEditCategoryDialog(
                                 params.row
@@ -235,6 +246,8 @@ const AdminCategoriesPage = () => {
                     <Button
                         variant="contained"
                         color="error"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 50 : 70, fontSize: isMobile ? "10px" : "13px" }}
                         onClick={() =>
                             handleDeleteCategory(
                                 params.row.categoryId
@@ -267,17 +280,18 @@ const AdminCategoriesPage = () => {
 
     return (
 
-        <div className="p-10 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
 
-            <div className="flex justify-between items-center mb-10">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 md:mb-10">
 
-                <h1 className="text-5xl font-bold">
+                <h1 className="text-3xl md:text-5xl font-bold">
                     Category Management
                 </h1>
 
                 <Button
                     variant="contained"
                     color="success"
+                    sx={{ alignSelf: { xs: "flex-start", sm: "auto" } }}
                     onClick={() =>
                         setIsCreateCategoryOpen(true)
                     }
@@ -288,9 +302,9 @@ const AdminCategoriesPage = () => {
             </div>
 
             <div
-                className="bg-white rounded-xl shadow"
+                className="bg-white rounded-xl shadow overflow-x-auto min-w-0"
                 style={{
-                    height: 500,
+                    height: isMobile ? 420 : 500,
                     width: "100%"
                 }}
             >
@@ -299,12 +313,23 @@ const AdminCategoriesPage = () => {
                     rows={categories}
                     columns={categoryColumns}
                     getRowId={(row) => row.categoryId}
+                    disableRowSelectionOnClick
                     pageSizeOptions={[5, 10]}
                     initialState={{
                         pagination: {
                             paginationModel: {
                                 pageSize: 5
                             }
+                        }
+                    }}
+                    sx={{
+                        "& .MuiDataGrid-columnHeaderTitle": {
+                            fontWeight: "bold",
+                            fontSize: isMobile ? "12px" : "14px"
+                        },
+                        "& .MuiDataGrid-cell": {
+                            fontSize: isMobile ? "12px" : "14px",
+                            padding: isMobile ? "4px 6px" : "8px 10px"
                         }
                     }}
                 />

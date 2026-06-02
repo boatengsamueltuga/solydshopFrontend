@@ -280,9 +280,9 @@ const SellerDashboardPage = () => {
 
     return (
 
-        <div className="p-10 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
 
-            <h1 className="text-5xl font-bold mb-10">
+            <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10">
                 Seller Dashboard
             </h1>
 
@@ -301,9 +301,9 @@ const SellerDashboardPage = () => {
             )}
 
             {/* Product Form */}
-            <div className="bg-white p-8 rounded-lg shadow mb-12">
+            <div className="bg-white p-4 md:p-8 rounded-lg shadow mb-8 md:mb-12">
 
-                <h2 className="text-3xl font-bold mb-6">
+                <h2 className="text-xl md:text-3xl font-bold mb-4 md:mb-6">
 
                     {editingProductId
                         ? "Edit Product"
@@ -447,11 +447,11 @@ const SellerDashboardPage = () => {
             {/* Seller Products */}
             <div>
 
-                <h2 className="text-4xl font-bold mb-8">
+                <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8">
                     My Products
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
 
                     {products.map((product) => (
 
@@ -466,17 +466,17 @@ const SellerDashboardPage = () => {
                                 className="w-full h-52 object-cover"
                             />
 
-                            <div className="p-5">
+                            <div className="p-4 md:p-5">
 
-                                <h3 className="text-2xl font-bold">
+                                <h3 className="text-lg md:text-2xl font-bold line-clamp-2">
                                     {product.productName}
                                 </h3>
 
-                                <p className="text-gray-600 mt-3">
+                                <p className="text-gray-600 mt-2 text-sm md:text-base line-clamp-3">
                                     {product.description}
                                 </p>
 
-                                <p className="mt-3 text-2xl font-bold text-green-700">
+                                <p className="mt-3 text-xl md:text-2xl font-bold text-green-700">
                                     ${product.price}
                                 </p>
 

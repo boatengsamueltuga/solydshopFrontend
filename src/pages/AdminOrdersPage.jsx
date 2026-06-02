@@ -28,6 +28,14 @@ const AdminOrdersPage = () => {
     const [newStatus, setNewStatus] =
     useState("");
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const fetchOrders = async () => {
 
         try {
@@ -101,25 +109,27 @@ const AdminOrdersPage = () => {
     {
         field: "orderId",
         headerName: "Order ID",
-        flex: 0.8
+        width: isMobile ? 70 : 100
     },
 
     {
         field: "customerName",
-        headerName: "Customer Name",
-        flex: 2
+        headerName: "Customer",
+        minWidth: isMobile ? 120 : 160,
+        flex: 1
     },
 
-    {
+    ...(!isMobile ? [{
         field: "customerEmail",
         headerName: "Customer Email",
-        flex: 2
-    },
+        minWidth: 180,
+        flex: 1.5
+    }] : []),
 
     {
         field: "totalAmount",
-        headerName: "Total Amount",
-        flex: 1.2,
+        headerName: "Total",
+        width: isMobile ? 80 : 120,
 
         renderCell: (params) => (
 
@@ -129,16 +139,16 @@ const AdminOrdersPage = () => {
         )
     },
 
-    {
-    field: "status",
-    headerName: "Status",
-    width: 140,
-    },
+    ...(!isMobile ? [{
+        field: "status",
+        headerName: "Status",
+        width: 130
+    }] : []),
 
     {
-    field: "actions",
-    headerName: "Actions",
-    width: 120,
+        field: "actions",
+        headerName: "Actions",
+        width: isMobile ? 80 : 110,
 
         renderCell: (params) => (
 
@@ -146,9 +156,7 @@ const AdminOrdersPage = () => {
                 variant="contained"
                 color="primary"
                 size="small"
-                sx={{
-                    minWidth: 70
-                }}
+                sx={{ minWidth: isMobile ? 55 : 70, fontSize: isMobile ? "10px" : "13px" }}
                 onClick={() =>
                     handleViewOrder(params.row)
                 }
@@ -177,20 +185,20 @@ const AdminOrdersPage = () => {
 
     return (
 
-        <div className="p-6 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
 
-            <div className="flex justify-between items-center mb-10">
+            <div className="mb-6 md:mb-10">
 
-                <h1 className="text-5xl font-bold">
+                <h1 className="text-3xl md:text-5xl font-bold">
                     Order Management
                 </h1>
 
             </div>
 
-              <div
-                className="bg-white rounded-xl shadow w-full"
+            <div
+                className="bg-white rounded-xl shadow w-full overflow-x-auto min-w-0"
                 style={{
-                    height: 600
+                    height: isMobile ? 450 : 600
                 }}
 >
 
@@ -209,7 +217,11 @@ const AdminOrdersPage = () => {
                     sx={{
                         "& .MuiDataGrid-columnHeaderTitle": {
                             fontWeight: "bold",
-                            fontSize: "16px"
+                            fontSize: isMobile ? "12px" : "14px"
+                        },
+                        "& .MuiDataGrid-cell": {
+                            fontSize: isMobile ? "12px" : "14px",
+                            padding: isMobile ? "4px 6px" : "8px 10px"
                         }
                     }}
                 />
@@ -230,7 +242,7 @@ const AdminOrdersPage = () => {
 
                     <DialogPanel className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
 
-                        <DialogTitle className="text-3xl font-bold mb-6">
+                        <DialogTitle className="text-xl md:text-3xl font-bold mb-4 md:mb-6">
 
                             Order #{selectedOrder?.orderId}
 
@@ -333,7 +345,7 @@ const AdminOrdersPage = () => {
 
                         </div>
 
-                        <div className="flex justify-end gap-3 mt-6">
+                        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6">
 
                         <Button
                             variant="contained"
