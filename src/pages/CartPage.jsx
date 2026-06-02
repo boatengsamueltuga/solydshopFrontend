@@ -219,9 +219,9 @@ const CartPage = () => {
 
     return (
 
-        <div className="p-10 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
 
-            <h1 className="text-5xl font-bold mb-10">
+            <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10">
                 My Cart
             </h1>
 
@@ -241,7 +241,7 @@ const CartPage = () => {
 
             {cart?.items?.length === 0 ? (
 
-                <div className="bg-white p-10 rounded-lg shadow text-center">
+                <div className="bg-white p-6 md:p-10 rounded-lg shadow text-center">
 
                     <h2 className="text-3xl font-bold text-gray-700">
                         Cart is empty
@@ -261,12 +261,12 @@ const CartPage = () => {
 
                         <div
                             key={item.productId}
-                            className="bg-white p-6 rounded-lg shadow flex justify-between items-center"
+                            className="bg-white p-4 md:p-6 rounded-lg shadow flex flex-col sm:flex-row justify-between sm:items-center gap-4"
                         >
 
                             <div>
 
-                                <h2 className="text-2xl font-bold">
+                                <h2 className="text-xl md:text-2xl font-bold">
                                     {item.productName}
                                 </h2>
 
@@ -302,9 +302,9 @@ const CartPage = () => {
 
                             </div>
 
-                            <div className="text-right">
+                            <div className="sm:text-right">
 
-                                <p className="text-2xl font-bold text-green-700">
+                                <p className="text-xl md:text-2xl font-bold text-green-700">
                                     ${item.price}
                                 </p>
 
@@ -324,9 +324,9 @@ const CartPage = () => {
                         </div>
                     ))}
 
-                    <div className="bg-white p-6 rounded-lg shadow mt-10 flex justify-between items-center">
+                    <div className="bg-white p-4 md:p-6 rounded-lg shadow mt-6 md:mt-10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
 
-                        <h2 className="text-3xl font-bold">
+                        <h2 className="text-2xl md:text-3xl font-bold">
                             Total: ${cart?.totalPrice || 0}
                         </h2>
 

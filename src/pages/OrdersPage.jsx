@@ -70,9 +70,9 @@ const OrdersPage = () => {
 
     return (
 
-        <div className="p-10 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
 
-            <h1 className="text-5xl font-bold mb-10">
+            <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10">
                 My Orders
             </h1>
 
@@ -90,14 +90,14 @@ const OrdersPage = () => {
 
                         <div
                             key={order.orderId}
-                            className="bg-white p-8 rounded-lg shadow"
+                            className="bg-white p-4 md:p-8 rounded-lg shadow"
                         >
 
-                            <div className="flex justify-between items-center mb-6">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4 md:mb-6">
 
                                 <div>
 
-                                    <h2 className="text-3xl font-bold">
+                                    <h2 className="text-xl md:text-3xl font-bold">
                                         Order #{order.orderId}
                                     </h2>
 
@@ -110,7 +110,7 @@ const OrdersPage = () => {
 
                                 </div>
 
-                                <h2 className="text-3xl font-bold text-green-700">
+                                <h2 className="text-xl md:text-3xl font-bold text-green-700">
                                     ${order.totalAmount}
                                 </h2>
 
@@ -122,12 +122,12 @@ const OrdersPage = () => {
 
                                     <div
                                         key={item.productId}
-                                        className="border p-4 rounded flex justify-between items-center"
+                                        className="border p-3 md:p-4 rounded flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
                                     >
 
                                         <div>
 
-                                            <h3 className="text-2xl font-bold">
+                                            <h3 className="text-lg md:text-2xl font-bold">
                                                 {item.productName}
                                             </h3>
 
@@ -137,7 +137,7 @@ const OrdersPage = () => {
 
                                         </div>
 
-                                        <p className="text-2xl font-bold text-green-700">
+                                        <p className="text-lg md:text-2xl font-bold text-green-700">
                                             ${item.price}
                                         </p>
 
