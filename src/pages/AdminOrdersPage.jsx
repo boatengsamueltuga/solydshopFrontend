@@ -15,6 +15,8 @@ import Loader from "../components/Loader";
 
 import toast from "react-hot-toast";
 
+import { FaEye, FaSyncAlt, FaTimes } from "react-icons/fa";
+
 const AdminOrdersPage = () => {
 
     const [orders, setOrders] = useState([]);
@@ -162,7 +164,8 @@ const AdminOrdersPage = () => {
                 variant="contained"
                 color="primary"
                 size="small"
-                sx={{ minWidth: isMobile ? 55 : 65, fontSize: isMobile ? "10px" : "13px" }}
+                startIcon={<FaEye />}
+                sx={{ minWidth: isMobile ? 50 : 60, fontSize: "11px", py: 0.5 }}
                 onClick={() =>
                     handleViewOrder(params.row)
                 }
@@ -248,15 +251,15 @@ const AdminOrdersPage = () => {
 
                 <div className="fixed inset-0 flex items-center justify-center p-4">
 
-                    <DialogPanel className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogPanel className="bg-white rounded-xl p-4 w-full max-w-lg max-h-[65vh] overflow-y-auto">
 
-                        <DialogTitle className="text-xl md:text-3xl font-bold mb-4 md:mb-6">
+                        <DialogTitle className="text-base md:text-xl font-bold mb-3">
 
                             Order #{selectedOrder?.orderId}
 
                         </DialogTitle>
 
-                        <div className="space-y-3">
+                        <div className="space-y-2 text-sm">
 
                             <p>
                                 <strong>Customer:</strong>{" "}
@@ -317,9 +320,9 @@ const AdminOrdersPage = () => {
 
                         </div>
 
-                        <div className="mt-6">
+                        <div className="mt-3">
 
-                            <h3 className="text-xl font-bold mb-4">
+                            <h3 className="text-sm font-bold mb-2">
                                 Order Items
                             </h3>
 
@@ -328,7 +331,7 @@ const AdminOrdersPage = () => {
 
                                     <div
                                         key={index}
-                                        className="border rounded-lg p-3 mb-2"
+                                        className="border rounded-lg p-2 mb-2 text-sm"
                                     >
 
                                         <p className="font-semibold">
@@ -353,26 +356,32 @@ const AdminOrdersPage = () => {
 
                         </div>
 
-                        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6">
+                        <div className="flex flex-row justify-end gap-2 mt-4">
 
-                        <Button
-                            variant="contained"
-                            color="success"
-                            onClick={handleUpdateStatus}
-                        >
-                            Update Status
-                        </Button>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                size="small"
+                                startIcon={<FaSyncAlt />}
+                                sx={{ fontSize: "11px", py: 0.5 }}
+                                onClick={handleUpdateStatus}
+                            >
+                                Update Status
+                            </Button>
 
-                        <Button
-                            variant="contained"
-                            onClick={() =>
-                                setIsOrderDialogOpen(false)
-                            }
-                        >
-                            Close
-                        </Button>
+                            <Button
+                                variant="contained"
+                                size="small"
+                                startIcon={<FaTimes />}
+                                sx={{ fontSize: "11px", py: 0.5 }}
+                                onClick={() =>
+                                    setIsOrderDialogOpen(false)
+                                }
+                            >
+                                Close
+                            </Button>
 
-                    </div>
+                        </div>
 
                     </DialogPanel>
 
