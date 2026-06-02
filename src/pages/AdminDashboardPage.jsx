@@ -39,6 +39,8 @@ const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
 
+    const [orders, setOrders] = useState([]);
+
     const [loading, setLoading] = useState(true);
 
     /*
@@ -176,11 +178,27 @@ const navigate = useNavigate();
     ---------------------------------------------------------------
     */
 
+    const fetchOrders = async () => {
+
+        try {
+
+            const response = await api.get("/order/admin");
+
+            setOrders(response.data);
+
+        } catch (error) {
+
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
 
         fetchProducts();
 
         fetchCategories();
+
+        fetchOrders();
 
     }, []);
 
@@ -775,7 +793,7 @@ const navigate = useNavigate();
                             </p>
 
                             <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
-                                0
+                                {orders.length}
                             </h2>
 
                         </div>
