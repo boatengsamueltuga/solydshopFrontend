@@ -101,7 +101,15 @@ const navigate = useNavigate();
     */
 
     const [editingProductId, setEditingProductId] =
-        useState(null); 
+        useState(null);
+
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
     /*
     ---------------------------------------------------------------
     | Fetch Products
@@ -527,14 +535,14 @@ const navigate = useNavigate();
         {
             field: "image",
             headerName: "Image",
-            width: 120,
+            width: isMobile ? 70 : 120,
 
             renderCell: (params) => (
 
                 <img
                     src={params.row.imageUrl}
                     alt={params.row.productName}
-                    className="w-16 h-16 object-cover rounded"
+                    className={`${isMobile ? "w-10 h-10" : "w-14 h-14"} object-cover rounded`}
                 />
             )
         },
@@ -542,13 +550,14 @@ const navigate = useNavigate();
         {
             field: "productName",
             headerName: "Product Name",
-            width: 250
+            minWidth: isMobile ? 120 : 200,
+            flex: 1
         },
 
         {
             field: "price",
             headerName: "Price",
-            width: 120,
+            width: isMobile ? 80 : 120,
 
             renderCell: (params) => (
 
@@ -558,36 +567,40 @@ const navigate = useNavigate();
             )
         },
 
-        {
+        ...(!isMobile ? [{
             field: "quantity",
             headerName: "Stock",
-            width: 120
-        },
+            width: 100
+        }] : []),
 
         {
             field: "actions",
             headerName: "Actions",
-            width: 250,
+            width: isMobile ? 150 : 220,
 
             renderCell: (params) => (
 
-                <div className="flex gap-3 mt-2">
+                <div className="flex gap-2 mt-2">
 
                     <Button
-                            variant="contained"
-                            color="warning"
-                            onClick={() =>
-                                handleEditProduct(
-                                    params.row
-                                )
-                            }
-                        >
-                            Edit
-                        </Button>
+                        variant="contained"
+                        color="warning"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 40 : 60, fontSize: isMobile ? "10px" : "13px" }}
+                        onClick={() =>
+                            handleEditProduct(
+                                params.row
+                            )
+                        }
+                    >
+                        Edit
+                    </Button>
 
                     <Button
                         variant="contained"
                         color="error"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 50 : 70, fontSize: isMobile ? "10px" : "13px" }}
                         onClick={() =>
                             handleDeleteProduct(
                                 params.row.productId
@@ -610,30 +623,33 @@ const navigate = useNavigate();
 
     const categoryColumns = [
 
-        {
+        ...(!isMobile ? [{
             field: "categoryId",
             headerName: "ID",
-            width: 120
-        },
+            width: 80
+        }] : []),
 
         {
             field: "categoryName",
             headerName: "Category Name",
-            width: 300
+            minWidth: 150,
+            flex: 1
         },
 
         {
             field: "actions",
             headerName: "Actions",
-            width: 250,
+            width: isMobile ? 150 : 220,
 
             renderCell: (params) => (
 
-                <div className="flex gap-3 mt-2">
+                <div className="flex gap-2 mt-2">
 
                     <Button
                         variant="contained"
                         color="warning"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 40 : 60, fontSize: isMobile ? "10px" : "13px" }}
                         onClick={() =>
                             openEditCategoryDialog(
                                 params.row
@@ -646,6 +662,8 @@ const navigate = useNavigate();
                     <Button
                         variant="contained"
                         color="error"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 50 : 70, fontSize: isMobile ? "10px" : "13px" }}
                         onClick={() =>
                             handleDeleteCategory(
                                 params.row.categoryId
@@ -684,23 +702,23 @@ const navigate = useNavigate();
 
     return (
 
-        <div className="p-10 bg-gray-100 min-h-screen">
+        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
 
             {/* Dashboard Header */}
-            <div className="mb-12">
+            <div className="mb-8 md:mb-12">
 
-                <h1 className="text-5xl font-bold text-gray-900">
+                <h1 className="text-3xl md:text-5xl font-bold text-gray-900">
                     Admin Dashboard
                 </h1>
 
-                <p className="text-xl text-gray-600 mt-4">
+                <p className="text-base md:text-xl text-gray-600 mt-2 md:mt-4">
                     Platform Management Overview
                 </p>
 
             </div>
 
             {/* Dashboard Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-14">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-8 md:mb-14">
 
                 <div className="bg-white rounded-xl shadow p-6">
 
@@ -708,17 +726,17 @@ const navigate = useNavigate();
 
                         <div>
 
-                            <p className="text-lg text-gray-500">
+                            <p className="text-sm md:text-lg text-gray-500">
                                 Products
                             </p>
 
-                            <h2 className="text-4xl font-bold mt-3">
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
                                 {products.length}
                             </h2>
 
                         </div>
 
-                        <FaBoxOpen className="text-5xl text-blue-600" />
+                        <FaBoxOpen className="text-3xl md:text-5xl text-blue-600" />
 
                     </div>
 
@@ -730,17 +748,17 @@ const navigate = useNavigate();
 
                         <div>
 
-                            <p className="text-lg text-gray-500">
+                            <p className="text-sm md:text-lg text-gray-500">
                                 Categories
                             </p>
 
-                            <h2 className="text-4xl font-bold mt-3">
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
                                 {categories.length}
                             </h2>
 
                         </div>
 
-                        <FaTags className="text-5xl text-green-600" />
+                        <FaTags className="text-3xl md:text-5xl text-green-600" />
 
                     </div>
 
@@ -752,17 +770,17 @@ const navigate = useNavigate();
 
                         <div>
 
-                            <p className="text-lg text-gray-500">
+                            <p className="text-sm md:text-lg text-gray-500">
                                 Orders
                             </p>
 
-                            <h2 className="text-4xl font-bold mt-3">
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
                                 0
                             </h2>
 
                         </div>
 
-                        <FaShoppingCart className="text-5xl text-yellow-500" />
+                        <FaShoppingCart className="text-3xl md:text-5xl text-yellow-500" />
 
                     </div>
 
@@ -774,17 +792,17 @@ const navigate = useNavigate();
 
                         <div>
 
-                            <p className="text-lg text-gray-500">
+                            <p className="text-sm md:text-lg text-gray-500">
                                 Users
                             </p>
 
-                            <h2 className="text-4xl font-bold mt-3">
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
                                 0
                             </h2>
 
                         </div>
 
-                        <FaUsers className="text-5xl text-purple-600" />
+                        <FaUsers className="text-3xl md:text-5xl text-purple-600" />
 
                     </div>
 
@@ -795,37 +813,41 @@ const navigate = useNavigate();
             {/* Quick Actions */}
             <div>
 
-                <h2 className="text-4xl font-bold mb-8 text-gray-900">
+                <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8 text-gray-900">
                     Quick Actions
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
 
-              <Button
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    onClick={() =>
-                        navigate("/admin/products")
-                    }
-                >
-                    Manage Products
-                </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        sx={{ py: { xs: 1.5, md: 2 }, fontSize: { xs: "0.75rem", md: "0.95rem" } }}
+                        onClick={() =>
+                            navigate("/admin/products")
+                        }
+                    >
+                        Manage Products
+                    </Button>
 
                     <Button
                         variant="contained"
                         color="success"
                         size="large"
+                        sx={{ py: { xs: 1.5, md: 2 }, fontSize: { xs: "0.75rem", md: "0.95rem" } }}
                         onClick={() =>
                             navigate("/admin/categories")
                         }
                     >
                         Manage Categories
                     </Button>
-                   <Button
+
+                    <Button
                         variant="contained"
                         color="warning"
                         size="large"
+                        sx={{ py: { xs: 1.5, md: 2 }, fontSize: { xs: "0.75rem", md: "0.95rem" } }}
                         onClick={() =>
                             navigate("/admin/orders")
                         }
@@ -833,38 +855,56 @@ const navigate = useNavigate();
                         Manage Orders
                     </Button>
 
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl font-bold text-xl shadow">
-
+                    <Button
+                        variant="contained"
+                        size="large"
+                        sx={{
+                            py: { xs: 1.5, md: 2 },
+                            fontSize: { xs: "0.75rem", md: "0.95rem" },
+                            backgroundColor: "#9333ea",
+                            "&:hover": { backgroundColor: "#7e22ce" }
+                        }}
+                    >
                         Manage Users
-
-                    </button>
+                    </Button>
 
                 </div>
 
             </div>
 
             {/* Admin Products Section */}
-            <div className="mt-16">
+            <div className="mt-8 md:mt-16">
 
-                <h2 className="text-4xl font-bold mb-8 text-gray-900">
+                <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8 text-gray-900">
                     All Products
                 </h2>
 
                 <div
-                    className="bg-white rounded-xl shadow"
-                    style={{ height: 600, width: "100%" }}
+                    className="bg-white rounded-xl shadow overflow-x-auto min-w-0"
+                    style={{ height: isMobile ? 450 : 600, width: "100%" }}
                 >
 
                     <DataGrid
                         rows={products}
                         columns={columns}
                         getRowId={(row) => row.productId}
+                        disableRowSelectionOnClick
                         pageSizeOptions={[5, 10, 20]}
                         initialState={{
                             pagination: {
                                 paginationModel: {
                                     pageSize: 5
                                 }
+                            }
+                        }}
+                        sx={{
+                            "& .MuiDataGrid-columnHeaderTitle": {
+                                fontWeight: "bold",
+                                fontSize: isMobile ? "12px" : "14px"
+                            },
+                            "& .MuiDataGrid-cell": {
+                                fontSize: isMobile ? "12px" : "14px",
+                                padding: isMobile ? "4px 6px" : "8px 10px"
                             }
                         }}
                     />
