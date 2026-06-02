@@ -346,7 +346,7 @@ const columns = [
     {
         field: "actions",
         headerName: "Actions",
-        width: isMobile ? 130 : 220,
+        width: isMobile ? 160 : 220,
 
         renderCell: (params) => (
 
@@ -429,7 +429,7 @@ const columns = [
     }
 return (
 
-    <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
+    <div className="p-4 md:p-10 bg-gray-100 min-h-screen w-full overflow-x-hidden">
        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-10">
 
            <h1 className="text-3xl md:text-5xl font-bold">
@@ -440,6 +440,7 @@ return (
                 variant="contained"
                 color="primary"
                 size="small"
+                sx={{ alignSelf: { xs: "flex-start", md: "auto" } }}
                 onClick={() =>
                     setIsCreateProductOpen(true)
                 }
@@ -450,7 +451,7 @@ return (
         </div>
 
             <div
-            className="bg-white rounded-xl shadow overflow-x-auto"
+            className="bg-white rounded-xl shadow overflow-x-auto min-w-0"
             style={{
                 height: isMobile ? 450 : 600,
                 width: "100%"
