@@ -3,25 +3,31 @@ import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 
 import {
+    Box,
     Button,
+    Chip,
     Dialog as MuiDialog,
     DialogTitle as MuiDialogTitle,
     DialogContent,
     DialogContentText,
     DialogActions,
+    Divider,
+    Grid,
     IconButton,
+    MenuItem,
+    Select,
+    TextField,
     Tooltip,
+    Typography,
+    InputLabel,
+    FormControl,
 } from "@mui/material";
 
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-
-import {
-    Dialog,
-    DialogPanel,
-    DialogTitle
-} from "@headlessui/react";
+import VisibilityIcon  from "@mui/icons-material/Visibility";
+import EditIcon        from "@mui/icons-material/Edit";
+import DeleteIcon      from "@mui/icons-material/Delete";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CloseIcon       from "@mui/icons-material/Close";
 
 import api from "../api/api";
 
@@ -31,28 +37,20 @@ import toast from "react-hot-toast";
 
 const AdminProductsPage = () => {
 
-    const [products, setProducts] = useState([]);
-
+    const [products,   setProducts]   = useState([]);
     const [categories, setCategories] = useState([]);
+    const [loading,    setLoading]    = useState(true);
 
-    const [loading, setLoading] = useState(true);
+    const [isFormOpen,        setIsFormOpen]        = useState(false);
+    const [editingProductId,  setEditingProductId]  = useState(null);
 
-    const [isCreateProductOpen, setIsCreateProductOpen] =
-        useState(false);
+    const [selectedProduct,   setSelectedProduct]   = useState(null);
+    const [isViewOpen,        setIsViewOpen]         = useState(false);
 
-    const [editingProductId, setEditingProductId] =
-        useState(null);
-
-    const [selectedProduct, setSelectedProduct] = useState(null);
-
-    const [isViewProductOpen, setIsViewProductOpen] = useState(false);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [productToDelete,   setProductToDelete]   = useState(null);
 
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-    // Delete confirmation dialog state
-    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-
-    const [productToDelete, setProductToDelete] = useState(null);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -60,41 +58,46 @@ const AdminProductsPage = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const [productForm, setProductForm] =
-        useState({
+    const [productForm, setProductForm] = useState({
+        productName: "",
+        description: "",
+        imageUrl:    "",
+        price:       "",
+        quantity:    "",
+        categoryId:  "",
+    });
 
+    const resetForm = () => {
+        setProductForm({
             productName: "",
-
             description: "",
-
-            imageUrl: "",
-
-            price: "",
-
-            quantity: "",
-
-            categoryId: ""
+            imageUrl:    "",
+            price:       "",
+            quantity:    "",
+            categoryId:  "",
         });
+        setEditingProductId(null);
+    };
+
+    /*
+    |----------------------------------------------------------
+    | Fetch
+    |----------------------------------------------------------
+    */
 
     const fetchProducts = async () => {
 
         try {
 
-            const response = await api.get(
-                "/public/products"
-            );
+            const response = await api.get("/public/products");
 
-            setProducts(
-                response.data.content
-            );
+            setProducts(response.data.content);
 
         } catch (error) {
 
             console.log(error);
 
-            toast.error(
-                "Unable to load products. Please refresh."
-            );
+            toast.error("Unable to load products. Please refresh.");
 
         } finally {
 
@@ -106,52 +109,62 @@ const AdminProductsPage = () => {
 
         try {
 
-            const response = await api.get(
-                "/public/categories"
-            );
+            const response = await api.get("/public/categories");
 
-            setCategories(
-                response.data.content
-            );
+            setCategories(response.data.content);
 
         } catch (error) {
 
             console.log(error);
 
-            toast.error(
-                "Unable to load categories. Please refresh."
-            );
+            toast.error("Unable to load categories. Please refresh.");
         }
     };
 
     useEffect(() => {
-
         fetchProducts();
-
         fetchCategories();
-
     }, []);
 
-    // Open the delete confirmation dialog
+    /*
+    |----------------------------------------------------------
+    | Handlers
+    |----------------------------------------------------------
+    */
+
+    const handleViewProduct = (product) => {
+        setSelectedProduct(product);
+        setIsViewOpen(true);
+    };
+
+    const handleEditProduct = (product) => {
+
+        setEditingProductId(product.productId);
+
+        setProductForm({
+            productName: product.productName,
+            description: product.description,
+            imageUrl:    product.imageUrl,
+            price:       product.price,
+            quantity:    product.quantity,
+            categoryId:  String(product.categoryId),
+        });
+
+        setIsFormOpen(true);
+    };
+
     const handleDeleteProduct = (product) => {
-
         setProductToDelete(product);
-
         setDeleteConfirmOpen(true);
     };
 
-    // Confirmed delete
     const confirmDelete = async () => {
 
         try {
 
-            await api.delete(
-                `/admin/products/${productToDelete.productId}`
-            );
+            await api.delete(`/admin/products/${productToDelete.productId}`);
 
-            toast.success(
-                `"${productToDelete.productName}" has been deleted.`
-            );
+            toast.success(`"${productToDelete.productName}" has been deleted.`);
 
             fetchProducts();
 
@@ -159,154 +172,102 @@ const AdminProductsPage = () => {
 
             console.log(error);
 
+            const serverMsg = error.response?.data?.message || "";
+
+            const isConstraintError =
+                serverMsg.toLowerCase().includes("integrity")  ||
+                serverMsg.toLowerCase().includes("foreign key")||
+                serverMsg.toLowerCase().includes("constraint") ||
+                serverMsg.toLowerCase().includes("order");
+
             toast.error(
-                "Failed to delete product. Please try again."
+                isConstraintError
+                    ? `"${productToDelete.productName}" cannot be deleted — it is linked to existing orders.`
+                    : "Failed to delete product. Please try again."
             );
 
         } finally {
 
             setDeleteConfirmOpen(false);
-
             setProductToDelete(null);
         }
     };
 
-    const handleEditProduct = (product) => {
+    const handleImageUpload = async (e) => {
 
-        setEditingProductId(
-            product.productId
-        );
+        const file = e.target.files[0];
 
-        setProductForm({
+        if (!file) return;
 
-            productName:
-                product.productName,
+        try {
 
-            description:
-                product.description,
+            const formData = new FormData();
+            formData.append("file", file);
 
-            imageUrl:
-                product.imageUrl,
+            const response = await api.post("/upload", formData, {
+                headers: {
+                    "X-XSRF-TOKEN": document.cookie
+                        .split("; ")
+                        .find(row => row.startsWith("XSRF-TOKEN="))
+                        ?.split("=")[1],
+                },
+            });
 
-            price:
-                product.price,
+            setProductForm((prev) => ({ ...prev, imageUrl: response.data }));
 
-            quantity:
-                product.quantity,
+            toast.success("Image uploaded successfully.");
 
-            categoryId:
-                String(product.categoryId)
-        });
+        } catch (error) {
 
-        setIsCreateProductOpen(true);
+            console.log(error);
+
+            toast.error("Image upload failed. Please try again.");
+        }
     };
 
-    const handleViewProduct = (product) => {
-
-        setSelectedProduct(product);
-
-        setIsViewProductOpen(true);
-    };
-
-    const handleCreateProduct = async () => {
+    const handleSaveProduct = async () => {
 
         if (
             !productForm.productName ||
             !productForm.description ||
-            !productForm.imageUrl ||
-            !productForm.price ||
-            !productForm.quantity ||
+            !productForm.imageUrl    ||
+            !productForm.price       ||
+            !productForm.quantity    ||
             !productForm.categoryId
         ) {
-
-            toast.error(
-                "Please fill in all required fields before saving."
-            );
-
+            toast.error("Please fill in all required fields before saving.");
             return;
         }
+
+        const payload = {
+            productName: productForm.productName,
+            description: productForm.description,
+            imageUrl:    productForm.imageUrl,
+            price:       Number(productForm.price),
+            quantity:    Number(productForm.quantity),
+            categoryId:  Number(productForm.categoryId),
+        };
 
         try {
 
             if (editingProductId) {
 
-                await api.put(
-                    `/admin/products/${editingProductId}`,
-                    {
-                        productName:
-                            productForm.productName,
+                await api.put(`/admin/products/${editingProductId}`, payload);
 
-                        description:
-                            productForm.description,
-
-                        imageUrl:
-                            productForm.imageUrl,
-
-                        price:
-                            Number(productForm.price),
-
-                        quantity:
-                            Number(productForm.quantity),
-
-                        categoryId:
-                            Number(productForm.categoryId)
-                    }
-                );
-
-                toast.success(
-                    `"${productForm.productName}" updated successfully.`
-                );
+                toast.success(`"${productForm.productName}" updated successfully.`);
 
             } else {
 
-                await api.post(
-                    "/admin/products",
-                    {
-                        productName:
-                            productForm.productName,
+                await api.post("/admin/products", payload);
 
-                        description:
-                            productForm.description,
-
-                        imageUrl:
-                            productForm.imageUrl,
-
-                        price:
-                            Number(productForm.price),
-
-                        quantity:
-                            Number(productForm.quantity),
-
-                        categoryId:
-                            Number(productForm.categoryId)
-                    }
-                );
-
-                toast.success(
-                    `"${productForm.productName}" added to the catalog.`
-                );
+                toast.success(`"${productForm.productName}" added to the catalog.`);
             }
 
             await fetchProducts();
 
-            setProductForm({
+            resetForm();
 
-                productName: "",
-
-                description: "",
-
-                imageUrl: "",
-
-                price: "",
-
-                quantity: "",
-
-                categoryId: ""
-            });
-
-            setEditingProductId(null);
-
-            setIsCreateProductOpen(false);
+            setIsFormOpen(false);
 
         } catch (error) {
 
@@ -320,116 +281,113 @@ const AdminProductsPage = () => {
         }
     };
 
+    /*
+    |----------------------------------------------------------
+    | DataGrid Columns
+    |----------------------------------------------------------
+    */
+
     const columns = [
 
         {
             field: "image",
             headerName: "Image",
             width: isMobile ? 70 : 100,
-
             renderCell: (params) => (
-
                 <img
                     src={params.row.imageUrl}
                     alt={params.row.productName}
                     className={`${isMobile ? "w-10 h-10" : "w-14 h-14"} object-cover rounded`}
                 />
-            )
+            ),
         },
 
         {
             field: "productName",
             headerName: "Product Name",
-            minWidth: isMobile ? 120 : 220,
-            flex: 1
+            minWidth: isMobile ? 130 : 220,
+            flex: 1,
+            renderCell: (params) => (
+                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4 }}>
+                    {params.row.productName}
+                </span>
+            ),
         },
 
         ...(!isMobile ? [{
             field: "categoryName",
             headerName: "Category",
             minWidth: 180,
-            flex: 1
+            flex: 1,
         }] : []),
 
         {
             field: "price",
             headerName: "Price",
             width: isMobile ? 80 : 120,
-
             renderCell: (params) => (
-
                 <span className="font-bold text-green-700">
                     ${params.row.price}
                 </span>
-            )
+            ),
         },
 
-        ...(!isMobile ? [{
+        {
             field: "quantity",
             headerName: "Stock",
-            width: 100,
-        }] : []),
+            width: isMobile ? 70 : 100,
+        },
 
         {
             field: "actions",
             headerName: "Actions",
             width: isMobile ? 130 : 160,
-
             renderCell: (params) => (
-
                 <div className="flex gap-1 items-center h-full">
 
                     <Tooltip title="View product" arrow>
-                        <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => handleViewProduct(params.row)}
-                        >
+                        <IconButton size="small" color="primary" onClick={() => handleViewProduct(params.row)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
                     <Tooltip title="Edit product" arrow>
-                        <IconButton
-                            size="small"
-                            color="warning"
-                            onClick={() => handleEditProduct(params.row)}
-                        >
+                        <IconButton size="small" color="warning" onClick={() => handleEditProduct(params.row)}>
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
                     <Tooltip title="Delete product" arrow>
-                        <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDeleteProduct(params.row)}
-                        >
+                        <IconButton size="small" color="error" onClick={() => handleDeleteProduct(params.row)}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
                 </div>
-            )
-        }
-
+            ),
+        },
     ];
 
+    /*
+    |----------------------------------------------------------
+    | Loading
+    |----------------------------------------------------------
+    */
+
     if (loading) {
-
         return (
-
             <div className="min-h-screen flex flex-col justify-center items-center">
-
                 <Loader />
-
-                <p className="text-2xl font-semibold mt-4">
-                    Loading products...
-                </p>
-
+                <p className="text-2xl font-semibold mt-4">Loading products...</p>
             </div>
         );
     }
+
+    /*
+    |----------------------------------------------------------
+    | Render
+    |----------------------------------------------------------
+    */
 
     return (
 
@@ -444,9 +402,8 @@ const AdminProductsPage = () => {
                 <Button
                     variant="contained"
                     color="primary"
-                    size="small"
+                    onClick={() => { resetForm(); setIsFormOpen(true); }}
                     sx={{ alignSelf: { xs: "flex-start", md: "auto" } }}
-                    onClick={() => setIsCreateProductOpen(true)}
                 >
                     Create Product
                 </Button>
@@ -457,57 +414,314 @@ const AdminProductsPage = () => {
                 className="bg-white rounded-xl shadow overflow-x-auto min-w-0"
                 style={{ height: isMobile ? 450 : 600, width: "100%" }}
             >
-
                 <DataGrid
                     rows={products}
                     columns={columns}
                     disableRowSelectionOnClick
                     getRowId={(row) => row.productId}
+                    getRowHeight={() => "auto"}
                     pageSizeOptions={[5, 10, 20]}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { pageSize: 5 }
-                        }
-                    }}
+                    initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
                     sx={{
                         "& .MuiDataGrid-columnHeaderTitle": {
                             fontWeight: "bold",
-                            fontSize: isMobile ? "12px" : "16px"
+                            fontSize: isMobile ? "12px" : "16px",
                         },
                         "& .MuiDataGrid-cell": {
                             fontSize: isMobile ? "12px" : "14px",
-                            padding: isMobile ? "4px 6px" : "8px 10px"
-                        }
+                            padding: isMobile ? "4px 6px" : "8px 10px",
+                        },
                     }}
                 />
-
             </div>
 
-            {/* ── Delete Confirmation Dialog ── */}
+            {/* ── View Product Dialog ── */}
             <MuiDialog
-                open={deleteConfirmOpen}
-                onClose={() => setDeleteConfirmOpen(false)}
-                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+                open={isViewOpen}
+                onClose={() => setIsViewOpen(false)}
+                maxWidth="md"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}
             >
+                {selectedProduct && (
+                    <>
+                        {/* Header */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                px: 3,
+                                py: 2,
+                                borderBottom: "1px solid #e5e7eb",
+                            }}
+                        >
+                            <Typography variant="h6" fontWeight="bold">
+                                Product Details
+                            </Typography>
 
-                <MuiDialogTitle sx={{ fontWeight: "bold", fontSize: "1.25rem" }}>
-                    Delete Product
+                            <IconButton size="small" onClick={() => setIsViewOpen(false)}>
+                                <CloseIcon fontSize="small" />
+                            </IconButton>
+                        </Box>
+
+                        {/* Body — two columns */}
+                        <DialogContent sx={{ p: 0 }}>
+                            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}>
+
+                                {/* Left — image */}
+                                <Box
+                                    sx={{
+                                        width: { xs: "100%", sm: "42%" },
+                                        minHeight: { xs: 220, sm: 320 },
+                                        bgcolor: "#f3f4f6",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        p: 2,
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    <img
+                                        src={selectedProduct.imageUrl}
+                                        alt={selectedProduct.productName}
+                                        style={{
+                                            maxWidth: "100%",
+                                            maxHeight: 280,
+                                            objectFit: "contain",
+                                        }}
+                                    />
+                                </Box>
+
+                                {/* Right — details */}
+                                <Box sx={{ flex: 1, p: 3, display: "flex", flexDirection: "column", gap: 2 }}>
+
+                                    <Typography
+                                        variant="h5"
+                                        fontWeight="bold"
+                                        color="text.primary"
+                                        sx={{ wordBreak: "break-word", lineHeight: 1.3 }}
+                                    >
+                                        {selectedProduct.productName}
+                                    </Typography>
+
+                                    <Typography variant="h4" fontWeight="bold" color="success.main">
+                                        ${Number(selectedProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    </Typography>
+
+                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                                        <Chip
+                                            label={selectedProduct.quantity > 0
+                                                ? `In Stock: ${selectedProduct.quantity}`
+                                                : "Out of Stock"}
+                                            color={selectedProduct.quantity > 0 ? "success" : "error"}
+                                            variant="filled"
+                                        />
+
+                                        {selectedProduct.categoryName && (
+                                            <Chip
+                                                label={selectedProduct.categoryName}
+                                                color="primary"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                    </Box>
+
+                                    <Divider />
+
+                                    <Box>
+                                        <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
+                                            Description
+                                        </Typography>
+
+                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.7 }}>
+                                            {selectedProduct.description}
+                                        </Typography>
+                                    </Box>
+
+                                </Box>
+
+                            </Box>
+                        </DialogContent>
+
+                        {/* Actions */}
+                        <DialogActions sx={{ px: 3, py: 2, borderTop: "1px solid #e5e7eb", gap: 1 }}>
+                            <Button
+                                onClick={() => setIsViewOpen(false)}
+                                variant="outlined"
+                                color="inherit"
+                            >
+                                Close
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                color="warning"
+                                startIcon={<EditIcon />}
+                                onClick={() => {
+                                    setIsViewOpen(false);
+                                    handleEditProduct(selectedProduct);
+                                }}
+                            >
+                                Edit Product
+                            </Button>
+                        </DialogActions>
+                    </>
+                )}
+            </MuiDialog>
+
+            {/* ── Create / Edit Product Dialog ── */}
+            <MuiDialog
+                open={isFormOpen}
+                onClose={() => { resetForm(); setIsFormOpen(false); }}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 3 } }}
+            >
+                <MuiDialogTitle sx={{ fontWeight: "bold", pb: 1 }}>
+                    {editingProductId ? "Edit Product" : "Create Product"}
                 </MuiDialogTitle>
 
-                <DialogContent>
+                <DialogContent sx={{ pt: 3, overflow: "visible" }}>
 
-                    <DialogContentText>
-                        Are you sure you want to delete{" "}
-                        <strong>{productToDelete?.productName}</strong>?
-                        This action cannot be undone.
-                    </DialogContentText>
+                    <Grid container spacing={2}>
+
+                        {/* Product Name */}
+                        <Grid item xs={12} sm={7}>
+                            <TextField
+                                label="Product Name"
+                                size="small"
+                                fullWidth
+                                value={productForm.productName}
+                                onChange={(e) =>
+                                    setProductForm({ ...productForm, productName: e.target.value })
+                                }
+                            />
+                        </Grid>
+
+                        {/* Price */}
+                        <Grid item xs={6} sm={2.5}>
+                            <TextField
+                                label="Price"
+                                size="small"
+                                type="number"
+                                fullWidth
+                                value={productForm.price}
+                                onChange={(e) =>
+                                    setProductForm({ ...productForm, price: e.target.value })
+                                }
+                            />
+                        </Grid>
+
+                        {/* Quantity */}
+                        <Grid item xs={6} sm={2.5}>
+                            <TextField
+                                label="Qty"
+                                size="small"
+                                type="number"
+                                fullWidth
+                                value={productForm.quantity}
+                                onChange={(e) =>
+                                    setProductForm({ ...productForm, quantity: e.target.value })
+                                }
+                            />
+                        </Grid>
+
+                        {/* Category */}
+                        <Grid item xs={12} sm={6}>
+                            <FormControl size="small" fullWidth>
+                                <InputLabel>Category</InputLabel>
+                                <Select
+                                    label="Category"
+                                    value={productForm.categoryId}
+                                    onChange={(e) =>
+                                        setProductForm({ ...productForm, categoryId: e.target.value })
+                                    }
+                                >
+                                    <MenuItem value=""><em>Select category</em></MenuItem>
+                                    {categories.map((cat) => (
+                                        <MenuItem key={cat.categoryId} value={String(cat.categoryId)}>
+                                            {cat.categoryName}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        {/* Image Upload */}
+                        <Grid item xs={12} sm={6}>
+                            <input
+                                type="file"
+                                id="productImageInput"
+                                hidden
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                startIcon={<CloudUploadIcon />}
+                                onClick={() => document.getElementById("productImageInput").click()}
+                                sx={{ height: "40px" }}
+                            >
+                                {productForm.imageUrl ? "Change Image" : "Upload Image"}
+                            </Button>
+                        </Grid>
+
+                        {/* Image preview — always full width on its own row */}
+                        {productForm.imageUrl && (
+                            <Grid item xs={12}>
+                                <Box
+                                    sx={{
+                                        width: "100%",
+                                        height: 160,
+                                        borderRadius: 2,
+                                        border: "1px solid #e5e7eb",
+                                        bgcolor: "#f3f4f6",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    <img
+                                        src={productForm.imageUrl}
+                                        alt="Preview"
+                                        style={{
+                                            maxWidth: "100%",
+                                            maxHeight: 160,
+                                            objectFit: "contain",
+                                            display: "block",
+                                        }}
+                                    />
+                                </Box>
+                            </Grid>
+                        )}
+
+                        {/* Description */}
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Description"
+                                size="small"
+                                fullWidth
+                                multiline
+                                rows={3}
+                                value={productForm.description}
+                                onChange={(e) =>
+                                    setProductForm({ ...productForm, description: e.target.value })
+                                }
+                            />
+                        </Grid>
+
+                    </Grid>
 
                 </DialogContent>
 
                 <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
 
                     <Button
-                        onClick={() => setDeleteConfirmOpen(false)}
+                        onClick={() => { resetForm(); setIsFormOpen(false); }}
                         variant="outlined"
                         color="inherit"
                     >
@@ -515,223 +729,45 @@ const AdminProductsPage = () => {
                     </Button>
 
                     <Button
-                        onClick={confirmDelete}
+                        onClick={handleSaveProduct}
                         variant="contained"
-                        color="error"
+                        color="primary"
                     >
-                        Delete
+                        {editingProductId ? "Update Product" : "Create Product"}
                     </Button>
 
                 </DialogActions>
 
             </MuiDialog>
 
-            {/* ── Create / Edit Product Dialog ── */}
-            <Dialog
-                open={isCreateProductOpen}
-                onClose={() => {
-
-                    setProductForm({
-                        productName: "",
-                        description: "",
-                        imageUrl: "",
-                        price: "",
-                        quantity: "",
-                        categoryId: ""
-                    });
-
-                    setEditingProductId(null);
-                    setIsCreateProductOpen(false);
-                }}
-                className="relative z-50"
+            {/* ── Delete Confirmation Dialog ── */}
+            <MuiDialog
+                open={deleteConfirmOpen}
+                onClose={() => setDeleteConfirmOpen(false)}
+                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
             >
+                <MuiDialogTitle sx={{ fontWeight: "bold", fontSize: "1.25rem" }}>
+                    Delete Product
+                </MuiDialogTitle>
 
-                <div className="fixed inset-0 bg-black/40" />
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete{" "}
+                        <strong>{productToDelete?.productName}</strong>?
+                        This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
 
-                <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+                    <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined" color="inherit">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmDelete} variant="contained" color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
 
-                    <DialogPanel className="bg-white rounded-2xl p-4 sm:p-8 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-
-                        <DialogTitle className="text-xl sm:text-3xl font-bold mb-4 sm:mb-8">
-                            {editingProductId ? "Edit Product" : "Create Product"}
-                        </DialogTitle>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            <input
-                                type="text"
-                                placeholder="Product Name"
-                                value={productForm.productName}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, productName: e.target.value })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            />
-
-                            <input
-                                type="number"
-                                placeholder="Price"
-                                value={productForm.price}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, price: e.target.value })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            />
-
-                            <input
-                                type="number"
-                                placeholder="Quantity"
-                                value={productForm.quantity}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, quantity: e.target.value })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            />
-
-                            <div>
-
-                                <input
-                                    type="file"
-                                    id="productImageInput"
-                                    hidden
-                                    accept="image/*"
-                                    onChange={async (e) => {
-
-                                        const file = e.target.files[0];
-
-                                        if (!file) return;
-
-                                        try {
-
-                                            const formData = new FormData();
-
-                                            formData.append("file", file);
-
-                                            const response = await api.post(
-                                                "/upload",
-                                                formData,
-                                                {
-                                                    headers: {
-                                                        "X-XSRF-TOKEN":
-                                                            document.cookie
-                                                                .split("; ")
-                                                                .find(row => row.startsWith("XSRF-TOKEN="))
-                                                                ?.split("=")[1]
-                                                    }
-                                                }
-                                            );
-
-                                            setProductForm({ ...productForm, imageUrl: response.data });
-
-                                            toast.success("Image uploaded successfully.");
-
-                                        } catch (error) {
-
-                                            console.log(error);
-
-                                            toast.error("Image upload failed. Please try again.");
-                                        }
-                                    }}
-                                />
-
-                                <button
-                                    type="button"
-                                    className="border border-gray-300 rounded-lg p-4 bg-gray-100 hover:bg-gray-200 text-left w-full"
-                                    onClick={() =>
-                                        document.getElementById("productImageInput").click()
-                                    }
-                                >
-                                    Upload Product Image
-                                </button>
-
-                            </div>
-
-                            {productForm.imageUrl && (
-
-                                <div className="md:col-span-2 flex justify-center">
-
-                                    <div className="w-72 h-48 border rounded-lg overflow-hidden bg-gray-100">
-
-                                        <img
-                                            src={productForm.imageUrl}
-                                            alt="Preview"
-                                            className="w-full h-full object-cover"
-                                        />
-
-                                    </div>
-
-                                </div>
-                            )}
-
-                            <select
-                                value={productForm.categoryId}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, categoryId: e.target.value })
-                                }
-                                className="border border-gray-300 rounded-lg p-4"
-                            >
-
-                                <option value="">Select Category</option>
-
-                                {categories.map((category) => (
-
-                                    <option
-                                        key={category.categoryId}
-                                        value={category.categoryId}
-                                    >
-                                        {category.categoryName}
-                                    </option>
-                                ))}
-
-                            </select>
-
-                        </div>
-
-                        <textarea
-                            placeholder="Product Description"
-                            value={productForm.description}
-                            onChange={(e) =>
-                                setProductForm({ ...productForm, description: e.target.value })
-                            }
-                            className="w-full border border-gray-300 rounded-lg p-3 sm:p-4 mt-4 sm:mt-6 h-32 sm:h-40"
-                        />
-
-                        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-6 sm:mt-8">
-
-                            <button
-                                onClick={() => {
-
-                                    setProductForm({
-                                        productName: "",
-                                        description: "",
-                                        imageUrl: "",
-                                        price: "",
-                                        quantity: "",
-                                        categoryId: ""
-                                    });
-
-                                    setEditingProductId(null);
-                                    setIsCreateProductOpen(false);
-                                }}
-                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={handleCreateProduct}
-                                className="px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold"
-                            >
-                                {editingProductId ? "Update Product" : "Create Product"}
-                            </button>
-
-                        </div>
-
-                    </DialogPanel>
-
-                </div>
-
-            </Dialog>
+            </MuiDialog>
 
         </div>
     );

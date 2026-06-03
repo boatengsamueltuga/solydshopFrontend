@@ -81,9 +81,33 @@ api.interceptors.response.use(
 
         const status = error.response.status;
 
-        const message =
+        const rawMessage =
             error.response.data?.message ||
             "Something went wrong";
+
+        /*
+        ---------------------------------------------------------------
+        | Sanitize Technical / SQL Error Messages
+        | Never expose raw stack traces or SQL to the user.
+        ---------------------------------------------------------------
+        */
+
+        const TECHNICAL_PATTERNS = [
+            "sql", "select", "insert", "delete from", "update set",
+            "constraint", "integrity", "foreign key", "hibernate",
+            "jdbc", "exception", "stacktrace", "at com.", "at org.",
+            "nullpointer", "referential",
+        ];
+
+        const isTechnical =
+            rawMessage.length > 120 ||
+            TECHNICAL_PATTERNS.some((kw) =>
+                rawMessage.toLowerCase().includes(kw)
+            );
+
+        const message = isTechnical
+            ? "An unexpected error occurred. Please try again."
+            : rawMessage;
 
 
 
