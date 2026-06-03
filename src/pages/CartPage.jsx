@@ -305,7 +305,7 @@ const CartPage = () => {
                             <div className="sm:text-right">
 
                                 <p className="text-xl md:text-2xl font-bold text-green-700">
-                                    ${item.price}
+                                    ${(item.price * item.quantity).toFixed(2)}
                                 </p>
 
                                 {/* Remove button */}
