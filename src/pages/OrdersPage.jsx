@@ -4,6 +4,36 @@ import { useSelector } from "react-redux";
 
 import api from "../api/api";
 
+import Loader from "../components/Loader";
+
+import { FaShoppingBag } from "react-icons/fa";
+
+import {
+    Box,
+    Card,
+    CardContent,
+    Chip,
+    Divider,
+    Stack,
+    Typography,
+} from "@mui/material";
+
+const STATUS_COLORS = {
+    PENDING:   "warning",
+    CONFIRMED: "info",
+    SHIPPED:   "secondary",
+    DELIVERED: "success",
+    CANCELLED: "error",
+};
+
+const CARD_ACCENTS = [
+    { border: "#38bdf8", price: "#38bdf8", badge: "#0c4a6e", badgeText: "#7dd3fc" },
+    { border: "#a78bfa", price: "#a78bfa", badge: "#2e1065", badgeText: "#c4b5fd" },
+    { border: "#fb923c", price: "#fb923c", badge: "#431407", badgeText: "#fdba74" },
+    { border: "#34d399", price: "#34d399", badge: "#022c22", badgeText: "#6ee7b7" },
+    { border: "#f472b6", price: "#f472b6", badge: "#4a044e", badgeText: "#f9a8d4" },
+];
+
 const OrdersPage = () => {
 
     const [orders, setOrders] = useState([]);
@@ -12,7 +42,6 @@ const OrdersPage = () => {
 
     const [error, setError] = useState("");
 
-    // Get authenticated user
     const { user } = useSelector(
         (state) => state.auth
     );
@@ -52,9 +81,25 @@ const OrdersPage = () => {
 
         return (
 
-            <h1 className="text-3xl p-10">
-                Loading orders...
-            </h1>
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 2,
+                    bgcolor: "#030712",
+                }}
+            >
+
+                <Loader />
+
+                <Typography variant="h6" sx={{ color: "#6b7280" }}>
+                    Loading your orders...
+                </Typography>
+
+            </Box>
         );
     }
 
@@ -62,97 +107,331 @@ const OrdersPage = () => {
 
         return (
 
-            <h1 className="text-3xl p-10 text-red-600">
-                {error}
-            </h1>
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    bgcolor: "#030712",
+                }}
+            >
+
+                <Typography variant="h6" color="error">
+                    {error}
+                </Typography>
+
+            </Box>
         );
     }
 
     return (
 
-        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
+        <Box
+            sx={{
+                p: { xs: 2, md: 5 },
+                bgcolor: "#030712",
+                minHeight: "100vh",
+            }}
+        >
 
-            <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10">
-                My Orders
-            </h1>
+            {/* Page Header */}
+            <Box sx={{ mb: { xs: 4, md: 6 } }}>
+
+                <Typography
+                    variant="h3"
+                    fontWeight="bold"
+                    sx={{
+                        fontSize: { xs: "2rem", md: "3rem" },
+                        color: "#f9fafb",
+                        letterSpacing: "-0.5px",
+                    }}
+                >
+                    My Orders
+                </Typography>
+
+                <Box
+                    sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        mt: 1.5,
+                        px: 2,
+                        py: 0.5,
+                        bgcolor: "#111827",
+                        borderRadius: 10,
+                        border: "1px solid #1f2937",
+                    }}
+                >
+                    <Typography variant="body2" sx={{ color: "#6b7280", fontWeight: 500 }}>
+                        {orders.length} order{orders.length !== 1 ? "s" : ""} placed
+                    </Typography>
+                </Box>
+
+            </Box>
 
             {orders.length === 0 ? (
 
-                <h2 className="text-2xl">
-                    No orders found
-                </h2>
+                <Card
+                    sx={{
+                        borderRadius: 3,
+                        bgcolor: "#0f172a",
+                        border: "1px solid #1e293b",
+                        boxShadow: "none",
+                    }}
+                >
+
+                    <CardContent
+                        sx={{
+                            py: 10,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            textAlign: "center",
+                        }}
+                    >
+
+                        <Box
+                            sx={{
+                                width: 96,
+                                height: 96,
+                                borderRadius: "50%",
+                                bgcolor: "#1e293b",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                mb: 3,
+                            }}
+                        >
+                            <FaShoppingBag style={{ fontSize: 40, color: "#475569" }} />
+                        </Box>
+
+                        <Typography variant="h5" fontWeight="bold" sx={{ color: "#e2e8f0" }}>
+                            No orders yet
+                        </Typography>
+
+                        <Typography variant="body1" sx={{ mt: 1, color: "#475569" }}>
+                            Your completed orders will appear here.
+                        </Typography>
+
+                    </CardContent>
+
+                </Card>
 
             ) : (
 
-                <div className="space-y-8">
+                <Stack spacing={3}>
 
-                    {orders.map((order) => (
+                    {orders.map((order, orderIndex) => {
 
-                        <div
-                            key={order.orderId}
-                            className="bg-white p-4 md:p-8 rounded-lg shadow"
-                        >
+                        const accent = CARD_ACCENTS[orderIndex % CARD_ACCENTS.length];
 
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4 md:mb-6">
+                        return (
 
-                                <div>
+                            <Card
+                                key={order.orderId}
+                                sx={{
+                                    borderRadius: 3,
+                                    bgcolor: "#0f172a",
+                                    border: "1px solid #1e293b",
+                                    borderTop: `3px solid ${accent.border}`,
+                                    boxShadow: `0 0 24px 0 ${accent.border}18`,
+                                    overflow: "hidden",
+                                }}
+                            >
 
-                                    <h2 className="text-xl md:text-3xl font-bold">
-                                        Order #{order.orderId}
-                                    </h2>
+                                {/* Order Header */}
+                                <Box
+                                    sx={{
+                                        px: { xs: 2.5, md: 4 },
+                                        py: { xs: 2, md: 2.5 },
+                                        bgcolor: "#0a0f1e",
+                                        borderBottom: "1px solid #1e293b",
+                                        display: "flex",
+                                        flexDirection: { xs: "column", sm: "row" },
+                                        justifyContent: "space-between",
+                                        alignItems: { sm: "center" },
+                                        gap: 2,
+                                    }}
+                                >
 
-                                    <p className="text-gray-600 mt-2">
-                                        Status:
-                                        <span className="font-bold ml-2 text-blue-700">
-                                            {order.status}
-                                        </span>
-                                    </p>
+                                    <Stack direction="row" alignItems="center" spacing={2}>
 
-                                </div>
+                                        <Box>
 
-                                <h2 className="text-xl md:text-3xl font-bold text-green-700">
-                                    ${order.totalAmount}
-                                </h2>
+                                            <Typography
+                                                variant="caption"
+                                                sx={{
+                                                    color: "#475569",
+                                                    textTransform: "uppercase",
+                                                    letterSpacing: 1.5,
+                                                    fontWeight: 600,
+                                                    display: "block",
+                                                }}
+                                            >
+                                                Order
+                                            </Typography>
 
-                            </div>
+                                            <Typography
+                                                variant="h6"
+                                                fontWeight="bold"
+                                                sx={{ color: accent.border }}
+                                            >
+                                                #{order.orderId}
+                                            </Typography>
 
-                            <div className="space-y-4">
+                                        </Box>
 
-                                {order.items.map((item) => (
+                                        <Chip
+                                            label={order.status}
+                                            color={STATUS_COLORS[order.status] || "default"}
+                                            size="small"
+                                            sx={{ fontWeight: 700, letterSpacing: 0.5 }}
+                                        />
 
-                                    <div
-                                        key={item.productId}
-                                        className="border p-3 md:p-4 rounded flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
-                                    >
+                                    </Stack>
 
-                                        <div>
+                                    <Box sx={{ textAlign: { sm: "right" } }}>
 
-                                            <h3 className="text-lg md:text-2xl font-bold">
-                                                {item.productName}
-                                            </h3>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{
+                                                color: "#475569",
+                                                textTransform: "uppercase",
+                                                letterSpacing: 1.5,
+                                                fontWeight: 600,
+                                                display: "block",
+                                            }}
+                                        >
+                                            Order Total
+                                        </Typography>
 
-                                            <p className="text-gray-600 mt-2">
-                                                Quantity: {item.quantity}
-                                            </p>
+                                        <Typography
+                                            variant="h5"
+                                            fontWeight="bold"
+                                            sx={{ color: accent.border }}
+                                        >
+                                            ${Number(order.totalAmount).toLocaleString("en-US", {
+                                                minimumFractionDigits: 2,
+                                            })}
+                                        </Typography>
 
-                                        </div>
+                                    </Box>
 
-                                        <p className="text-lg md:text-2xl font-bold text-green-700">
-                                            ${item.price}
-                                        </p>
+                                </Box>
 
-                                    </div>
-                                ))}
+                                {/* Order Items */}
+                                <CardContent sx={{ px: { xs: 2.5, md: 4 }, py: { xs: 2, md: 3 } }}>
 
-                            </div>
+                                    <Stack>
 
-                        </div>
-                    ))}
+                                        {order.items.map((item, index) => (
 
-                </div>
+                                            <Box key={item.productId}>
+
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        flexDirection: { xs: "column", sm: "row" },
+                                                        justifyContent: "space-between",
+                                                        alignItems: { sm: "center" },
+                                                        gap: 2,
+                                                        py: 2,
+                                                    }}
+                                                >
+
+                                                    {/* Product Info */}
+                                                    <Box>
+
+                                                        <Typography
+                                                            variant="subtitle1"
+                                                            fontWeight={700}
+                                                            sx={{ color: "#e2e8f0" }}
+                                                        >
+                                                            {item.productName}
+                                                        </Typography>
+
+                                                        <Box
+                                                            sx={{
+                                                                display: "inline-flex",
+                                                                alignItems: "center",
+                                                                mt: 0.75,
+                                                                px: 1.5,
+                                                                py: 0.25,
+                                                                bgcolor: accent.badge,
+                                                                borderRadius: 10,
+                                                            }}
+                                                        >
+                                                            <Typography
+                                                                variant="caption"
+                                                                fontWeight={700}
+                                                                sx={{ color: accent.badgeText }}
+                                                            >
+                                                                Qty: {item.quantity}
+                                                            </Typography>
+                                                        </Box>
+
+                                                    </Box>
+
+                                                    {/* Unit Price */}
+                                                    <Box
+                                                        sx={{
+                                                            textAlign: { sm: "right" },
+                                                            bgcolor: "#0a0f1e",
+                                                            border: `1px solid ${accent.border}`,
+                                                            borderRadius: 2,
+                                                            px: 2.5,
+                                                            py: 1.25,
+                                                            minWidth: 150,
+                                                            boxShadow: `0 0 12px 0 ${accent.border}30`,
+                                                        }}
+                                                    >
+
+                                                        <Typography
+                                                            variant="caption"
+                                                            sx={{
+                                                                color: accent.badgeText,
+                                                                textTransform: "uppercase",
+                                                                letterSpacing: 1.2,
+                                                                fontWeight: 700,
+                                                                display: "block",
+                                                            }}
+                                                        >
+                                                            Unit Price
+                                                        </Typography>
+
+                                                        <Typography
+                                                            variant="h6"
+                                                            fontWeight="bold"
+                                                            sx={{ color: accent.border }}
+                                                        >
+                                                            ${Number(item.price).toLocaleString("en-US", {
+                                                                minimumFractionDigits: 2,
+                                                            })}
+                                                        </Typography>
+
+                                                    </Box>
+
+                                                </Box>
+
+                                                {index < order.items.length - 1 && (
+                                                    <Divider sx={{ borderColor: "#1e293b" }} />
+                                                )}
+
+                                            </Box>
+                                        ))}
+
+                                    </Stack>
+
+                                </CardContent>
+
+                            </Card>
+                        );
+                    })}
+
+                </Stack>
             )}
 
-        </div>
+        </Box>
     );
 };
 
