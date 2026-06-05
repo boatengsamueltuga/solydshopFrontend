@@ -15,6 +15,7 @@ import {
     Select,
     FormControl,
     InputLabel,
+    Stack,
     Tooltip,
     Typography,
     Box,
@@ -165,17 +166,18 @@ const AdminOrdersPage = () => {
         {
             field: "actions",
             headerName: "Actions",
-            width: isMobile ? 60 : 90,
+            width: isMobile ? 80 : 110,
             renderCell: (params) => (
-                <Tooltip title="View order" arrow>
-                    <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => handleViewOrder(params.row)}
-                    >
-                        <VisibilityIcon fontSize="small" />
-                    </IconButton>
-                </Tooltip>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    startIcon={<VisibilityIcon />}
+                    onClick={() => handleViewOrder(params.row)}
+                    sx={{ fontSize: isMobile ? "10px" : "12px" }}
+                >
+                    View
+                </Button>
             ),
         },
     ];
@@ -241,12 +243,12 @@ const AdminOrdersPage = () => {
                 onClose={() => setIsDialogOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 3 } }}
+                PaperProps={{ sx: { borderRadius: 3, maxHeight: "85vh" } }}
             >
                 {selectedOrder && (
                     <>
-                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 2, borderBottom: "1px solid #e5e7eb" }}>
-                            <Typography variant="h6" fontWeight="bold">
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 2, borderBottom: "2px solid", borderColor: "primary.main", bgcolor: "#f0f7ff" }}>
+                            <Typography variant="h6" fontWeight="bold" color="primary.main">
                                 Order #{selectedOrder.orderId}
                             </Typography>
                             <IconButton size="small" onClick={() => setIsDialogOpen(false)}>
@@ -254,23 +256,65 @@ const AdminOrdersPage = () => {
                             </IconButton>
                         </Box>
 
-                        <DialogContent sx={{ pt: 2 }}>
+                        <DialogContent sx={{ pt: 2, overflowY: "auto" }}>
 
-                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 2 }}>
-                                <Typography variant="body2"><strong>Customer:</strong> {selectedOrder.customerName}</Typography>
-                                <Typography variant="body2"><strong>Email:</strong> {selectedOrder.customerEmail}</Typography>
-                                <Typography variant="body2"><strong>Shipping Address:</strong> {selectedOrder.shippingAddress}</Typography>
-                                <Typography variant="body2" color="success.main" fontWeight="bold">
-                                    Total: ${Number(selectedOrder.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                                </Typography>
+                            {/* Customer Info */}
+                            <Box
+                                sx={{
+                                    bgcolor: "#f0f7ff",
+                                    border: "1px solid",
+                                    borderColor: "primary.light",
+                                    borderLeft: "4px solid",
+                                    borderLeftColor: "primary.main",
+                                    borderRadius: 2,
+                                    p: 2,
+                                    mb: 2,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 0.75,
+                                }}
+                            >
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
+                                    <Box>
+                                        <Typography variant="caption" color="primary.main" fontWeight={700} textTransform="uppercase" letterSpacing={1}>Customer</Typography>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", fontSize: "1.05rem" }}>{selectedOrder.customerName}</Typography>
+                                    </Box>
+                                    <Chip
+                                        label={selectedOrder.status}
+                                        color={STATUS_COLORS[selectedOrder.status] || "default"}
+                                        size="small"
+                                        sx={{ fontWeight: 700 }}
+                                    />
+                                </Box>
+
+                                <Divider />
+
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Typography variant="body2" fontWeight={700} color="text.primary" sx={{ minWidth: 65 }}>Email:</Typography>
+                                    <Typography variant="body2" color="primary.dark" fontWeight={500}>{selectedOrder.customerEmail}</Typography>
+                                </Box>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Typography variant="body2" fontWeight={700} color="text.primary" sx={{ minWidth: 65 }}>Shipping:</Typography>
+                                    <Typography variant="body2" color="text.secondary" fontWeight={500} fontStyle={!selectedOrder.shippingAddress ? "italic" : "normal"}>
+                                        {selectedOrder.shippingAddress || "Address not provided"}
+                                    </Typography>
+                                </Box>
+
+                                <Divider />
+
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <Typography variant="body2" fontWeight={700} color="text.primary">Order Total</Typography>
+                                    <Typography variant="h6" fontWeight="bold" color="success.main">
+                                        ${Number(selectedOrder.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    </Typography>
+                                </Box>
                             </Box>
 
-                            <Divider sx={{ mb: 2 }} />
-
+                            {/* Status Update */}
                             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                                <InputLabel>Status</InputLabel>
+                                <InputLabel sx={{ fontWeight: "bold" }}>Update Status</InputLabel>
                                 <Select
-                                    label="Status"
+                                    label="Update Status"
                                     value={newStatus}
                                     onChange={(e) => setNewStatus(e.target.value)}
                                 >
@@ -282,28 +326,42 @@ const AdminOrdersPage = () => {
 
                             <Divider sx={{ mb: 2 }} />
 
-                            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-                                Order Items
+                            {/* Order Items */}
+                            <Typography variant="subtitle1" fontWeight="bold" color="primary.main" sx={{ mb: 1.5 }}>
+                                Order Items ({selectedOrder.items?.length})
                             </Typography>
 
-                            {selectedOrder.items?.map((item, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{
-                                        border: "1px solid #e5e7eb",
-                                        borderRadius: 2,
-                                        p: 1.5,
-                                        mb: 1,
-                                    }}
-                                >
-                                    <Typography variant="body2" fontWeight="bold">{item.productName}</Typography>
-                                    <Typography variant="body2" color="text.secondary">Qty: {item.quantity}</Typography>
-                                    <Typography variant="body2" color="text.secondary">Unit Price: ${item.price}</Typography>
-                                    <Typography variant="body2" color="success.main" fontWeight="bold">
-                                        Line Total: ${item.price * item.quantity}
-                                    </Typography>
-                                </Box>
-                            ))}
+                            <Stack divider={<Divider />} sx={{ border: "1px solid", borderColor: "primary.light", borderRadius: 2, overflow: "hidden" }}>
+                                {selectedOrder.items?.map((item, index) => (
+                                    <Box
+                                        key={index}
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: { sm: "center" },
+                                            flexDirection: { xs: "column", sm: "row" },
+                                            gap: 1,
+                                            px: 2,
+                                            py: 1.5,
+                                            bgcolor: index % 2 === 0 ? "white" : "#f0f7ff",
+                                        }}
+                                    >
+                                        <Box>
+                                            <Typography variant="body1" sx={{ fontWeight: "bold", color: "primary.dark" }}>{item.productName}</Typography>
+                                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.25 }}>
+                                                <Typography variant="caption" fontWeight={700} color="text.primary">Qty:</Typography>
+                                                <Typography variant="caption" fontWeight={600} color="primary.main">{item.quantity}</Typography>
+                                                <Typography variant="caption" color="text.disabled">&nbsp;·&nbsp;</Typography>
+                                                <Typography variant="caption" fontWeight={700} color="text.primary">Unit:</Typography>
+                                                <Typography variant="caption" fontWeight={600} color="success.main">${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</Typography>
+                                            </Box>
+                                        </Box>
+                                        <Typography variant="body2" fontWeight="bold" color="success.main" sx={{ whiteSpace: "nowrap" }}>
+                                            ${Number(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                            </Stack>
 
                         </DialogContent>
 

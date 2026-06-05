@@ -6,8 +6,6 @@ import api from "../api/api";
 
 import Loader from "../components/Loader";
 
-import { FaShoppingBag } from "react-icons/fa";
-
 import {
     Box,
     Card,
@@ -16,35 +14,27 @@ import {
     Divider,
     Stack,
     Typography,
+    Paper,
 } from "@mui/material";
 
-const STATUS_COLORS = {
-    PENDING:   "warning",
-    CONFIRMED: "info",
-    SHIPPED:   "secondary",
-    DELIVERED: "success",
-    CANCELLED: "error",
-};
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 
-const CARD_ACCENTS = [
-    { border: "#38bdf8", price: "#38bdf8", badge: "#0c4a6e", badgeText: "#7dd3fc" },
-    { border: "#a78bfa", price: "#a78bfa", badge: "#2e1065", badgeText: "#c4b5fd" },
-    { border: "#fb923c", price: "#fb923c", badge: "#431407", badgeText: "#fdba74" },
-    { border: "#34d399", price: "#34d399", badge: "#022c22", badgeText: "#6ee7b7" },
-    { border: "#f472b6", price: "#f472b6", badge: "#4a044e", badgeText: "#f9a8d4" },
-];
+const STATUS_COLORS = {
+    PENDING:    "warning",
+    CONFIRMED:  "info",
+    PROCESSING: "info",
+    SHIPPED:    "secondary",
+    DELIVERED:  "success",
+    CANCELLED:  "error",
+};
 
 const OrdersPage = () => {
 
-    const [orders, setOrders] = useState([]);
-
+    const [orders,  setOrders]  = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error,   setError]   = useState("");
 
-    const [error, setError] = useState("");
-
-    const { user } = useSelector(
-        (state) => state.auth
-    );
+    const { user } = useSelector((state) => state.auth);
 
     useEffect(() => {
 
@@ -52,9 +42,7 @@ const OrdersPage = () => {
 
             try {
 
-                const response = await api.get(
-                    `/order/${user.userId}`
-                );
+                const response = await api.get(`/order/${user.userId}`);
 
                 setOrders(response.data);
 
@@ -62,7 +50,7 @@ const OrdersPage = () => {
 
                 console.log(error);
 
-                setError("Unable to load orders");
+                setError("Unable to load orders. Please try again.");
 
             } finally {
 
@@ -70,363 +58,224 @@ const OrdersPage = () => {
             }
         };
 
-        if (user?.userId) {
-
-            fetchOrders();
-        }
+        if (user?.userId) fetchOrders();
 
     }, [user]);
 
+    /*
+    |----------------------------------------------------------
+    | Loading / Error
+    |----------------------------------------------------------
+    */
+
     if (loading) {
-
         return (
-
-            <Box
-                sx={{
-                    minHeight: "100vh",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 2,
-                    bgcolor: "#030712",
-                }}
-            >
-
+            <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2, bgcolor: "grey.100" }}>
                 <Loader />
-
-                <Typography variant="h6" sx={{ color: "#6b7280" }}>
-                    Loading your orders...
-                </Typography>
-
+                <Typography variant="h6" color="text.secondary">Loading your orders...</Typography>
             </Box>
         );
     }
 
     if (error) {
-
         return (
-
-            <Box
-                sx={{
-                    minHeight: "100vh",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    bgcolor: "#030712",
-                }}
-            >
-
-                <Typography variant="h6" color="error">
-                    {error}
-                </Typography>
-
+            <Box sx={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", bgcolor: "grey.100" }}>
+                <Typography variant="h6" color="error">{error}</Typography>
             </Box>
         );
     }
 
+    /*
+    |----------------------------------------------------------
+    | Render
+    |----------------------------------------------------------
+    */
+
     return (
 
-        <Box
-            sx={{
-                p: { xs: 2, md: 5 },
-                bgcolor: "#030712",
-                minHeight: "100vh",
-            }}
-        >
+        <Box sx={{ p: { xs: 2, sm: 3, md: 5 }, bgcolor: "grey.100", minHeight: "100vh" }}>
 
-            {/* Page Header */}
-            <Box sx={{ mb: { xs: 4, md: 6 } }}>
+            {/* ── Header ── */}
+            <Box sx={{ mb: { xs: 3, md: 5 } }}>
 
                 <Typography
-                    variant="h3"
+                    variant="h4"
                     fontWeight="bold"
-                    sx={{
-                        fontSize: { xs: "2rem", md: "3rem" },
-                        color: "#f9fafb",
-                        letterSpacing: "-0.5px",
-                    }}
+                    sx={{ fontSize: { xs: "1.75rem", md: "2.5rem" }, color: "text.primary" }}
                 >
                     My Orders
                 </Typography>
 
-                <Box
-                    sx={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        mt: 1.5,
-                        px: 2,
-                        py: 0.5,
-                        bgcolor: "#111827",
-                        borderRadius: 10,
-                        border: "1px solid #1f2937",
-                    }}
-                >
-                    <Typography variant="body2" sx={{ color: "#6b7280", fontWeight: 500 }}>
-                        {orders.length} order{orders.length !== 1 ? "s" : ""} placed
-                    </Typography>
-                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    {orders.length} order{orders.length !== 1 ? "s" : ""} placed
+                </Typography>
 
             </Box>
 
+            {/* ── Empty State ── */}
             {orders.length === 0 ? (
 
-                <Card
+                <Paper
+                    elevation={0}
                     sx={{
                         borderRadius: 3,
-                        bgcolor: "#0f172a",
-                        border: "1px solid #1e293b",
-                        boxShadow: "none",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        py: 10,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        textAlign: "center",
+                        bgcolor: "white",
                     }}
                 >
-
-                    <CardContent
+                    <Box
                         sx={{
-                            py: 10,
+                            width: 80,
+                            height: 80,
+                            borderRadius: "50%",
+                            bgcolor: "grey.100",
                             display: "flex",
-                            flexDirection: "column",
                             alignItems: "center",
-                            textAlign: "center",
+                            justifyContent: "center",
+                            mb: 2,
                         }}
                     >
+                        <ShoppingBagOutlinedIcon sx={{ fontSize: 36, color: "text.disabled" }} />
+                    </Box>
 
-                        <Box
-                            sx={{
-                                width: 96,
-                                height: 96,
-                                borderRadius: "50%",
-                                bgcolor: "#1e293b",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                mb: 3,
-                            }}
-                        >
-                            <FaShoppingBag style={{ fontSize: 40, color: "#475569" }} />
-                        </Box>
+                    <Typography variant="h6" fontWeight="bold" color="text.primary">
+                        No orders yet
+                    </Typography>
 
-                        <Typography variant="h5" fontWeight="bold" sx={{ color: "#e2e8f0" }}>
-                            No orders yet
-                        </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                        Your completed orders will appear here.
+                    </Typography>
 
-                        <Typography variant="body1" sx={{ mt: 1, color: "#475569" }}>
-                            Your completed orders will appear here.
-                        </Typography>
-
-                    </CardContent>
-
-                </Card>
+                </Paper>
 
             ) : (
 
                 <Stack spacing={3}>
 
-                    {orders.map((order, orderIndex) => {
+                    {orders.map((order) => (
 
-                        const accent = CARD_ACCENTS[orderIndex % CARD_ACCENTS.length];
+                        <Card
+                            key={order.orderId}
+                            elevation={0}
+                            sx={{
+                                borderRadius: 3,
+                                border: "1px solid",
+                                borderColor: "divider",
+                                overflow: "hidden",
+                                bgcolor: "white",
+                            }}
+                        >
 
-                        return (
-
-                            <Card
-                                key={order.orderId}
+                            {/* ── Order Header ── */}
+                            <Box
                                 sx={{
-                                    borderRadius: 3,
-                                    bgcolor: "#0f172a",
-                                    border: "1px solid #1e293b",
-                                    borderTop: `3px solid ${accent.border}`,
-                                    boxShadow: `0 0 24px 0 ${accent.border}18`,
-                                    overflow: "hidden",
+                                    px: { xs: 2.5, md: 4 },
+                                    py: { xs: 2, md: 2.5 },
+                                    bgcolor: "grey.50",
+                                    borderBottom: "1px solid",
+                                    borderColor: "divider",
+                                    display: "flex",
+                                    flexDirection: { xs: "column", sm: "row" },
+                                    justifyContent: "space-between",
+                                    alignItems: { sm: "center" },
+                                    gap: 1.5,
                                 }}
                             >
 
-                                {/* Order Header */}
-                                <Box
-                                    sx={{
-                                        px: { xs: 2.5, md: 4 },
-                                        py: { xs: 2, md: 2.5 },
-                                        bgcolor: "#0a0f1e",
-                                        borderBottom: "1px solid #1e293b",
-                                        display: "flex",
-                                        flexDirection: { xs: "column", sm: "row" },
-                                        justifyContent: "space-between",
-                                        alignItems: { sm: "center" },
-                                        gap: 2,
-                                    }}
-                                >
+                                <Stack direction="row" alignItems="center" spacing={1.5}>
 
-                                    <Stack direction="row" alignItems="center" spacing={2}>
-
-                                        <Box>
-
-                                            <Typography
-                                                variant="caption"
-                                                sx={{
-                                                    color: "#475569",
-                                                    textTransform: "uppercase",
-                                                    letterSpacing: 1.5,
-                                                    fontWeight: 600,
-                                                    display: "block",
-                                                }}
-                                            >
-                                                Order
-                                            </Typography>
-
-                                            <Typography
-                                                variant="h6"
-                                                fontWeight="bold"
-                                                sx={{ color: accent.border }}
-                                            >
-                                                #{order.orderId}
-                                            </Typography>
-
-                                        </Box>
-
-                                        <Chip
-                                            label={order.status}
-                                            color={STATUS_COLORS[order.status] || "default"}
-                                            size="small"
-                                            sx={{ fontWeight: 700, letterSpacing: 0.5 }}
-                                        />
-
-                                    </Stack>
-
-                                    <Box sx={{ textAlign: { sm: "right" } }}>
-
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                color: "#475569",
-                                                textTransform: "uppercase",
-                                                letterSpacing: 1.5,
-                                                fontWeight: 600,
-                                                display: "block",
-                                            }}
-                                        >
-                                            Order Total
+                                    <Box>
+                                        <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
+                                            Order
                                         </Typography>
-
-                                        <Typography
-                                            variant="h5"
-                                            fontWeight="bold"
-                                            sx={{ color: accent.border }}
-                                        >
-                                            ${Number(order.totalAmount).toLocaleString("en-US", {
-                                                minimumFractionDigits: 2,
-                                            })}
+                                        <Typography variant="h6" fontWeight="bold" color="text.primary">
+                                            #{order.orderId}
                                         </Typography>
-
                                     </Box>
 
+                                    <Chip
+                                        label={order.status}
+                                        color={STATUS_COLORS[order.status] || "default"}
+                                        size="small"
+                                        sx={{ fontWeight: 700 }}
+                                    />
+
+                                </Stack>
+
+                                <Box sx={{ textAlign: { sm: "right" } }}>
+                                    <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1} display="block">
+                                        Order Total
+                                    </Typography>
+                                    <Typography variant="h5" fontWeight="bold" color="success.main">
+                                        ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    </Typography>
                                 </Box>
 
-                                {/* Order Items */}
-                                <CardContent sx={{ px: { xs: 2.5, md: 4 }, py: { xs: 2, md: 3 } }}>
+                            </Box>
 
-                                    <Stack>
+                            {/* ── Order Items ── */}
+                            <CardContent sx={{ px: { xs: 2.5, md: 4 }, py: { xs: 2, md: 3 } }}>
 
-                                        {order.items.map((item, index) => (
+                                <Stack divider={<Divider />}>
 
-                                            <Box key={item.productId}>
+                                    {order.items.map((item) => (
 
-                                                <Box
-                                                    sx={{
-                                                        display: "flex",
-                                                        flexDirection: { xs: "column", sm: "row" },
-                                                        justifyContent: "space-between",
-                                                        alignItems: { sm: "center" },
-                                                        gap: 2,
-                                                        py: 2,
-                                                    }}
-                                                >
+                                        <Box
+                                            key={item.productId}
+                                            sx={{
+                                                display: "flex",
+                                                flexDirection: { xs: "column", sm: "row" },
+                                                justifyContent: "space-between",
+                                                alignItems: { sm: "center" },
+                                                gap: 1.5,
+                                                py: 2,
+                                            }}
+                                        >
 
-                                                    {/* Product Info */}
-                                                    <Box>
-
-                                                        <Typography
-                                                            variant="subtitle1"
-                                                            fontWeight={700}
-                                                            sx={{ color: "#e2e8f0" }}
-                                                        >
-                                                            {item.productName}
-                                                        </Typography>
-
-                                                        <Box
-                                                            sx={{
-                                                                display: "inline-flex",
-                                                                alignItems: "center",
-                                                                mt: 0.75,
-                                                                px: 1.5,
-                                                                py: 0.25,
-                                                                bgcolor: accent.badge,
-                                                                borderRadius: 10,
-                                                            }}
-                                                        >
-                                                            <Typography
-                                                                variant="caption"
-                                                                fontWeight={700}
-                                                                sx={{ color: accent.badgeText }}
-                                                            >
-                                                                Qty: {item.quantity}
-                                                            </Typography>
-                                                        </Box>
-
-                                                    </Box>
-
-                                                    {/* Unit Price */}
-                                                    <Box
-                                                        sx={{
-                                                            textAlign: { sm: "right" },
-                                                            bgcolor: "#0a0f1e",
-                                                            border: `1px solid ${accent.border}`,
-                                                            borderRadius: 2,
-                                                            px: 2.5,
-                                                            py: 1.25,
-                                                            minWidth: 150,
-                                                            boxShadow: `0 0 12px 0 ${accent.border}30`,
-                                                        }}
-                                                    >
-
-                                                        <Typography
-                                                            variant="caption"
-                                                            sx={{
-                                                                color: accent.badgeText,
-                                                                textTransform: "uppercase",
-                                                                letterSpacing: 1.2,
-                                                                fontWeight: 700,
-                                                                display: "block",
-                                                            }}
-                                                        >
-                                                            Unit Price
-                                                        </Typography>
-
-                                                        <Typography
-                                                            variant="h6"
-                                                            fontWeight="bold"
-                                                            sx={{ color: accent.border }}
-                                                        >
-                                                            ${Number(item.price).toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2,
-                                                            })}
-                                                        </Typography>
-
-                                                    </Box>
-
-                                                </Box>
-
-                                                {index < order.items.length - 1 && (
-                                                    <Divider sx={{ borderColor: "#1e293b" }} />
-                                                )}
-
+                                            <Box>
+                                                <Typography variant="subtitle1" fontWeight={600} color="text.primary">
+                                                    {item.productName}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Qty: {item.quantity}
+                                                </Typography>
                                             </Box>
-                                        ))}
 
-                                    </Stack>
+                                            <Box
+                                                sx={{
+                                                    textAlign: { sm: "right" },
+                                                    bgcolor: "grey.50",
+                                                    border: "1px solid",
+                                                    borderColor: "divider",
+                                                    borderRadius: 2,
+                                                    px: 2.5,
+                                                    py: 1.25,
+                                                    minWidth: { sm: 140 },
+                                                }}
+                                            >
+                                                <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1} display="block">
+                                                    Unit Price
+                                                </Typography>
+                                                <Typography variant="h6" fontWeight="bold" color="success.main">
+                                                    ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                </Typography>
+                                            </Box>
 
-                                </CardContent>
+                                        </Box>
+                                    ))}
 
-                            </Card>
-                        );
-                    })}
+                                </Stack>
+
+                            </CardContent>
+
+                        </Card>
+                    ))}
 
                 </Stack>
             )}
