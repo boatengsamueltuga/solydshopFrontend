@@ -628,7 +628,7 @@ const AdminProductsPage = () => {
                         </Grid>
 
                         {/* Category */}
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sx={{ width: "70%" }}>
                             <FormControl size="small" fullWidth>
                                 <InputLabel>Category</InputLabel>
                                 <Select
@@ -649,7 +649,7 @@ const AdminProductsPage = () => {
                         </Grid>
 
                         {/* Image Upload */}
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sx={{ width: "35%" }}>
                             <input
                                 type="file"
                                 id="productImageInput"
@@ -669,20 +669,21 @@ const AdminProductsPage = () => {
                             </Button>
                         </Grid>
 
-                        {/* Image preview — always full width on its own row */}
+                        {/* Image preview — to the right of the button */}
                         {productForm.imageUrl && (
-                            <Grid item xs={12}>
+                            <Grid item xs={12} sx={{ width: "60%" }}>
                                 <Box
                                     sx={{
                                         width: "100%",
-                                        height: 160,
+                                        height: 90,
                                         borderRadius: 2,
                                         border: "1px solid #e5e7eb",
                                         bgcolor: "#f3f4f6",
+                                        overflow: "hidden",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        overflow: "hidden",
+                                        p: 0.5,
                                     }}
                                 >
                                     <img
@@ -690,7 +691,7 @@ const AdminProductsPage = () => {
                                         alt="Preview"
                                         style={{
                                             maxWidth: "100%",
-                                            maxHeight: 160,
+                                            maxHeight: 80,
                                             objectFit: "contain",
                                             display: "block",
                                         }}
@@ -700,13 +701,13 @@ const AdminProductsPage = () => {
                         )}
 
                         {/* Description */}
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sx={{ width: "100%" }}>
                             <TextField
                                 label="Description"
                                 size="small"
                                 fullWidth
                                 multiline
-                                rows={3}
+                                rows={5}
                                 value={productForm.description}
                                 onChange={(e) =>
                                     setProductForm({ ...productForm, description: e.target.value })

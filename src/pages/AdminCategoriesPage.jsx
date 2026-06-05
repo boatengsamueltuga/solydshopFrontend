@@ -2,13 +2,20 @@ import { useEffect, useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 
-import { Button } from "@mui/material";
-
 import {
-    Dialog,
-    DialogPanel,
-    DialogTitle
-} from "@headlessui/react";
+    Button,
+    Dialog as MuiDialog,
+    DialogTitle as MuiDialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    IconButton,
+    TextField,
+    Tooltip,
+} from "@mui/material";
+
+import EditIcon   from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import api from "../api/api";
 
@@ -19,23 +26,17 @@ import toast from "react-hot-toast";
 const AdminCategoriesPage = () => {
 
     const [categories, setCategories] = useState([]);
+    const [loading,    setLoading]    = useState(true);
 
-    const [loading, setLoading] = useState(true);
+    const [isCreateOpen,  setIsCreateOpen]  = useState(false);
+    const [categoryName,  setCategoryName]  = useState("");
 
-    const [isCreateCategoryOpen, setIsCreateCategoryOpen] =
-        useState(false);
+    const [isEditOpen,          setIsEditOpen]          = useState(false);
+    const [selectedCategoryId,  setSelectedCategoryId]  = useState(null);
+    const [editCategoryName,    setEditCategoryName]    = useState("");
 
-    const [categoryName, setCategoryName] =
-        useState("");
-
-    const [isEditCategoryOpen, setIsEditCategoryOpen] =
-        useState(false);
-
-    const [selectedCategoryId, setSelectedCategoryId] =
-        useState(null);
-
-    const [editCategoryName, setEditCategoryName] =
-        useState("");
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [categoryToDelete,  setCategoryToDelete]  = useState(null);
 
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -45,238 +46,164 @@ const AdminCategoriesPage = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    /*
+    |----------------------------------------------------------
+    | Fetch
+    |----------------------------------------------------------
+    */
+
     const fetchCategories = async () => {
-
         try {
-
-            const response = await api.get(
-                "/public/categories"
-            );
-
-            setCategories(
-                response.data.content
-            );
-
+            const response = await api.get("/public/categories");
+            setCategories(response.data.content);
         } catch (error) {
-
             console.log(error);
-
-            toast.error(
-                "Failed to load categories"
-            );
-
+            toast.error("Failed to load categories");
         } finally {
-
             setLoading(false);
         }
     };
 
     useEffect(() => {
-
         fetchCategories();
-
     }, []);
 
-    const handleDeleteCategory = async (categoryId) => {
+    /*
+    |----------------------------------------------------------
+    | Handlers
+    |----------------------------------------------------------
+    */
 
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this category?"
-        );
+    const handleDeleteCategory = (category) => {
+        setCategoryToDelete(category);
+        setDeleteConfirmOpen(true);
+    };
 
-        if (!confirmed) {
-
-            return;
-        }
-
+    const confirmDelete = async () => {
         try {
-
-            await api.delete(
-                `/admin/categories/${categoryId}`
-            );
-
-            toast.success(
-                "Category deleted successfully"
-            );
-
+            await api.delete(`/admin/categories/${categoryToDelete.categoryId}`);
+            toast.success(`"${categoryToDelete.categoryName}" deleted successfully.`);
             fetchCategories();
-
         } catch (error) {
-
             console.log(error);
-
-            toast.error(
-                "Failed to delete category"
-            );
+            toast.error("Failed to delete category.");
+        } finally {
+            setDeleteConfirmOpen(false);
+            setCategoryToDelete(null);
         }
     };
 
     const handleCreateCategory = async () => {
-
         if (!categoryName.trim()) {
-
-            toast.error(
-                "Category name is required"
-            );
-
+            toast.error("Category name is required");
             return;
         }
-
         try {
-
-            await api.post(
-                "/admin/categories",
-                {
-                    categoryName
-                }
-            );
-
-            toast.success(
-                "Category created successfully"
-            );
-
+            await api.post("/admin/categories", { categoryName });
+            toast.success("Category created successfully.");
             fetchCategories();
-
             setCategoryName("");
-
-            setIsCreateCategoryOpen(false);
-
+            setIsCreateOpen(false);
         } catch (error) {
-
             console.log(error);
-
-            toast.error(
-                "Failed to create category"
-            );
+            toast.error("Failed to create category.");
         }
     };
 
-    const openEditCategoryDialog = (category) => {
-
-        setSelectedCategoryId(
-            category.categoryId
-        );
-
-        setEditCategoryName(
-            category.categoryName
-        );
-
-        setIsEditCategoryOpen(true);
+    const openEditDialog = (category) => {
+        setSelectedCategoryId(category.categoryId);
+        setEditCategoryName(category.categoryName);
+        setIsEditOpen(true);
     };
 
     const handleUpdateCategory = async () => {
-
         if (!editCategoryName.trim()) {
-
-            toast.error(
-                "Category name is required"
-            );
-
+            toast.error("Category name is required");
             return;
         }
-
         try {
-
-            await api.put(
-                `/admin/categories/${selectedCategoryId}`,
-                {
-                    categoryName: editCategoryName
-                }
-            );
-
-            toast.success(
-                "Category updated successfully"
-            );
-
+            await api.put(`/admin/categories/${selectedCategoryId}`, { categoryName: editCategoryName });
+            toast.success("Category updated successfully.");
             fetchCategories();
-
             setSelectedCategoryId(null);
-
             setEditCategoryName("");
-
-            setIsEditCategoryOpen(false);
-
+            setIsEditOpen(false);
         } catch (error) {
-
             console.log(error);
-
-            toast.error(
-                "Failed to update category"
-            );
+            toast.error("Failed to update category.");
         }
     };
 
-    const categoryColumns = [
+    /*
+    |----------------------------------------------------------
+    | DataGrid Columns
+    |----------------------------------------------------------
+    */
+
+    const columns = [
 
         ...(!isMobile ? [{
             field: "categoryId",
             headerName: "ID",
-            width: 80
+            width: 80,
         }] : []),
 
         {
             field: "categoryName",
             headerName: "Category Name",
             minWidth: 150,
-            flex: 1
+            flex: 1,
+            renderCell: (params) => (
+                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4 }}>
+                    {params.row.categoryName}
+                </span>
+            ),
         },
 
         {
             field: "actions",
             headerName: "Actions",
-            width: isMobile ? 150 : 220,
-
+            width: isMobile ? 90 : 120,
             renderCell: (params) => (
+                <div className="flex gap-1 items-center h-full">
 
-                <div className="flex gap-2 mt-2">
+                    <Tooltip title="Edit category" arrow>
+                        <IconButton size="small" color="warning" onClick={() => openEditDialog(params.row)}>
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
 
-                    <Button
-                        variant="contained"
-                        color="warning"
-                        size="small"
-                        sx={{ minWidth: isMobile ? 40 : 60, fontSize: isMobile ? "10px" : "13px" }}
-                        onClick={() =>
-                            openEditCategoryDialog(
-                                params.row
-                            )
-                        }
-                    >
-                        Edit
-                    </Button>
-
-                    <Button
-                        variant="contained"
-                        color="error"
-                        size="small"
-                        sx={{ minWidth: isMobile ? 50 : 70, fontSize: isMobile ? "10px" : "13px" }}
-                        onClick={() =>
-                            handleDeleteCategory(
-                                params.row.categoryId
-                            )
-                        }
-                    >
-                        Delete
-                    </Button>
+                    <Tooltip title="Delete category" arrow>
+                        <IconButton size="small" color="error" onClick={() => handleDeleteCategory(params.row)}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
 
                 </div>
-            )
-        }
+            ),
+        },
     ];
 
+    /*
+    |----------------------------------------------------------
+    | Loading
+    |----------------------------------------------------------
+    */
+
     if (loading) {
-
         return (
-
             <div className="min-h-screen flex flex-col justify-center items-center">
-
                 <Loader />
-
-                <p className="text-2xl font-semibold mt-4">
-                    Loading categories...
-                </p>
-
+                <p className="text-2xl font-semibold mt-4">Loading categories...</p>
             </div>
         );
     }
+
+    /*
+    |----------------------------------------------------------
+    | Render
+    |----------------------------------------------------------
+    */
 
     return (
 
@@ -291,10 +218,8 @@ const AdminCategoriesPage = () => {
                 <Button
                     variant="contained"
                     color="success"
-                    sx={{ alignSelf: { xs: "flex-start", sm: "auto" } }}
-                    onClick={() =>
-                        setIsCreateCategoryOpen(true)
-                    }
+                    sx={{ alignSelf: "flex-start", width: "fit-content" }}
+                    onClick={() => setIsCreateOpen(true)}
                 >
                     Create Category
                 </Button>
@@ -303,171 +228,131 @@ const AdminCategoriesPage = () => {
 
             <div
                 className="bg-white rounded-xl shadow overflow-x-auto min-w-0"
-                style={{
-                    height: isMobile ? 420 : 500,
-                    width: "100%"
-                }}
+                style={{ height: isMobile ? 420 : 500, width: "100%" }}
             >
-
                 <DataGrid
                     rows={categories}
-                    columns={categoryColumns}
+                    columns={columns}
                     getRowId={(row) => row.categoryId}
+                    getRowHeight={() => "auto"}
                     disableRowSelectionOnClick
                     pageSizeOptions={[5, 10]}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5
-                            }
-                        }
-                    }}
+                    initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
                     sx={{
                         "& .MuiDataGrid-columnHeaderTitle": {
                             fontWeight: "bold",
-                            fontSize: isMobile ? "12px" : "14px"
+                            fontSize: isMobile ? "12px" : "14px",
                         },
                         "& .MuiDataGrid-cell": {
                             fontSize: isMobile ? "12px" : "14px",
-                            padding: isMobile ? "4px 6px" : "8px 10px"
-                        }
+                            padding: isMobile ? "4px 6px" : "8px 10px",
+                        },
                     }}
                 />
-
             </div>
-            {/* Create Category Dialog */}
-            <Dialog
-                open={isCreateCategoryOpen}
-                onClose={() => {
 
-                    setCategoryName("");
-
-                    setIsCreateCategoryOpen(false);
-                }}
-                className="relative z-50"
+            {/* ── Create Category Dialog ── */}
+            <MuiDialog
+                open={isCreateOpen}
+                onClose={() => { setCategoryName(""); setIsCreateOpen(false); }}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 3 } }}
             >
+                <MuiDialogTitle sx={{ fontWeight: "bold", pb: 1 }}>
+                    Create Category
+                </MuiDialogTitle>
 
-                <div className="fixed inset-0 bg-black/40" />
+                <DialogContent sx={{ pt: 3, overflow: "visible" }}>
+                    <TextField
+                        label="Category Name"
+                        fullWidth
+                        autoFocus
+                        value={categoryName}
+                        onChange={(e) => setCategoryName(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleCreateCategory()}
+                    />
+                </DialogContent>
 
-                <div className="fixed inset-0 flex items-center justify-center p-4">
+                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+                    <Button
+                        onClick={() => { setCategoryName(""); setIsCreateOpen(false); }}
+                        variant="outlined"
+                        color="inherit"
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleCreateCategory} variant="contained" color="success">
+                        Create
+                    </Button>
+                </DialogActions>
+            </MuiDialog>
 
-                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
-
-                        <DialogTitle className="text-3xl font-bold mb-6">
-
-                            Create Category
-
-                        </DialogTitle>
-
-                        <input
-                            type="text"
-                            placeholder="Enter category name"
-                            value={categoryName}
-                            onChange={(e) =>
-                                setCategoryName(
-                                    e.target.value
-                                )
-                            }
-                            className="w-full border border-gray-300 rounded-lg p-4 text-lg mb-6"
-                        />
-
-                        <div className="flex justify-end gap-4">
-
-                            <button
-                                onClick={() => {
-
-                                    setCategoryName("");
-
-                                    setIsCreateCategoryOpen(false);
-                                }}
-                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={handleCreateCategory}
-                                className="px-6 py-3 rounded-lg bg-green-600 text-white font-semibold"
-                            >
-                                Create
-                            </button>
-
-                        </div>
-
-                    </DialogPanel>
-
-                </div>
-
-            </Dialog>
-
-            {/* Edit Category Dialog */}
-            <Dialog
-                open={isEditCategoryOpen}
-                onClose={() => {
-
-                    setSelectedCategoryId(null);
-
-                    setEditCategoryName("");
-
-                    setIsEditCategoryOpen(false);
-                }}
-                className="relative z-50"
+            {/* ── Edit Category Dialog ── */}
+            <MuiDialog
+                open={isEditOpen}
+                onClose={() => { setSelectedCategoryId(null); setEditCategoryName(""); setIsEditOpen(false); }}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 3 } }}
             >
+                <MuiDialogTitle sx={{ fontWeight: "bold", pb: 1 }}>
+                    Edit Category
+                </MuiDialogTitle>
 
-                <div className="fixed inset-0 bg-black/40" />
+                <DialogContent sx={{ pt: 3, overflow: "visible" }}>
+                    <TextField
+                        label="Category Name"
+                        fullWidth
+                        autoFocus
+                        value={editCategoryName}
+                        onChange={(e) => setEditCategoryName(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleUpdateCategory()}
+                    />
+                </DialogContent>
 
-                <div className="fixed inset-0 flex items-center justify-center p-4">
+                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+                    <Button
+                        onClick={() => { setSelectedCategoryId(null); setEditCategoryName(""); setIsEditOpen(false); }}
+                        variant="outlined"
+                        color="inherit"
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleUpdateCategory} variant="contained" color="warning">
+                        Update
+                    </Button>
+                </DialogActions>
+            </MuiDialog>
 
-                    <DialogPanel className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+            {/* ── Delete Confirmation Dialog ── */}
+            <MuiDialog
+                open={deleteConfirmOpen}
+                onClose={() => setDeleteConfirmOpen(false)}
+                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+            >
+                <MuiDialogTitle sx={{ fontWeight: "bold", fontSize: "1.25rem" }}>
+                    Delete Category
+                </MuiDialogTitle>
 
-                        <DialogTitle className="text-3xl font-bold mb-6">
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete{" "}
+                        <strong>{categoryToDelete?.categoryName}</strong>?
+                        This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
 
-                            Edit Category
+                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+                    <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined" color="inherit">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmDelete} variant="contained" color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </MuiDialog>
 
-                        </DialogTitle>
-
-                        <input
-                            type="text"
-                            placeholder="Enter category name"
-                            value={editCategoryName}
-                            onChange={(e) =>
-                                setEditCategoryName(
-                                    e.target.value
-                                )
-                            }
-                            className="w-full border border-gray-300 rounded-lg p-4 text-lg mb-6"
-                        />
-
-                        <div className="flex justify-end gap-4">
-
-                            <button
-                                onClick={() => {
-
-                                    setSelectedCategoryId(null);
-
-                                    setEditCategoryName("");
-
-                                    setIsEditCategoryOpen(false);
-                                }}
-                                className="px-6 py-3 rounded-lg bg-gray-300 font-semibold"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={handleUpdateCategory}
-                                className="px-6 py-3 rounded-lg bg-yellow-500 text-white font-semibold"
-                            >
-                                Update
-                            </button>
-
-                        </div>
-
-                    </DialogPanel>
-
-                </div>
-
-            </Dialog>
         </div>
     );
 };
