@@ -13,14 +13,21 @@ import {
 } from "@mui/x-data-grid";
 
 import {
-    Button
+    Button,
+    Box,
+    Dialog as MuiDialog,
+    DialogTitle as MuiDialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Grid,
 } from "@mui/material";
 
-import {
-    Dialog,
-    DialogPanel,
-    DialogTitle
-} from "@headlessui/react";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 import api from "../api/api";
 import Loader from "../components/Loader";
@@ -509,6 +516,34 @@ const navigate = useNavigate();
 
         /*
     ---------------------------------------------------------------
+    | Image Upload
+    ---------------------------------------------------------------
+    */
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const response = await api.post("/upload", formData, {
+                headers: {
+                    "X-XSRF-TOKEN": document.cookie
+                        .split("; ")
+                        .find(row => row.startsWith("XSRF-TOKEN="))
+                        ?.split("=")[1],
+                },
+            });
+            setProductForm((prev) => ({ ...prev, imageUrl: response.data }));
+            toast.success("Image uploaded successfully.");
+        } catch (error) {
+            console.log(error);
+            toast.error("Image upload failed. Please try again.");
+        }
+    };
+
+    /*
+    ---------------------------------------------------------------
     | Open Edit Product Dialog
     ---------------------------------------------------------------
     */
@@ -569,7 +604,12 @@ const navigate = useNavigate();
             field: "productName",
             headerName: "Product Name",
             minWidth: isMobile ? 120 : 200,
-            flex: 1
+            flex: 1,
+            renderCell: (params) => (
+                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4 }}>
+                    {params.row.productName}
+                </span>
+            ),
         },
 
         {
@@ -906,6 +946,7 @@ const navigate = useNavigate();
                         rows={products}
                         columns={columns}
                         getRowId={(row) => row.productId}
+                        getRowHeight={() => "auto"}
                         disableRowSelectionOnClick
                         pageSizeOptions={[5, 10, 20]}
                         initialState={{
@@ -931,11 +972,163 @@ const navigate = useNavigate();
 
             </div>
 
-          
+            {/* ── Create / Edit Product Dialog ── */}
+            <MuiDialog
+                open={isCreateProductOpen}
+                onClose={() => {
+                    setIsCreateProductOpen(false);
+                    setEditingProductId(null);
+                    setProductForm({ productName: "", description: "", imageUrl: "", price: "", quantity: "", categoryId: "" });
+                }}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 3 } }}
+            >
+                <MuiDialogTitle sx={{ fontWeight: "bold", pb: 1 }}>
+                    {editingProductId ? "Edit Product" : "Create Product"}
+                </MuiDialogTitle>
 
+                <DialogContent sx={{ pt: 3, overflow: "visible" }}>
+                    <Grid container spacing={2}>
 
+                        {/* Product Name */}
+                        <Grid item xs={12} sm={7}>
+                            <TextField
+                                label="Product Name"
+                                size="small"
+                                fullWidth
+                                value={productForm.productName}
+                                onChange={(e) => setProductForm({ ...productForm, productName: e.target.value })}
+                            />
+                        </Grid>
 
-        
+                        {/* Price */}
+                        <Grid item xs={6} sm={2.5}>
+                            <TextField
+                                label="Price"
+                                size="small"
+                                type="number"
+                                fullWidth
+                                value={productForm.price}
+                                onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                            />
+                        </Grid>
+
+                        {/* Quantity */}
+                        <Grid item xs={6} sm={2.5}>
+                            <TextField
+                                label="Qty"
+                                size="small"
+                                type="number"
+                                fullWidth
+                                value={productForm.quantity}
+                                onChange={(e) => setProductForm({ ...productForm, quantity: e.target.value })}
+                            />
+                        </Grid>
+
+                        {/* Category */}
+                        <Grid item xs={12} sx={{ width: "70%" }}>
+                            <FormControl size="small" fullWidth>
+                                <InputLabel>Category</InputLabel>
+                                <Select
+                                    label="Category"
+                                    value={productForm.categoryId}
+                                    onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
+                                >
+                                    <MenuItem value=""><em>Select category</em></MenuItem>
+                                    {categories.map((cat) => (
+                                        <MenuItem key={cat.categoryId} value={String(cat.categoryId)}>
+                                            {cat.categoryName}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        {/* Image Upload */}
+                        <Grid item xs={12} sx={{ width: "35%" }}>
+                            <input
+                                type="file"
+                                id="dashboardProductImageInput"
+                                hidden
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                startIcon={<CloudUploadIcon />}
+                                onClick={() => document.getElementById("dashboardProductImageInput").click()}
+                                sx={{ height: "40px" }}
+                            >
+                                {productForm.imageUrl ? "Change Image" : "Upload Image"}
+                            </Button>
+                        </Grid>
+
+                        {/* Image preview */}
+                        {productForm.imageUrl && (
+                            <Grid item xs={12} sx={{ width: "60%" }}>
+                                <Box
+                                    sx={{
+                                        width: "100%",
+                                        height: 90,
+                                        borderRadius: 2,
+                                        border: "1px solid #e5e7eb",
+                                        bgcolor: "#f3f4f6",
+                                        overflow: "hidden",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        p: 0.5,
+                                    }}
+                                >
+                                    <img
+                                        src={productForm.imageUrl}
+                                        alt="Preview"
+                                        style={{ maxWidth: "100%", maxHeight: 80, objectFit: "contain", display: "block" }}
+                                    />
+                                </Box>
+                            </Grid>
+                        )}
+
+                        {/* Description */}
+                        <Grid item xs={12} sx={{ width: "100%" }}>
+                            <TextField
+                                label="Description"
+                                size="small"
+                                fullWidth
+                                multiline
+                                rows={5}
+                                value={productForm.description}
+                                onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                            />
+                        </Grid>
+
+                    </Grid>
+                </DialogContent>
+
+                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+                    <Button
+                        onClick={() => {
+                            setIsCreateProductOpen(false);
+                            setEditingProductId(null);
+                            setProductForm({ productName: "", description: "", imageUrl: "", price: "", quantity: "", categoryId: "" });
+                        }}
+                        variant="outlined"
+                        color="inherit"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleCreateProduct}
+                        variant="contained"
+                        color="primary"
+                    >
+                        {editingProductId ? "Update Product" : "Create Product"}
+                    </Button>
+                </DialogActions>
+            </MuiDialog>
 
         </div>
     );
