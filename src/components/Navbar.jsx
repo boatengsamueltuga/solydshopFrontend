@@ -92,9 +92,12 @@ const Navbar = () => {
 
             <div className="flex justify-between items-center">
 
-                <h1 className="text-3xl md:text-5xl font-bold">
-                    SolydShop
-                </h1>
+                <Link to="/" className="flex items-center gap-2 text-white no-underline hover:opacity-80 transition-opacity">
+                    <FaStore className="text-2xl md:text-4xl" />
+                    <h1 className="text-3xl md:text-5xl font-bold">
+                        SolydShop
+                    </h1>
+                </Link>
 
                 {/* Desktop links */}
                 <div className="hidden md:flex items-center gap-2">
