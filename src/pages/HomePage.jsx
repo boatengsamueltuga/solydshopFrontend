@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import api from "../api/api";
 
-import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 
 import {
@@ -13,129 +12,117 @@ import {
     fetchProductsFailure
 } from "../features/product/productSlice";
 
+import {
+    Box,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardMedia,
+    Chip,
+    Container,
+    FormControl,
+    InputAdornment,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Skeleton,
+    TextField,
+    Typography,
+} from "@mui/material";
+
+import SearchIcon        from "@mui/icons-material/Search";
+import ShoppingCartIcon  from "@mui/icons-material/ShoppingCart";
+import StorefrontIcon    from "@mui/icons-material/Storefront";
+import FilterAltOffIcon  from "@mui/icons-material/FilterAltOff";
+
+/*
+|----------------------------------------------------------
+| Skeleton placeholder shown while loading
+|----------------------------------------------------------
+*/
+
+const SkeletonCard = () => (
+    <Card elevation={2} sx={{ borderRadius: 3, display: "flex", flexDirection: "column" }}>
+        <Skeleton variant="rectangular" height={45} />
+        <CardContent sx={{ flexGrow: 1, p: 1 }}>
+            <Skeleton variant="text" width="85%" />
+            <Skeleton variant="text" width="65%" />
+            <Skeleton variant="text" width="35%" />
+            <Skeleton variant="rounded" width={60} height={18} sx={{ mt: 0.3 }} />
+        </CardContent>
+        <CardActions sx={{ p: 1.5, pt: 0 }}>
+            <Skeleton variant="rounded" width="100%" height={32} />
+        </CardActions>
+    </Card>
+);
+
+/*
+|----------------------------------------------------------
+| Page component
+|----------------------------------------------------------
+*/
+
 const HomePage = () => {
 
     const dispatch = useDispatch();
 
-    const {
-        products,
-        loading,
-        error
-    } = useSelector(
-        (state) => state.product
-    );
+    const { products, loading, error } = useSelector((state) => state.product);
 
-    // Get authenticated user
-    const { user } = useSelector(
-        (state) => state.auth
-    );
+    const { user } = useSelector((state) => state.auth);
 
-    // Search keyword
-    const [keyword, setKeyword] = useState("");
-
-    // Category filter
+    const [keyword,    setKeyword]    = useState("");
     const [categoryId, setCategoryId] = useState("");
-
-    // Store categories
     const [categories, setCategories] = useState([]);
 
-    // Fetch categories
+    /*
+    |----------------------------------------------------------
+    | Fetch helpers
+    |----------------------------------------------------------
+    */
+
     const fetchCategories = async () => {
-
         try {
-
-            const response = await api.get(
-                "/public/categories"
-            );
-
-            setCategories(
-                response.data.content
-            );
-
+            const response = await api.get("/public/categories");
+            setCategories(response.data.content);
         } catch (error) {
-
             console.log(error);
         }
     };
 
-    // Fetch products with filters
     const fetchProducts = async (
-        searchKeyword = keyword,
+        searchKeyword      = keyword,
         selectedCategoryId = categoryId
     ) => {
-
         dispatch(fetchProductsStart());
-
         try {
-
             let url = "/public/products?";
-
-            // Add keyword filter
-            if (searchKeyword.trim() !== "") {
-
-                url += `keyword=${searchKeyword}&`;
-            }
-
-            // Add category filter
-            if (selectedCategoryId !== "") {
-
-                url += `categoryId=${selectedCategoryId}`;
-            }
-
+            if (searchKeyword.trim() !== "")   url += `keyword=${searchKeyword}&`;
+            if (selectedCategoryId !== "")      url += `categoryId=${selectedCategoryId}`;
             const response = await api.get(url);
-
-            dispatch(
-                fetchProductsSuccess(
-                    response.data.content
-                )
-            );
-
+            dispatch(fetchProductsSuccess(response.data.content));
         } catch (error) {
-
-            dispatch(
-                fetchProductsFailure(
-                    error.message
-                )
-            );
+            dispatch(fetchProductsFailure(error.message));
         }
     };
 
-    // Initial load
     useEffect(() => {
-
         fetchProducts();
-
         fetchCategories();
-
     }, []);
 
-    // Debounced realtime search
     useEffect(() => {
-
-        const timeout = setTimeout(() => {
-
-            fetchProducts();
-
-        }, 400);
-
+        const timeout = setTimeout(() => fetchProducts(), 400);
         return () => clearTimeout(timeout);
-
     }, [keyword, categoryId]);
 
-    // Handle Enter key search
     const handleKeyDown = (e) => {
-
-        if (e.key === "Enter") {
-
-            fetchProducts();
-        }
+        if (e.key === "Enter") fetchProducts();
     };
 
-    // Add product to cart
     const handleAddToCart = async (productId) => {
-
         try {
-
             const xsrfToken = document.cookie
                 .split("; ")
                 .find(row => row.startsWith("XSRF-TOKEN="))
@@ -143,163 +130,283 @@ const HomePage = () => {
 
             await api.post(
                 `/cart/${user.userId}/items`,
-                {
-                    productId: productId,
-                    quantity: 1
-                },
-                {
-                    headers: {
-                        "X-XSRF-TOKEN": xsrfToken
-                    }
-                }
+                { productId, quantity: 1 },
+                { headers: { "X-XSRF-TOKEN": xsrfToken } }
             );
 
             toast.success("Product added to cart");
 
         } catch (error) {
-
             console.log(error);
-
             toast.error("Failed to add product to cart");
         }
     };
 
-    if (error) {
+    const clearFilters = () => {
+        setKeyword("");
+        setCategoryId("");
+    };
 
-        return <h1>{error}</h1>;
+    const hasActiveFilters = keyword.trim() !== "" || categoryId !== "";
+
+    /*
+    |----------------------------------------------------------
+    | Error state
+    |----------------------------------------------------------
+    */
+
+    if (error) {
+        return (
+            <Box sx={{ p: 6, textAlign: "center" }}>
+                <Typography color="error" variant="h6">{error}</Typography>
+            </Box>
+        );
     }
+
+    /*
+    |----------------------------------------------------------
+    | Render
+    |----------------------------------------------------------
+    */
 
     return (
 
-        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
+        <Box sx={{ bgcolor: "#f5f7fa", minHeight: "100vh" }}>
 
-            <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10">
-                Products
-            </h1>
+            {/* ── Hero ── */}
+            <Box
+                sx={{
+                    background: "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)",
+                    color: "white",
+                    py: { xs: 7, md: 11 },
+                    px: 3,
+                    textAlign: "center",
+                }}
+            >
+                <StorefrontIcon sx={{ fontSize: { xs: 52, md: 68 }, mb: 2, opacity: 0.9 }} />
 
-            {/* Search and filter section */}
-            <div className="flex flex-col md:flex-row gap-4 md:gap-5 mb-6 md:mb-10">
-
-                {/* Search input */}
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={keyword}
-                    onChange={(e) =>
-                        setKeyword(e.target.value)
-                    }
-                    onKeyDown={handleKeyDown}
-                    className="p-4 border rounded w-full md:w-1/2"
-                />
-
-                {/* Category filter */}
-                <select
-                    value={categoryId}
-                    onChange={(e) =>
-                        setCategoryId(e.target.value)
-                    }
-                    className="p-4 border rounded w-full md:w-1/4"
+                <Typography
+                    variant="h3"
+                    fontWeight="bold"
+                    gutterBottom
+                    sx={{ fontSize: { xs: "2rem", md: "3rem" } }}
                 >
+                    Find What You Need
+                </Typography>
 
-                    <option value="">
-                        All Categories
-                    </option>
+                <Typography
+                    variant="h6"
+                    sx={{ opacity: 0.82, maxWidth: 560, mx: "auto", fontWeight: 400 }}
+                >
+                    Premium heavy equipment parts &amp; machinery — built for performance
+                </Typography>
+            </Box>
 
-                    {categories.map((category) => (
+            <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
 
-                        <option
-                            key={category.categoryId}
-                            value={category.categoryId}
+                {/* ── Search & Filter bar ── */}
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: { xs: 2, md: 3 },
+                        mb: 5,
+                        borderRadius: 3,
+                        display: "flex",
+                        flexDirection: { xs: "column", md: "row" },
+                        alignItems: { md: "center" },
+                        gap: 2,
+                    }}
+                >
+                    <TextField
+                        placeholder="Search products..."
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        size="small"
+                        fullWidth
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon color="action" />
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={{ flex: 2 }}
+                    />
+
+                    <FormControl size="small" sx={{ flex: 1, minWidth: 180 }}>
+                        <InputLabel>Category</InputLabel>
+                        <Select
+                            label="Category"
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(e.target.value)}
                         >
-                            {category.categoryName}
-                        </option>
-                    ))}
+                            <MenuItem value="">All Categories</MenuItem>
+                            {categories.map((cat) => (
+                                <MenuItem key={cat.categoryId} value={cat.categoryId}>
+                                    {cat.categoryName}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
-                </select>
-
-                {/* Search button */}
-                <button
-                    onClick={() =>
-                        fetchProducts()
-                    }
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded font-bold w-full md:w-auto"
-                >
-                    Search
-                </button>
-
-            </div>
-
-            {/* Loading indicator */}
-            {loading && (
-
-                <div className="mb-6 flex items-center gap-4">
-
-                    <Loader />
-                    <p className="text-xl font-semibold text-blue-600">
-                        Searching products...
-                    </p>
-
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-
-                {products.map((product) => (
-
-                    <div
-                        key={product.productId}
-                        className="bg-white rounded-lg shadow-lg overflow-hidden hover:scale-105 transition duration-300 flex flex-col"
+                    <Button
+                        variant="contained"
+                        onClick={() => fetchProducts()}
+                        startIcon={<SearchIcon />}
+                        sx={{ px: 4, py: 1, borderRadius: 2, flexShrink: 0 }}
                     >
+                        Search
+                    </Button>
+                </Paper>
 
-                        <img
-                            src={product.imageUrl}
-                            alt={product.productName}
-                            className="w-full h-44 object-cover"
-                        />
+                {/* ── Results header ── */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mb: 3,
+                        flexWrap: "wrap",
+                        gap: 1,
+                    }}
+                >
+                    <Typography variant="h5" fontWeight="bold" color="text.primary">
+                        {loading
+                            ? "Searching…"
+                            : `${products.length} Product${products.length !== 1 ? "s" : ""} Found`}
+                    </Typography>
 
-                        <div className="p-4 flex flex-col flex-1">
+                    {hasActiveFilters && !loading && (
+                        <Button
+                            size="small"
+                            color="inherit"
+                            onClick={clearFilters}
+                            startIcon={<FilterAltOffIcon />}
+                            sx={{ color: "text.secondary" }}
+                        >
+                            Clear Filters
+                        </Button>
+                    )}
+                </Box>
 
-                            <h2 className="text-lg md:text-xl font-bold line-clamp-2">
-                                {product.productName}
-                            </h2>
-
-                            <p className="text-gray-600 mt-3 text-sm md:text-base line-clamp-3">
-                                {product.description}
-                            </p>
-
-                            <p className="mt-4 text-2xl font-bold text-green-700">
-                                ${product.price}
-                            </p>
-
-                            {/* Stock display */}
-                            <p className="mt-2 text-lg font-semibold text-gray-700">
-                                Stock: {product.quantity}
-                            </p>
-
-                            <button
-                                onClick={() =>
-                                    handleAddToCart(product.productId)
-                                }
-                                disabled={product.quantity === 0}
-                                className={`mt-5 w-full p-3 rounded font-bold text-white ${
-                                    product.quantity === 0
-                                        ? "bg-gray-400 cursor-not-allowed"
-                                        : "bg-blue-600 hover:bg-blue-700"
-                                }`}
-                            >
-                                {product.quantity === 0
-                                    ? "Out Of Stock"
-                                    : "Add To Cart"}
-                            </button>
-
-                        </div>
-
+                {/* ── Product Grid ── */}
+                {loading ? (
+                    <div className="grid grid-cols-3 lg:grid-cols-4 gap-2">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <SkeletonCard key={i} />
+                        ))}
                     </div>
-                ))}
 
-            </div>
+                ) : products.length === 0 ? (
+                    <Box sx={{ py: 12, textAlign: "center" }}>
+                        <StorefrontIcon sx={{ fontSize: 72, color: "text.disabled", mb: 2 }} />
+                        <Typography variant="h6" color="text.secondary">
+                            No products found
+                        </Typography>
+                        <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
+                            Try adjusting your search or clearing filters
+                        </Typography>
+                    </Box>
 
-        </div>
+                ) : (
+                    <div className="grid grid-cols-3 lg:grid-cols-4 gap-2">
+                        {products.map((product) => (
+                            <Card
+                                key={product.productId}
+                                elevation={2}
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    borderRadius: 3,
+                                    overflow: "hidden",
+                                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                                    "&:hover": { transform: "translateY(-3px)", boxShadow: 6 },
+                                }}
+                            >
+                                <CardMedia
+                                    component="img"
+                                    height="45"
+                                    image={product.imageUrl}
+                                    alt={product.productName}
+                                    sx={{ objectFit: "cover" }}
+                                />
+
+                                <CardContent sx={{ flexGrow: 1, p: 1, pb: "4px !important" }}>
+                                    <Typography
+                                        sx={{
+                                            fontSize: { xs: "0.72rem", md: "0.8rem" },
+                                            fontWeight: 600,
+                                            display: "-webkit-box",
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: "vertical",
+                                            overflow: "hidden",
+                                            lineHeight: 1.25,
+                                            mb: 0.3,
+                                            color: "text.primary",
+                                        }}
+                                    >
+                                        {product.productName}
+                                    </Typography>
+
+                                    <Typography
+                                        sx={{
+                                            fontSize: { xs: "0.63rem", md: "0.7rem" },
+                                            color: "text.secondary",
+                                            display: "-webkit-box",
+                                            WebkitLineClamp: 1,
+                                            WebkitBoxOrient: "vertical",
+                                            overflow: "hidden",
+                                            mb: 0.4,
+                                        }}
+                                    >
+                                        {product.description}
+                                    </Typography>
+
+                                    <Typography
+                                        fontWeight="bold"
+                                        color="success.main"
+                                        sx={{ fontSize: { xs: "0.82rem", md: "0.9rem" }, mb: 0.4 }}
+                                    >
+                                        ${Number(product.price).toLocaleString()}
+                                    </Typography>
+
+                                    <Chip
+                                        label={product.quantity > 0 ? "In Stock" : "Out of Stock"}
+                                        color={product.quantity > 0 ? "success" : "error"}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ fontSize: "0.58rem", height: 18 }}
+                                    />
+                                </CardContent>
+
+                                <CardActions sx={{ p: 1, pt: 0 }}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        fullWidth
+                                        startIcon={<ShoppingCartIcon sx={{ fontSize: "0.8rem !important" }} />}
+                                        disabled={product.quantity === 0}
+                                        onClick={() => handleAddToCart(product.productId)}
+                                        sx={{
+                                            borderRadius: 2,
+                                            py: 0.4,
+                                            fontSize: { xs: "0.6rem", md: "0.68rem" },
+                                            textTransform: "none",
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
+                                    </Button>
+                                </CardActions>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
+            </Container>
+
+        </Box>
     );
 };
 

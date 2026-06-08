@@ -15,6 +15,17 @@ import api from "../api/api";
 
 import { HiMenu, HiX } from "react-icons/hi";
 
+import {
+    FaHome,
+    FaShoppingCart,
+    FaBoxOpen,
+    FaStore,
+    FaUserShield,
+    FaSignInAlt,
+    FaUserPlus,
+    FaSignOutAlt,
+} from "react-icons/fa";
+
 import { Button, IconButton } from "@mui/material";
 
 const Navbar = () => {
@@ -88,37 +99,37 @@ const Navbar = () => {
                 {/* Desktop links */}
                 <div className="hidden md:flex items-center gap-2">
 
-                    <Button component={Link} to="/" sx={navLinkSx}>
+                    <Button component={Link} to="/" sx={navLinkSx} startIcon={<FaHome />}>
                         Home
                     </Button>
 
                     {isAuthenticated && (
-                        <Button component={Link} to="/cart" sx={navLinkSx}>
+                        <Button component={Link} to="/cart" sx={navLinkSx} startIcon={<FaShoppingCart />}>
                             Cart
                         </Button>
                     )}
 
                     {isAuthenticated && (
-                        <Button component={Link} to="/orders" sx={navLinkSx}>
+                        <Button component={Link} to="/orders" sx={navLinkSx} startIcon={<FaBoxOpen />}>
                             Orders
                         </Button>
                     )}
 
                     {user?.roles?.includes("ROLE_SELLER") && (
-                        <Button component={Link} to="/seller/dashboard" sx={navLinkSx}>
+                        <Button component={Link} to="/seller/dashboard" sx={navLinkSx} startIcon={<FaStore />}>
                             Seller Dashboard
                         </Button>
                     )}
 
                     {user?.roles?.includes("ROLE_ADMIN") && (
-                        <Button component={Link} to="/admin/dashboard" sx={navLinkSx}>
+                        <Button component={Link} to="/admin/dashboard" sx={navLinkSx} startIcon={<FaUserShield />}>
                             Admin Dashboard
                         </Button>
                     )}
 
                     {!isAuthenticated && (
                         <>
-                            <Button component={Link} to="/login" sx={navLinkSx}>
+                            <Button component={Link} to="/login" sx={navLinkSx} startIcon={<FaSignInAlt />}>
                                 Login
                             </Button>
 
@@ -126,10 +137,8 @@ const Navbar = () => {
                                 component={Link}
                                 to="/register"
                                 variant="contained"
-                                sx={{
-                                    textTransform: "none",
-                                    fontSize: "1rem"
-                                }}
+                                startIcon={<FaUserPlus />}
+                                sx={{ textTransform: "none", fontSize: "1rem" }}
                             >
                                 Register
                             </Button>
@@ -137,7 +146,7 @@ const Navbar = () => {
                     )}
 
                     {isAuthenticated && (
-                        <Button variant="outlined" onClick={handleLogout} sx={logoutSx}>
+                        <Button variant="outlined" onClick={handleLogout} sx={logoutSx} startIcon={<FaSignOutAlt />}>
                             Logout
                         </Button>
                     )}
@@ -160,41 +169,41 @@ const Navbar = () => {
             {menuOpen && (
                 <div className="flex flex-col pt-4 pb-2 border-t border-gray-700 mt-4 md:hidden">
 
-                    <Button component={Link} to="/" onClick={closeMenu} sx={mobileNavLinkSx}>
+                    <Button component={Link} to="/" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaHome />}>
                         Home
                     </Button>
 
                     {isAuthenticated && (
-                        <Button component={Link} to="/cart" onClick={closeMenu} sx={mobileNavLinkSx}>
+                        <Button component={Link} to="/cart" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaShoppingCart />}>
                             Cart
                         </Button>
                     )}
 
                     {isAuthenticated && (
-                        <Button component={Link} to="/orders" onClick={closeMenu} sx={mobileNavLinkSx}>
+                        <Button component={Link} to="/orders" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaBoxOpen />}>
                             Orders
                         </Button>
                     )}
 
                     {user?.roles?.includes("ROLE_SELLER") && (
-                        <Button component={Link} to="/seller/dashboard" onClick={closeMenu} sx={mobileNavLinkSx}>
+                        <Button component={Link} to="/seller/dashboard" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaStore />}>
                             Seller Dashboard
                         </Button>
                     )}
 
                     {user?.roles?.includes("ROLE_ADMIN") && (
-                        <Button component={Link} to="/admin/dashboard" onClick={closeMenu} sx={mobileNavLinkSx}>
+                        <Button component={Link} to="/admin/dashboard" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaUserShield />}>
                             Admin Dashboard
                         </Button>
                     )}
 
                     {!isAuthenticated && (
                         <>
-                            <Button component={Link} to="/login" onClick={closeMenu} sx={mobileNavLinkSx}>
+                            <Button component={Link} to="/login" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaSignInAlt />}>
                                 Login
                             </Button>
 
-                            <Button component={Link} to="/register" onClick={closeMenu} sx={mobileNavLinkSx}>
+                            <Button component={Link} to="/register" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaUserPlus />}>
                                 Register
                             </Button>
                         </>
@@ -204,6 +213,7 @@ const Navbar = () => {
                         <Button
                             onClick={() => { handleLogout(); closeMenu(); }}
                             sx={{ ...mobileNavLinkSx, color: "#f87171" }}
+                            startIcon={<FaSignOutAlt />}
                         >
                             Logout
                         </Button>
