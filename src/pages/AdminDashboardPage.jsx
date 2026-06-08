@@ -32,6 +32,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import api from "../api/api";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
+import confirmToast from "../utils/confirmToast";
 
 const AdminDashboardPage = () => {
     
@@ -215,37 +216,17 @@ const navigate = useNavigate();
     ---------------------------------------------------------------
     */
 
-    const handleDeleteProduct = async (productId) => {
-
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this product?"
-        );
-
-        if (!confirmed) {
-
-            return;
-        }
-
-        try {
-
-            await api.delete(
-                `/admin/products/${productId}`
-            );
-
-            toast.success(
-                "Product deleted successfully"
-            );
-
-            fetchProducts();
-
-        } catch (error) {
-
-            console.log(error);
-
-            toast.error(
-                "Failed to delete product"
-            );
-        }
+    const handleDeleteProduct = (productId) => {
+        confirmToast("Delete this product? This cannot be undone.", async () => {
+            try {
+                await api.delete(`/admin/products/${productId}`);
+                toast.success("Product deleted successfully");
+                fetchProducts();
+            } catch (error) {
+                console.log(error);
+                toast.error("Failed to delete product");
+            }
+        });
     };
 
     /*
@@ -254,37 +235,17 @@ const navigate = useNavigate();
     ---------------------------------------------------------------
     */
 
-    const handleDeleteCategory = async (categoryId) => {
-
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this category?"
-        );
-
-        if (!confirmed) {
-
-            return;
-        }
-
-        try {
-
-            await api.delete(
-                `/admin/categories/${categoryId}`
-            );
-
-            toast.success(
-                "Category deleted successfully"
-            );
-
-            fetchCategories();
-
-        } catch (error) {
-
-            console.log(error);
-
-            toast.error(
-                "Failed to delete category"
-            );
-        }
+    const handleDeleteCategory = (categoryId) => {
+        confirmToast("Delete this category? This cannot be undone.", async () => {
+            try {
+                await api.delete(`/admin/categories/${categoryId}`);
+                toast.success("Category deleted successfully");
+                fetchCategories();
+            } catch (error) {
+                console.log(error);
+                toast.error("Failed to delete category");
+            }
+        });
     };
 
     /*
@@ -922,6 +883,7 @@ const navigate = useNavigate();
                             backgroundColor: "#9333ea",
                             "&:hover": { backgroundColor: "#7e22ce" }
                         }}
+                        onClick={() => navigate("/admin/users")}
                     >
                         Manage Users
                     </Button>

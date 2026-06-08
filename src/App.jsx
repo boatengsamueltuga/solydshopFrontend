@@ -27,6 +27,7 @@ import AdminProductsPage from "./pages/AdminProductsPage";
 import AdminCategoriesPage from "./pages/AdminCategoriesPage";
 // Added AdminOrdesPage import
 import AdminOrdersPage from "./pages/AdminOrdersPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -154,6 +155,14 @@ function App() {
                             </ProtectedRoute>
                     }
                  />
+                <Route
+                    path="/admin/users"
+                    element={
+                        <ProtectedRoute allowedRoles={["ROLE_ADMIN"]}>
+                            <AdminUsersPage />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route
                     path="/login"
                     element={<LoginPage />}

@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           position="top-right"
           reverseOrder={false}
           toastOptions={{
-            duration: 3000,
+            duration: 2000,
             style: {
               background: '#111827',
               color: '#ffffff',

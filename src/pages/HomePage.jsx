@@ -64,6 +64,13 @@ const SkeletonCard = () => (
 |----------------------------------------------------------
 */
 
+const HERO_IMAGES = [
+    "https://images.unsplash.com/photo-1628645419184-26a1f2757340?auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1580901369227-308f6f40bdeb?auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1583024011792-b165975b52f5?auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1523848309072-c199db53f137?auto=format&fit=crop&w=1920&q=80",
+];
+
 const HomePage = () => {
 
     const dispatch = useDispatch();
@@ -75,6 +82,14 @@ const HomePage = () => {
     const [keyword,    setKeyword]    = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [categories, setCategories] = useState([]);
+    const [heroIndex,  setHeroIndex]  = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     /*
     |----------------------------------------------------------
@@ -176,30 +191,111 @@ const HomePage = () => {
             {/* ── Hero ── */}
             <Box
                 sx={{
-                    background: "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)",
+                    position: "relative",
+                    overflow: "hidden",
                     color: "white",
-                    py: { xs: 7, md: 11 },
+                    py: { xs: 6, md: 10 },
                     px: 3,
                     textAlign: "center",
                 }}
             >
-                <StorefrontIcon sx={{ fontSize: { xs: 52, md: 68 }, mb: 2, opacity: 0.9 }} />
+                {/* Slideshow background layers */}
+                {HERO_IMAGES.map((img, i) => (
+                    <Box
+                        key={img}
+                        sx={{
+                            position: "absolute",
+                            inset: 0,
+                            backgroundImage: `url('${img}')`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            opacity: i === heroIndex ? 1 : 0,
+                            transition: "opacity 1.2s ease-in-out",
+                            zIndex: 0,
+                        }}
+                    />
+                ))}
+                {/* Dark overlay */}
+                <Box sx={{ position: "absolute", inset: 0, bgcolor: "rgba(0,0,0,0.55)", zIndex: 1 }} />
 
-                <Typography
-                    variant="h3"
-                    fontWeight="bold"
-                    gutterBottom
-                    sx={{ fontSize: { xs: "2rem", md: "3rem" } }}
-                >
-                    Find What You Need
-                </Typography>
+                <Box sx={{ position: "relative", zIndex: 2, maxWidth: 780, mx: "auto" }}>
 
-                <Typography
-                    variant="h6"
-                    sx={{ opacity: 0.82, maxWidth: 560, mx: "auto", fontWeight: 400 }}
-                >
-                    Premium heavy equipment parts &amp; machinery — built for performance
-                </Typography>
+                    {/* Eyebrow label */}
+                    <Typography
+                        sx={{
+                            display: "inline-block",
+                            fontSize: "0.72rem",
+                            fontWeight: 700,
+                            letterSpacing: 3,
+                            textTransform: "uppercase",
+                            color: "rgba(255,255,255,0.7)",
+                            mb: 2,
+                        }}
+                    >
+                        Heavy Equipment Parts &amp; Supplies
+                    </Typography>
+
+                    {/* Headline */}
+                    <Typography
+                        component="h1"
+                        sx={{
+                            fontSize: { xs: "2.4rem", md: "3.8rem" },
+                            fontWeight: 800,
+                            lineHeight: 1.1,
+                            letterSpacing: -1,
+                            mb: 2.5,
+                            textShadow: "0 2px 12px rgba(0,0,0,0.4)",
+                        }}
+                    >
+                        The Parts That<br />
+                        <Box component="span" sx={{ color: "#facc15" }}>Power Industry</Box>
+                    </Typography>
+
+                    {/* Subtitle */}
+                    <Typography
+                        sx={{
+                            fontSize: { xs: "1rem", md: "1.15rem" },
+                            color: "rgba(255,255,255,0.82)",
+                            maxWidth: 560,
+                            mx: "auto",
+                            lineHeight: 1.7,
+                            mb: 4,
+                            fontWeight: 400,
+                        }}
+                    >
+                        Source genuine components for excavators, bulldozers, cranes &amp; more.
+                        Built for demanding sites — delivered with speed and precision.
+                    </Typography>
+
+                    {/* Feature highlights */}
+                    <Box sx={{ display: "flex", justifyContent: "center", gap: { xs: 1.5, md: 2.5 }, flexWrap: "wrap" }}>
+                        {[
+                            { icon: "✔", label: "Genuine OEM Parts" },
+                            { icon: "⚡", label: "Fast Delivery" },
+                            { icon: "🛡", label: "Quality Guaranteed" },
+                        ].map(({ icon, label }) => (
+                            <Box
+                                key={label}
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.8,
+                                    px: 2,
+                                    py: 0.8,
+                                    borderRadius: 2,
+                                    bgcolor: "rgba(255,255,255,0.1)",
+                                    border: "1px solid rgba(255,255,255,0.2)",
+                                    backdropFilter: "blur(6px)",
+                                }}
+                            >
+                                <Typography sx={{ fontSize: "0.85rem" }}>{icon}</Typography>
+                                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "rgba(255,255,255,0.9)", letterSpacing: 0.3 }}>
+                                    {label}
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
             </Box>
 
             <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
