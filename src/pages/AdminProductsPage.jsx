@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 
 import {
+    Avatar,
     Box,
     Button,
     Chip,
+    Container,
     Dialog as MuiDialog,
     DialogTitle as MuiDialogTitle,
     DialogContent,
@@ -14,26 +16,29 @@ import {
     Divider,
     Grid,
     IconButton,
+    InputAdornment,
+    InputLabel,
+    FormControl,
     MenuItem,
+    Paper,
     Select,
+    Stack,
     TextField,
     Tooltip,
     Typography,
-    InputLabel,
-    FormControl,
 } from "@mui/material";
 
-import VisibilityIcon  from "@mui/icons-material/Visibility";
-import EditIcon        from "@mui/icons-material/Edit";
-import DeleteIcon      from "@mui/icons-material/Delete";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import CloseIcon       from "@mui/icons-material/Close";
+import VisibilityIcon        from "@mui/icons-material/Visibility";
+import EditIcon              from "@mui/icons-material/Edit";
+import DeleteIcon            from "@mui/icons-material/Delete";
+import CloudUploadIcon       from "@mui/icons-material/CloudUpload";
+import CloseIcon             from "@mui/icons-material/Close";
+import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 
-import api from "../api/api";
-
+import api    from "../api/api";
 import Loader from "../components/Loader";
-
-import toast from "react-hot-toast";
+import toast  from "react-hot-toast";
 
 const AdminProductsPage = () => {
 
@@ -41,11 +46,11 @@ const AdminProductsPage = () => {
     const [categories, setCategories] = useState([]);
     const [loading,    setLoading]    = useState(true);
 
-    const [isFormOpen,        setIsFormOpen]        = useState(false);
-    const [editingProductId,  setEditingProductId]  = useState(null);
+    const [isFormOpen,       setIsFormOpen]       = useState(false);
+    const [editingProductId, setEditingProductId] = useState(null);
 
-    const [selectedProduct,   setSelectedProduct]   = useState(null);
-    const [isViewOpen,        setIsViewOpen]         = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isViewOpen,      setIsViewOpen]       = useState(false);
 
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [productToDelete,   setProductToDelete]   = useState(null);
@@ -86,37 +91,23 @@ const AdminProductsPage = () => {
     */
 
     const fetchProducts = async () => {
-
         try {
-
             const response = await api.get("/public/products");
-
             setProducts(response.data.content);
-
         } catch (error) {
-
             console.log(error);
-
             toast.error("Unable to load products. Please refresh.");
-
         } finally {
-
             setLoading(false);
         }
     };
 
     const fetchCategories = async () => {
-
         try {
-
             const response = await api.get("/public/categories");
-
             setCategories(response.data.content);
-
         } catch (error) {
-
             console.log(error);
-
             toast.error("Unable to load categories. Please refresh.");
         }
     };
@@ -138,9 +129,7 @@ const AdminProductsPage = () => {
     };
 
     const handleEditProduct = (product) => {
-
         setEditingProductId(product.productId);
-
         setProductForm({
             productName: product.productName,
             description: product.description,
@@ -149,7 +138,6 @@ const AdminProductsPage = () => {
             quantity:    product.quantity,
             categoryId:  String(product.categoryId),
         });
-
         setIsFormOpen(true);
     };
 
@@ -159,51 +147,35 @@ const AdminProductsPage = () => {
     };
 
     const confirmDelete = async () => {
-
         try {
-
             await api.delete(`/admin/products/${productToDelete.productId}`);
-
             toast.success(`"${productToDelete.productName}" has been deleted.`);
-
             fetchProducts();
-
         } catch (error) {
-
             console.log(error);
-
             const serverMsg = error.response?.data?.message || "";
-
             const isConstraintError =
-                serverMsg.toLowerCase().includes("integrity")  ||
-                serverMsg.toLowerCase().includes("foreign key")||
-                serverMsg.toLowerCase().includes("constraint") ||
+                serverMsg.toLowerCase().includes("integrity")   ||
+                serverMsg.toLowerCase().includes("foreign key") ||
+                serverMsg.toLowerCase().includes("constraint")  ||
                 serverMsg.toLowerCase().includes("order");
-
             toast.error(
                 isConstraintError
                     ? `"${productToDelete.productName}" cannot be deleted — it is linked to existing orders.`
                     : "Failed to delete product. Please try again."
             );
-
         } finally {
-
             setDeleteConfirmOpen(false);
             setProductToDelete(null);
         }
     };
 
     const handleImageUpload = async (e) => {
-
         const file = e.target.files[0];
-
         if (!file) return;
-
         try {
-
             const formData = new FormData();
             formData.append("file", file);
-
             const response = await api.post("/upload", formData, {
                 headers: {
                     "X-XSRF-TOKEN": document.cookie
@@ -212,21 +184,15 @@ const AdminProductsPage = () => {
                         ?.split("=")[1],
                 },
             });
-
             setProductForm((prev) => ({ ...prev, imageUrl: response.data }));
-
             toast.success("Image uploaded successfully.");
-
         } catch (error) {
-
             console.log(error);
-
             toast.error("Image upload failed. Please try again.");
         }
     };
 
     const handleSaveProduct = async () => {
-
         if (
             !productForm.productName ||
             !productForm.description ||
@@ -249,30 +215,18 @@ const AdminProductsPage = () => {
         };
 
         try {
-
             if (editingProductId) {
-
                 await api.put(`/admin/products/${editingProductId}`, payload);
-
                 toast.success(`"${productForm.productName}" updated successfully.`);
-
             } else {
-
                 await api.post("/admin/products", payload);
-
                 toast.success(`"${productForm.productName}" added to the catalog.`);
             }
-
             await fetchProducts();
-
             resetForm();
-
             setIsFormOpen(false);
-
         } catch (error) {
-
             console.log(error);
-
             toast.error(
                 editingProductId
                     ? "Failed to update product. Please try again."
@@ -292,13 +246,21 @@ const AdminProductsPage = () => {
         {
             field: "image",
             headerName: "Image",
-            width: isMobile ? 70 : 100,
+            width: isMobile ? 70 : 90,
             renderCell: (params) => (
-                <img
-                    src={params.row.imageUrl}
-                    alt={params.row.productName}
-                    className={`${isMobile ? "w-10 h-10" : "w-14 h-14"} object-cover rounded`}
-                />
+                <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+                    <Box
+                        component="img"
+                        src={params.row.imageUrl}
+                        alt={params.row.productName}
+                        sx={{
+                            width:  isMobile ? 36 : 48,
+                            height: isMobile ? 36 : 48,
+                            objectFit: "cover",
+                            borderRadius: 1,
+                        }}
+                    />
+                </Box>
             ),
         },
 
@@ -317,53 +279,58 @@ const AdminProductsPage = () => {
         ...(!isMobile ? [{
             field: "categoryName",
             headerName: "Category",
-            minWidth: 180,
+            minWidth: 160,
             flex: 1,
         }] : []),
 
         {
             field: "price",
             headerName: "Price",
-            width: isMobile ? 80 : 120,
+            width: isMobile ? 80 : 110,
             renderCell: (params) => (
-                <span className="font-bold text-green-700">
-                    ${params.row.price}
-                </span>
+                <Typography variant="body2" fontWeight="bold" color="success.dark">
+                    ${Number(params.row.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </Typography>
             ),
         },
 
         {
             field: "quantity",
             headerName: "Stock",
-            width: isMobile ? 70 : 100,
+            width: isMobile ? 70 : 90,
+            renderCell: (params) => (
+                <Chip
+                    label={params.row.quantity > 0 ? params.row.quantity : "Out"}
+                    color={params.row.quantity > 0 ? "success" : "error"}
+                    size="small"
+                    variant="outlined"
+                    sx={{ fontWeight: 700, fontSize: "0.7rem" }}
+                />
+            ),
         },
 
         {
             field: "actions",
             headerName: "Actions",
-            width: isMobile ? 130 : 160,
+            width: isMobile ? 120 : 140,
             renderCell: (params) => (
-                <div className="flex gap-1 items-center h-full">
-
-                    <Tooltip title="View product" arrow>
+                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ height: "100%" }}>
+                    <Tooltip title="View" arrow>
                         <IconButton size="small" color="primary" onClick={() => handleViewProduct(params.row)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-
-                    <Tooltip title="Edit product" arrow>
+                    <Tooltip title="Edit" arrow>
                         <IconButton size="small" color="warning" onClick={() => handleEditProduct(params.row)}>
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-
-                    <Tooltip title="Delete product" arrow>
+                    <Tooltip title="Delete" arrow>
                         <IconButton size="small" color="error" onClick={() => handleDeleteProduct(params.row)}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-
-                </div>
+                </Stack>
             ),
         },
     ];
@@ -376,10 +343,10 @@ const AdminProductsPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col justify-center items-center">
+            <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2, bgcolor: "grey.50" }}>
                 <Loader />
-                <p className="text-2xl font-semibold mt-4">Loading products...</p>
-            </div>
+                <Typography variant="h6" color="text.secondary">Loading products...</Typography>
+            </Box>
         );
     }
 
@@ -391,49 +358,141 @@ const AdminProductsPage = () => {
 
     return (
 
-        <div className="p-4 md:p-10 bg-gray-100 min-h-screen w-full overflow-x-hidden">
+        <Box sx={{ bgcolor: "grey.50", minHeight: "100vh" }}>
 
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-10">
-
-                <h1 className="text-3xl md:text-5xl font-bold">
-                    Product Management
-                </h1>
-
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => { resetForm(); setIsFormOpen(true); }}
-                    sx={{ alignSelf: { xs: "flex-start", md: "auto" } }}
-                >
-                    Create Product
-                </Button>
-
-            </div>
-
-            <div
-                className="bg-white rounded-xl shadow overflow-x-auto min-w-0"
-                style={{ height: isMobile ? 450 : 600, width: "100%" }}
+            {/* ── Banner ── */}
+            <Box
+                sx={{
+                    background: "linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%)",
+                    color: "white",
+                    px: { xs: 3, sm: 5, md: 8 },
+                    py: { xs: 4, md: 5 },
+                }}
             >
-                <DataGrid
-                    rows={products}
-                    columns={columns}
-                    disableRowSelectionOnClick
-                    getRowId={(row) => row.productId}
-                    getRowHeight={() => "auto"}
-                    pageSizeOptions={[5, 10, 20]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+                <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2} sx={{ mb: 3 }}>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Avatar sx={{ bgcolor: "rgba(255,255,255,0.15)", width: 56, height: 56 }}>
+                            <InventoryOutlinedIcon sx={{ fontSize: 28 }} />
+                        </Avatar>
+                        <Box>
+                            <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: "1.6rem", md: "2.2rem" } }}>
+                                Product Management
+                            </Typography>
+                            <Typography variant="body2" sx={{ opacity: 0.75, mt: 0.25 }}>
+                                Manage your full product catalog
+                            </Typography>
+                        </Box>
+                    </Stack>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddCircleOutlinedIcon />}
+                        onClick={() => { resetForm(); setIsFormOpen(true); }}
+                        sx={{
+                            bgcolor: "white",
+                            color: "primary.dark",
+                            fontWeight: 700,
+                            textTransform: "none",
+                            borderRadius: 2,
+                            px: 3,
+                            "&:hover": { bgcolor: "grey.100" },
+                        }}
+                    >
+                        Create Product
+                    </Button>
+                </Stack>
+
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                    {[
+                        { label: "Total Products", value: products.length },
+                        { label: "In Stock",       value: products.filter(p => p.quantity > 0).length },
+                        { label: "Out of Stock",   value: products.filter(p => p.quantity === 0).length },
+                    ].map(({ label, value }) => (
+                        <Paper
+                            key={label}
+                            elevation={0}
+                            sx={{
+                                px: 3, py: 1.75,
+                                bgcolor: "rgba(255,255,255,0.12)",
+                                border: "1px solid rgba(255,255,255,0.2)",
+                                borderRadius: 2,
+                                color: "white",
+                                minWidth: 140,
+                            }}
+                        >
+                            <Typography variant="caption" sx={{ opacity: 0.75, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 600 }}>
+                                {label}
+                            </Typography>
+                            <Typography variant="h5" fontWeight="bold">{value}</Typography>
+                        </Paper>
+                    ))}
+                </Stack>
+            </Box>
+
+            {/* ── Content ── */}
+            <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
+
+                <Paper
+                    elevation={0}
                     sx={{
-                        "& .MuiDataGrid-columnHeaderTitle": {
-                            fontWeight: "bold",
-                            fontSize: isMobile ? "12px" : "16px",
-                        },
-                        "& .MuiDataGrid-cell": {
-                            fontSize: isMobile ? "12px" : "14px",
-                            padding: isMobile ? "4px 6px" : "8px 10px",
-                        },
+                        borderRadius: 3,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        overflow: "hidden",
                     }}
-                />
-            </div>
+                >
+                    {/* Table header bar */}
+                    <Box
+                        sx={{
+                            px: 3,
+                            py: 2,
+                            borderBottom: "1px solid",
+                            borderColor: "divider",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            bgcolor: "grey.50",
+                        }}
+                    >
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                            <InventoryOutlinedIcon sx={{ color: "primary.main", fontSize: 20 }} />
+                            <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
+                                All Products
+                            </Typography>
+                            <Chip
+                                label={products.length}
+                                size="small"
+                                color="primary"
+                                sx={{ fontWeight: 700, height: 20, fontSize: "0.72rem" }}
+                            />
+                        </Stack>
+                    </Box>
+
+                    <DataGrid
+                        rows={products}
+                        columns={columns}
+                        disableRowSelectionOnClick
+                        getRowId={(row) => row.productId}
+                        getRowHeight={() => "auto"}
+                        pageSizeOptions={[5, 10, 20]}
+                        initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                        style={{ height: isMobile ? 450 : 620, width: "100%", border: "none" }}
+                        sx={{
+                            "& .MuiDataGrid-columnHeaderTitle": {
+                                fontWeight: "bold",
+                                fontSize: isMobile ? "12px" : "14px",
+                            },
+                            "& .MuiDataGrid-cell": {
+                                fontSize: isMobile ? "12px" : "14px",
+                                padding: isMobile ? "4px 6px" : "8px 10px",
+                            },
+                            "& .MuiDataGrid-row:hover": {
+                                bgcolor: "primary.50",
+                            },
+                        }}
+                    />
+                </Paper>
+
+            </Container>
 
             {/* ── View Product Dialog ── */}
             <MuiDialog
@@ -445,7 +504,6 @@ const AdminProductsPage = () => {
             >
                 {selectedProduct && (
                     <>
-                        {/* Header */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -453,28 +511,25 @@ const AdminProductsPage = () => {
                                 justifyContent: "space-between",
                                 px: 3,
                                 py: 2,
-                                borderBottom: "1px solid #e5e7eb",
+                                borderBottom: "1px solid",
+                                borderColor: "divider",
+                                bgcolor: "grey.50",
                             }}
                         >
-                            <Typography variant="h6" fontWeight="bold">
-                                Product Details
-                            </Typography>
-
+                            <Typography variant="h6" fontWeight="bold">Product Details</Typography>
                             <IconButton size="small" onClick={() => setIsViewOpen(false)}>
                                 <CloseIcon fontSize="small" />
                             </IconButton>
                         </Box>
 
-                        {/* Body — two columns */}
                         <DialogContent sx={{ p: 0 }}>
                             <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}>
 
-                                {/* Left — image */}
                                 <Box
                                     sx={{
                                         width: { xs: "100%", sm: "42%" },
                                         minHeight: { xs: 220, sm: 320 },
-                                        bgcolor: "#f3f4f6",
+                                        bgcolor: "grey.100",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
@@ -482,86 +537,52 @@ const AdminProductsPage = () => {
                                         flexShrink: 0,
                                     }}
                                 >
-                                    <img
+                                    <Box
+                                        component="img"
                                         src={selectedProduct.imageUrl}
                                         alt={selectedProduct.productName}
-                                        style={{
-                                            maxWidth: "100%",
-                                            maxHeight: 280,
-                                            objectFit: "contain",
-                                        }}
+                                        sx={{ maxWidth: "100%", maxHeight: 280, objectFit: "contain" }}
                                     />
                                 </Box>
 
-                                {/* Right — details */}
                                 <Box sx={{ flex: 1, p: 3, display: "flex", flexDirection: "column", gap: 2 }}>
-
-                                    <Typography
-                                        variant="h5"
-                                        fontWeight="bold"
-                                        color="text.primary"
-                                        sx={{ wordBreak: "break-word", lineHeight: 1.3 }}
-                                    >
+                                    <Typography variant="h5" fontWeight="bold" color="text.primary" sx={{ wordBreak: "break-word", lineHeight: 1.3 }}>
                                         {selectedProduct.productName}
                                     </Typography>
-
                                     <Typography variant="h4" fontWeight="bold" color="success.main">
                                         ${Number(selectedProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                     </Typography>
-
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                                         <Chip
-                                            label={selectedProduct.quantity > 0
-                                                ? `In Stock: ${selectedProduct.quantity}`
-                                                : "Out of Stock"}
+                                            label={selectedProduct.quantity > 0 ? `In Stock: ${selectedProduct.quantity}` : "Out of Stock"}
                                             color={selectedProduct.quantity > 0 ? "success" : "error"}
                                             variant="filled"
                                         />
-
                                         {selectedProduct.categoryName && (
-                                            <Chip
-                                                label={selectedProduct.categoryName}
-                                                color="primary"
-                                                variant="outlined"
-                                            />
+                                            <Chip label={selectedProduct.categoryName} color="primary" variant="outlined" />
                                         )}
                                     </Box>
-
                                     <Divider />
-
                                     <Box>
                                         <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
                                             Description
                                         </Typography>
-
                                         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.7 }}>
                                             {selectedProduct.description}
                                         </Typography>
                                     </Box>
-
                                 </Box>
 
                             </Box>
                         </DialogContent>
 
-                        {/* Actions */}
-                        <DialogActions sx={{ px: 3, py: 2, borderTop: "1px solid #e5e7eb", gap: 1 }}>
-                            <Button
-                                onClick={() => setIsViewOpen(false)}
-                                variant="outlined"
-                                color="inherit"
-                            >
-                                Close
-                            </Button>
-
+                        <DialogActions sx={{ px: 3, py: 2, borderTop: "1px solid", borderColor: "divider", gap: 1 }}>
+                            <Button onClick={() => setIsViewOpen(false)} variant="outlined" color="inherit">Close</Button>
                             <Button
                                 variant="contained"
                                 color="warning"
                                 startIcon={<EditIcon />}
-                                onClick={() => {
-                                    setIsViewOpen(false);
-                                    handleEditProduct(selectedProduct);
-                                }}
+                                onClick={() => { setIsViewOpen(false); handleEditProduct(selectedProduct); }}
                             >
                                 Edit Product
                             </Button>
@@ -578,28 +599,40 @@ const AdminProductsPage = () => {
                 fullWidth
                 PaperProps={{ sx: { borderRadius: 3 } }}
             >
-                <MuiDialogTitle sx={{ fontWeight: "bold", pb: 1 }}>
-                    {editingProductId ? "Edit Product" : "Create Product"}
-                </MuiDialogTitle>
+                {/* Dialog Header */}
+                <Box sx={{ height: 4, bgcolor: editingProductId ? "warning.main" : "primary.main" }} />
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 2, borderBottom: "1px solid", borderColor: "divider" }}>
+                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                        <Avatar sx={{ bgcolor: editingProductId ? "warning.main" : "primary.main", width: 36, height: 36 }}>
+                            {editingProductId ? <EditIcon sx={{ fontSize: 18 }} /> : <AddCircleOutlinedIcon sx={{ fontSize: 18 }} />}
+                        </Avatar>
+                        <Box>
+                            <Typography variant="subtitle1" fontWeight="bold">
+                                {editingProductId ? "Edit Product" : "Create Product"}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {editingProductId ? `Editing product #${editingProductId}` : "Fill in the details below"}
+                            </Typography>
+                        </Box>
+                    </Stack>
+                    <IconButton size="small" onClick={() => { resetForm(); setIsFormOpen(false); }}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                </Box>
 
-                <DialogContent sx={{ pt: 3, overflow: "visible" }}>
-
+                <DialogContent sx={{ pt: 3 }}>
                     <Grid container spacing={2}>
 
-                        {/* Product Name */}
                         <Grid item xs={12} sm={7}>
                             <TextField
                                 label="Product Name"
                                 size="small"
                                 fullWidth
                                 value={productForm.productName}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, productName: e.target.value })
-                                }
+                                onChange={(e) => setProductForm({ ...productForm, productName: e.target.value })}
                             />
                         </Grid>
 
-                        {/* Price */}
                         <Grid item xs={6} sm={2.5}>
                             <TextField
                                 label="Price"
@@ -607,13 +640,11 @@ const AdminProductsPage = () => {
                                 type="number"
                                 fullWidth
                                 value={productForm.price}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, price: e.target.value })
-                                }
+                                onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                                InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
                             />
                         </Grid>
 
-                        {/* Quantity */}
                         <Grid item xs={6} sm={2.5}>
                             <TextField
                                 label="Qty"
@@ -621,22 +652,17 @@ const AdminProductsPage = () => {
                                 type="number"
                                 fullWidth
                                 value={productForm.quantity}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, quantity: e.target.value })
-                                }
+                                onChange={(e) => setProductForm({ ...productForm, quantity: e.target.value })}
                             />
                         </Grid>
 
-                        {/* Category */}
-                        <Grid item xs={12} sx={{ width: "70%" }}>
+                        <Grid item xs={12}>
                             <FormControl size="small" fullWidth>
                                 <InputLabel>Category</InputLabel>
                                 <Select
                                     label="Category"
                                     value={productForm.categoryId}
-                                    onChange={(e) =>
-                                        setProductForm({ ...productForm, categoryId: e.target.value })
-                                    }
+                                    onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
                                 >
                                     <MenuItem value=""><em>Select category</em></MenuItem>
                                     {categories.map((cat) => (
@@ -648,95 +674,68 @@ const AdminProductsPage = () => {
                             </FormControl>
                         </Grid>
 
-                        {/* Image Upload */}
-                        <Grid item xs={12} sx={{ width: "35%" }}>
-                            <input
-                                type="file"
-                                id="productImageInput"
-                                hidden
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                            />
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                startIcon={<CloudUploadIcon />}
-                                onClick={() => document.getElementById("productImageInput").click()}
-                                sx={{ height: "40px" }}
-                            >
-                                {productForm.imageUrl ? "Change Image" : "Upload Image"}
-                            </Button>
+                        <Grid item xs={12}>
+                            <input type="file" id="productImageInput" hidden accept="image/*" onChange={handleImageUpload} />
+                            <Stack direction="row" alignItems="center" spacing={2} flexWrap="wrap">
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    startIcon={<CloudUploadIcon />}
+                                    onClick={() => document.getElementById("productImageInput").click()}
+                                    sx={{ textTransform: "none", borderRadius: 2, fontWeight: 600 }}
+                                >
+                                    {productForm.imageUrl ? "Change Image" : "Upload Image"}
+                                </Button>
+                                {productForm.imageUrl && (
+                                    <Chip label="Image uploaded" color="success" variant="outlined" size="small" />
+                                )}
+                            </Stack>
                         </Grid>
 
-                        {/* Image preview — to the right of the button */}
                         {productForm.imageUrl && (
-                            <Grid item xs={12} sx={{ width: "60%" }}>
-                                <Box
-                                    sx={{
-                                        width: "100%",
-                                        height: 90,
-                                        borderRadius: 2,
-                                        border: "1px solid #e5e7eb",
-                                        bgcolor: "#f3f4f6",
-                                        overflow: "hidden",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        p: 0.5,
-                                    }}
+                            <Grid item xs={12}>
+                                <Paper
+                                    variant="outlined"
+                                    sx={{ borderRadius: 2, overflow: "hidden", height: 100, display: "flex", alignItems: "center", justifyContent: "center", bgcolor: "grey.50" }}
                                 >
-                                    <img
+                                    <Box
+                                        component="img"
                                         src={productForm.imageUrl}
                                         alt="Preview"
-                                        style={{
-                                            maxWidth: "100%",
-                                            maxHeight: 80,
-                                            objectFit: "contain",
-                                            display: "block",
-                                        }}
+                                        sx={{ maxHeight: 90, maxWidth: "100%", objectFit: "contain" }}
                                     />
-                                </Box>
+                                </Paper>
                             </Grid>
                         )}
 
-                        {/* Description */}
-                        <Grid item xs={12} sx={{ width: "100%" }}>
+                        <Grid item xs={12}>
                             <TextField
                                 label="Description"
                                 size="small"
                                 fullWidth
                                 multiline
-                                rows={5}
+                                rows={4}
                                 value={productForm.description}
-                                onChange={(e) =>
-                                    setProductForm({ ...productForm, description: e.target.value })
-                                }
+                                onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
                             />
                         </Grid>
 
                     </Grid>
-
                 </DialogContent>
 
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-
-                    <Button
-                        onClick={() => { resetForm(); setIsFormOpen(false); }}
-                        variant="outlined"
-                        color="inherit"
-                    >
+                <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+                    <Button onClick={() => { resetForm(); setIsFormOpen(false); }} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
                         Cancel
                     </Button>
-
                     <Button
                         onClick={handleSaveProduct}
                         variant="contained"
-                        color="primary"
+                        color={editingProductId ? "warning" : "primary"}
+                        startIcon={editingProductId ? <EditIcon /> : <AddCircleOutlinedIcon />}
+                        sx={{ textTransform: "none", fontWeight: 700 }}
                     >
                         {editingProductId ? "Update Product" : "Create Product"}
                     </Button>
-
                 </DialogActions>
 
             </MuiDialog>
@@ -747,30 +746,21 @@ const AdminProductsPage = () => {
                 onClose={() => setDeleteConfirmOpen(false)}
                 PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
             >
-                <MuiDialogTitle sx={{ fontWeight: "bold", fontSize: "1.25rem" }}>
+                <MuiDialogTitle sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
                     Delete Product
                 </MuiDialogTitle>
-
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to delete{" "}
-                        <strong>{productToDelete?.productName}</strong>?
-                        This action cannot be undone.
+                        Are you sure you want to delete <strong>{productToDelete?.productName}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
-
                 <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-                    <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined" color="inherit">
-                        Cancel
-                    </Button>
-                    <Button onClick={confirmDelete} variant="contained" color="error">
-                        Delete
-                    </Button>
+                    <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>Cancel</Button>
+                    <Button onClick={confirmDelete} variant="contained" color="error" sx={{ textTransform: "none", fontWeight: 700 }}>Delete</Button>
                 </DialogActions>
-
             </MuiDialog>
 
-        </div>
+        </Box>
     );
 };
 

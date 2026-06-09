@@ -14,6 +14,7 @@ import {
     Card,
     CardContent,
     Chip,
+    Container,
     Divider,
     Paper,
     Stack,
@@ -201,7 +202,7 @@ const OrdersPage = () => {
             </Box>
 
             {/* ── Content ── */}
-            <Box sx={{ px: { xs: 2, sm: 4, md: 8 }, py: { xs: 3, md: 5 } }}>
+            <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
 
                 {/* ── Empty State ── */}
                 {orders.length === 0 ? (
@@ -491,7 +492,7 @@ const OrdersPage = () => {
 
                 )}
 
-            </Box>
+            </Container>
 
         </Box>
     );
