@@ -740,91 +740,43 @@ const navigate = useNavigate();
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-8 md:mb-14">
 
                 <div className="bg-white rounded-xl shadow p-6">
-
                     <div className="flex justify-between items-center">
-
                         <div>
-
-                            <p className="text-sm md:text-lg text-gray-500">
-                                Products
-                            </p>
-
-                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
-                                {products.length}
-                            </h2>
-
+                            <p className="text-sm md:text-lg text-gray-500">Products</p>
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">{products.length}</h2>
                         </div>
-
                         <FaBoxOpen className="text-3xl md:text-5xl text-blue-600" />
-
                     </div>
-
                 </div>
 
                 <div className="bg-white rounded-xl shadow p-6">
-
                     <div className="flex justify-between items-center">
-
                         <div>
-
-                            <p className="text-sm md:text-lg text-gray-500">
-                                Categories
-                            </p>
-
-                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
-                                {categories.length}
-                            </h2>
-
+                            <p className="text-sm md:text-lg text-gray-500">Categories</p>
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">{categories.length}</h2>
                         </div>
-
                         <FaTags className="text-3xl md:text-5xl text-green-600" />
-
                     </div>
-
                 </div>
 
                 <div className="bg-white rounded-xl shadow p-6">
-
                     <div className="flex justify-between items-center">
-
                         <div>
-
-                            <p className="text-sm md:text-lg text-gray-500">
-                                Orders
-                            </p>
-
-                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
-                                {orders.length}
-                            </h2>
-
+                            <p className="text-sm md:text-lg text-gray-500">Orders</p>
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">{orders.length}</h2>
                         </div>
-
                         <FaShoppingCart className="text-3xl md:text-5xl text-yellow-500" />
-
                     </div>
-
                 </div>
 
                 <div className="bg-white rounded-xl shadow p-6">
-
                     <div className="flex justify-between items-center">
-
                         <div>
-
-                            <p className="text-sm md:text-lg text-gray-500">
-                                Users
-                            </p>
-
-                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">
-                                0
-                            </h2>
-
+                            <p className="text-sm md:text-lg text-gray-500">Users</p>
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">0</h2>
                         </div>
-
                         <FaUsers className="text-3xl md:text-5xl text-purple-600" />
-
                     </div>
-
                 </div>
 
             </div>
@@ -838,53 +790,27 @@ const navigate = useNavigate();
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
+                    <Button variant="contained" color="primary" size="large"
                         sx={{ py: { xs: 1.5, md: 2 }, fontSize: { xs: "0.75rem", md: "0.95rem" } }}
-                        onClick={() =>
-                            navigate("/admin/products")
-                        }
-                    >
+                        onClick={() => navigate("/admin/products")}>
                         Manage Products
                     </Button>
 
-                    <Button
-                        variant="contained"
-                        color="success"
-                        size="large"
+                    <Button variant="contained" color="success" size="large"
                         sx={{ py: { xs: 1.5, md: 2 }, fontSize: { xs: "0.75rem", md: "0.95rem" } }}
-                        onClick={() =>
-                            navigate("/admin/categories")
-                        }
-                    >
+                        onClick={() => navigate("/admin/categories")}>
                         Manage Categories
                     </Button>
 
-                    <Button
-                        variant="contained"
-                        color="warning"
-                        size="large"
+                    <Button variant="contained" color="warning" size="large"
                         sx={{ py: { xs: 1.5, md: 2 }, fontSize: { xs: "0.75rem", md: "0.95rem" } }}
-                        onClick={() =>
-                            navigate("/admin/orders")
-                        }
-                    >
+                        onClick={() => navigate("/admin/orders")}>
                         Manage Orders
                     </Button>
 
-                    <Button
-                        variant="contained"
-                        size="large"
-                        sx={{
-                            py: { xs: 1.5, md: 2 },
-                            fontSize: { xs: "0.75rem", md: "0.95rem" },
-                            backgroundColor: "#9333ea",
-                            "&:hover": { backgroundColor: "#7e22ce" }
-                        }}
-                        onClick={() => navigate("/admin/users")}
-                    >
+                    <Button variant="contained" size="large"
+                        sx={{ py: { xs: 1.5, md: 2 }, fontSize: { xs: "0.75rem", md: "0.95rem" }, backgroundColor: "#9333ea", "&:hover": { backgroundColor: "#7e22ce" } }}
+                        onClick={() => navigate("/admin/users")}>
                         Manage Users
                     </Button>
 
