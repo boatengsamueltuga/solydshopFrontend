@@ -1,356 +1,484 @@
 import { useEffect, useState } from "react";
+
 import { useSelector } from "react-redux";
-import api from "../api/api";
+import { useNavigate } from "react-router-dom";
+
+import api    from "../api/api";
 import Loader from "../components/Loader";
-import toast from "react-hot-toast";
+import toast  from "react-hot-toast";
+
+import {
+    Avatar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    CircularProgress,
+    Container,
+    Divider,
+    IconButton,
+    Paper,
+    Stack,
+    Typography,
+} from "@mui/material";
+
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import AddIcon                  from "@mui/icons-material/Add";
+import RemoveIcon               from "@mui/icons-material/Remove";
+import DeleteOutlineIcon        from "@mui/icons-material/DeleteOutlined";
+import StorefrontOutlinedIcon   from "@mui/icons-material/StorefrontOutlined";
+import ShoppingBagOutlinedIcon  from "@mui/icons-material/ShoppingBagOutlined";
+import InventoryOutlinedIcon    from "@mui/icons-material/InventoryOutlined";
+import LockOutlinedIcon         from "@mui/icons-material/LockOutlined";
 
 const CartPage = () => {
 
-    const [cart, setCart] = useState(null);
-
-    const [loading, setLoading] = useState(true);
-
-    // Action loader for cart updates
+    const [cart,          setCart]          = useState(null);
+    const [loading,       setLoading]       = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
+    const [error,         setError]         = useState("");
 
-    const [error, setError] = useState("");
+    const { user } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
 
-    // Get authenticated user
-    const { user } = useSelector(
-        (state) => state.auth
-    );
-
-    // Reusable XSRF token helper
-    const getXsrfToken = () => {
-
-        return document.cookie
+    const getXsrfToken = () =>
+        document.cookie
             .split("; ")
             .find(row => row.startsWith("XSRF-TOKEN="))
             ?.split("=")[1];
-    };
 
-    // Fetch cart
     const fetchCart = async () => {
-
         try {
-
-            const response = await api.get(
-                `/cart/${user.userId}`
-            );
-
+            const response = await api.get(`/cart/${user.userId}`);
             setCart(response.data);
-
         } catch (error) {
-
             console.log(error);
-
-            //toast.error("Failed to load cart");
-
         } finally {
-
             setLoading(false);
         }
     };
 
     useEffect(() => {
-
-        if (user?.userId) {
-
-            fetchCart();
-        }
-
+        if (user?.userId) fetchCart();
     }, [user]);
 
-    // Increase quantity
     const handleIncreaseQuantity = async (productId) => {
-
         setActionLoading(true);
-
         try {
-
             await api.post(
                 `/cart/${user.userId}/items`,
-                {
-                    productId: productId,
-                    quantity: 1
-                },
-                {
-                    headers: {
-                        "X-XSRF-TOKEN": getXsrfToken()
-                    }
-                }
+                { productId, quantity: 1 },
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
-
             await fetchCart();
-
         } catch (error) {
-
             console.log(error);
-
             toast.error("Failed to increase quantity");
-
         } finally {
-
             setActionLoading(false);
         }
     };
 
-    // Decrease quantity
     const handleDecreaseQuantity = async (productId) => {
-
         setActionLoading(true);
-
         try {
-
             await api.put(
                 `/cart/${user.userId}/items/${productId}/decrease`,
                 {},
-                {
-                    headers: {
-                        "X-XSRF-TOKEN": getXsrfToken()
-                    }
-                }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
-
             await fetchCart();
-
         } catch (error) {
-
             console.log(error);
-
             toast.error("Failed to decrease quantity");
-
         } finally {
-
             setActionLoading(false);
         }
     };
 
-    // Remove item
     const handleRemoveItem = async (productId) => {
-
         setActionLoading(true);
-
         try {
-
             await api.delete(
                 `/cart/${user.userId}/items/${productId}`,
-                {
-                    headers: {
-                        "X-XSRF-TOKEN": getXsrfToken()
-                    }
-                }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
-
             await fetchCart();
-
         } catch (error) {
-
             console.log(error);
-
             toast.error("Failed to remove item");
-
         } finally {
-
             setActionLoading(false);
         }
     };
 
-    // Checkout
     const handleCheckout = async () => {
-
         setActionLoading(true);
-
         try {
-
             await api.post(
                 `/order/${user.userId}/checkout`,
                 {},
-                {
-                    headers: {
-                        "X-XSRF-TOKEN": getXsrfToken()
-                    }
-                }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
-
             toast.success("Checkout successful");
-
             await fetchCart();
-
         } catch (error) {
-
             console.log(error);
-
             toast.error("Checkout failed");
-
         } finally {
-
             setActionLoading(false);
         }
     };
 
-    // Page loading state
+    /*
+    |----------------------------------------------------------
+    | Loading / Error
+    |----------------------------------------------------------
+    */
+
     if (loading) {
-
         return (
-
-            <div className="min-h-screen flex flex-col justify-center items-center">
-
+            <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2, bgcolor: "grey.50" }}>
                 <Loader />
-
-                <p className="text-2xl font-semibold mt-4">
-                    Loading cart...
-                </p>
-
-            </div>
+                <Typography variant="h6" color="text.secondary">Loading your cart...</Typography>
+            </Box>
         );
     }
 
-    // Error state
     if (error) {
-
         return (
-
-            <h1 className="text-3xl p-10 text-red-600">
-                {error}
-            </h1>
+            <Box sx={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", bgcolor: "grey.50" }}>
+                <Typography variant="h6" color="error">{error}</Typography>
+            </Box>
         );
     }
+
+    const items      = cart?.items ?? [];
+    const totalPrice = Number(cart?.totalPrice ?? 0);
+    const itemCount  = items.reduce((sum, i) => sum + i.quantity, 0);
+
+    /*
+    |----------------------------------------------------------
+    | Render
+    |----------------------------------------------------------
+    */
 
     return (
 
-        <div className="p-4 md:p-10 bg-gray-100 min-h-screen">
+        <Box sx={{ bgcolor: "grey.50", minHeight: "100vh" }}>
 
-            <h1 className="text-3xl md:text-5xl font-bold mb-6 md:mb-10">
-                My Cart
-            </h1>
+            {/* ── Banner ── */}
+            <Box
+                sx={{
+                    background: "linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%)",
+                    color: "white",
+                    px: { xs: 3, sm: 5, md: 8 },
+                    py: { xs: 4, md: 6 },
+                }}
+            >
+                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: items.length > 0 ? 3 : 0 }}>
+                    <Avatar sx={{ bgcolor: "rgba(255,255,255,0.15)", width: 56, height: 56 }}>
+                        <ShoppingCartOutlinedIcon sx={{ fontSize: 30 }} />
+                    </Avatar>
+                    <Box>
+                        <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: "1.6rem", md: "2.2rem" } }}>
+                            My Cart
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.75, mt: 0.25 }}>
+                            {itemCount > 0
+                                ? `${itemCount} item${itemCount !== 1 ? "s" : ""} in your cart`
+                                : "Your cart is empty"}
+                        </Typography>
+                    </Box>
+                </Stack>
 
-            {/* Cart action loader */}
-            {actionLoading && (
+                {items.length > 0 && (
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                        <Paper elevation={0} sx={{ px: 3, py: 1.75, bgcolor: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 2, color: "white", minWidth: 140 }}>
+                            <Typography variant="caption" sx={{ opacity: 0.75, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 600 }}>
+                                Items
+                            </Typography>
+                            <Typography variant="h5" fontWeight="bold">{itemCount}</Typography>
+                        </Paper>
+                        <Paper elevation={0} sx={{ px: 3, py: 1.75, bgcolor: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 2, color: "white", minWidth: 160 }}>
+                            <Typography variant="caption" sx={{ opacity: 0.75, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 600 }}>
+                                Subtotal
+                            </Typography>
+                            <Typography variant="h5" fontWeight="bold">
+                                ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                            </Typography>
+                        </Paper>
+                    </Stack>
+                )}
+            </Box>
 
-                <div className="mb-6 flex items-center gap-4">
+            {/* ── Content ── */}
+            <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
 
-                    <Loader />
+                {/* ── Action Loading Bar ── */}
+                {actionLoading && (
+                    <Paper elevation={0} sx={{ mb: 3, px: 3, py: 1.5, borderRadius: 2, border: "1px solid", borderColor: "info.light", bgcolor: "#e3f2fd", display: "flex", alignItems: "center", gap: 2 }}>
+                        <CircularProgress size={20} thickness={5} />
+                        <Typography variant="body2" fontWeight={600} color="info.dark">
+                            Updating your cart...
+                        </Typography>
+                    </Paper>
+                )}
 
-                    <p className="text-xl font-semibold text-blue-600">
-                        Updating cart...
-                    </p>
+                {/* ── Empty State ── */}
+                {items.length === 0 ? (
 
-                </div>
-            )}
-
-            {cart?.items?.length === 0 ? (
-
-                <div className="bg-white p-6 md:p-10 rounded-lg shadow text-center">
-
-                    <h2 className="text-3xl font-bold text-gray-700">
-                        Cart is empty
-                    </h2>
-
-                    <p className="text-gray-500 mt-4 text-lg">
-                        Add products to your cart to continue shopping.
-                    </p>
-
-                </div>
-
-            ) : (
-
-                <div className="space-y-6">
-
-                    {cart?.items?.map((item) => (
-
-                        <div
-                            key={item.productId}
-                            className="bg-white p-4 md:p-6 rounded-lg shadow flex flex-col sm:flex-row justify-between sm:items-center gap-4"
+                    <Paper elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", py: 10, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", bgcolor: "white" }}>
+                        <Avatar sx={{ width: 88, height: 88, bgcolor: "#e8eaf6", mb: 3 }}>
+                            <ShoppingCartOutlinedIcon sx={{ fontSize: 44, color: "primary.main" }} />
+                        </Avatar>
+                        <Typography variant="h5" fontWeight="bold" color="text.primary" gutterBottom>
+                            Your cart is empty
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 320, lineHeight: 1.7 }}>
+                            Looks like you haven't added anything yet. Start browsing products.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            startIcon={<StorefrontOutlinedIcon />}
+                            onClick={() => navigate("/")}
+                            sx={{ borderRadius: 2, px: 4, py: 1.25, textTransform: "none", fontWeight: 700, fontSize: "1rem" }}
                         >
+                            Browse Products
+                        </Button>
+                    </Paper>
 
-                            <div>
+                ) : (
 
-                                <h2 className="text-xl md:text-2xl font-bold">
-                                    {item.productName}
-                                </h2>
+                    /* ── Two-column layout ── */
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", lg: "1fr 340px" },
+                            gap: 3,
+                            alignItems: "start",
+                        }}
+                    >
 
-                                <div className="flex items-center gap-4 mt-4">
+                        {/* ── Cart Items ── */}
+                        <Stack spacing={2}>
 
-                                    {/* Decrease Button */}
-                                    <button
-                                        onClick={() =>
-                                            handleDecreaseQuantity(item.productId)
-                                        }
-                                        disabled={actionLoading}
-                                        className="bg-gray-300 px-4 py-2 rounded font-bold disabled:opacity-50"
-                                    >
-                                        -
-                                    </button>
+                            {items.map((item) => (
 
-                                    <span className="text-xl font-bold">
-                                        {item.quantity}
-                                    </span>
-
-                                    {/* Increase Button */}
-                                    <button
-                                        onClick={() =>
-                                            handleIncreaseQuantity(item.productId)
-                                        }
-                                        disabled={actionLoading}
-                                        className="bg-gray-300 px-4 py-2 rounded font-bold disabled:opacity-50"
-                                    >
-                                        +
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                            <div className="sm:text-right">
-
-                                <p className="text-xl md:text-2xl font-bold text-green-700">
-                                    ${(item.price * item.quantity).toFixed(2)}
-                                </p>
-
-                                {/* Remove button */}
-                                <button
-                                    onClick={() =>
-                                        handleRemoveItem(item.productId)
-                                    }
-                                    disabled={actionLoading}
-                                    className="mt-4 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded font-bold disabled:opacity-50"
+                                <Card
+                                    key={item.productId}
+                                    elevation={0}
+                                    sx={{
+                                        borderRadius: 3,
+                                        border: "1px solid",
+                                        borderColor: "divider",
+                                        transition: "box-shadow 0.2s ease",
+                                        "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.07)" },
+                                    }}
                                 >
-                                    Remove
-                                </button>
+                                    <CardContent sx={{ p: { xs: 2, md: 3 }, "&:last-child": { pb: "20px !important" } }}>
 
-                            </div>
+                                        <Stack
+                                            direction={{ xs: "column", sm: "row" }}
+                                            alignItems={{ sm: "center" }}
+                                            justifyContent="space-between"
+                                            gap={2}
+                                        >
 
-                        </div>
-                    ))}
+                                            {/* Left — image + details */}
+                                            <Stack direction="row" alignItems="center" spacing={2} sx={{ flex: 1 }}>
 
-                    <div className="bg-white p-4 md:p-6 rounded-lg shadow mt-6 md:mt-10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                                <Avatar
+                                                    variant="rounded"
+                                                    sx={{ width: 64, height: 64, bgcolor: "grey.100", flexShrink: 0 }}
+                                                >
+                                                    <InventoryOutlinedIcon sx={{ color: "text.disabled", fontSize: 28 }} />
+                                                </Avatar>
 
-                        <h2 className="text-2xl md:text-3xl font-bold">
-                            Total: ${cart?.totalPrice || 0}
-                        </h2>
+                                                <Box>
+                                                    <Typography
+                                                        variant="subtitle1"
+                                                        fontWeight={700}
+                                                        sx={{
+                                                            background: "linear-gradient(135deg, #1a237e 0%, #3949ab 100%)",
+                                                            WebkitBackgroundClip: "text",
+                                                            WebkitTextFillColor: "transparent",
+                                                            backgroundClip: "text",
+                                                            letterSpacing: 0.2,
+                                                        }}
+                                                    >
+                                                        {item.productName}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
+                                                        Unit price: <strong>${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong>
+                                                    </Typography>
+                                                </Box>
 
-                        {/* Checkout button */}
-                        <button
-                            onClick={handleCheckout}
-                            disabled={actionLoading}
-                            className={`text-white px-8 py-3 rounded font-bold text-xl ${
-                                actionLoading
-                                    ? "bg-gray-500 cursor-not-allowed"
-                                    : "bg-green-600 hover:bg-green-700"
-                            }`}
+                                            </Stack>
+
+                                            {/* Right — qty controls + price + remove */}
+                                            <Stack direction={{ xs: "row" }} alignItems="center" spacing={2} flexWrap="wrap">
+
+                                                {/* Quantity controls */}
+                                                <Stack direction="row" alignItems="center" spacing={1}
+                                                    sx={{
+                                                        border: "1px solid",
+                                                        borderColor: "divider",
+                                                        borderRadius: 2,
+                                                        px: 0.5,
+                                                        py: 0.25,
+                                                    }}
+                                                >
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleDecreaseQuantity(item.productId)}
+                                                        disabled={actionLoading}
+                                                        sx={{ color: "text.secondary" }}
+                                                    >
+                                                        <RemoveIcon fontSize="small" />
+                                                    </IconButton>
+
+                                                    <Typography variant="body1" fontWeight={700} sx={{ minWidth: 24, textAlign: "center" }}>
+                                                        {item.quantity}
+                                                    </Typography>
+
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleIncreaseQuantity(item.productId)}
+                                                        disabled={actionLoading}
+                                                        sx={{ color: "primary.main" }}
+                                                    >
+                                                        <AddIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Stack>
+
+                                                {/* Line total */}
+                                                <Typography variant="h6" fontWeight="bold" color="success.dark" sx={{ minWidth: 90, textAlign: "right" }}>
+                                                    ${(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                </Typography>
+
+                                                {/* Remove */}
+                                                <IconButton
+                                                    onClick={() => handleRemoveItem(item.productId)}
+                                                    disabled={actionLoading}
+                                                    color="error"
+                                                    size="small"
+                                                    sx={{
+                                                        border: "1px solid",
+                                                        borderColor: "error.light",
+                                                        borderRadius: 1.5,
+                                                    }}
+                                                >
+                                                    <DeleteOutlineIcon fontSize="small" />
+                                                </IconButton>
+
+                                            </Stack>
+
+                                        </Stack>
+
+                                    </CardContent>
+                                </Card>
+
+                            ))}
+
+                        </Stack>
+
+                        {/* ── Order Summary ── */}
+                        <Card
+                            elevation={0}
+                            sx={{
+                                borderRadius: 3,
+                                border: "1px solid",
+                                borderColor: "divider",
+                                position: { lg: "sticky" },
+                                top: { lg: 24 },
+                                overflow: "hidden",
+                            }}
                         >
-                            {actionLoading
-                                ? "Processing..."
-                                : "Checkout"}
-                        </button>
+                            {/* Summary header accent */}
+                            <Box sx={{ height: 4, bgcolor: "success.main" }} />
 
-                    </div>
+                            <CardContent sx={{ p: 3 }}>
 
-                </div>
-            )}
+                                <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 2.5 }}>
+                                    Order Summary
+                                </Typography>
 
-        </div>
+                                <Stack spacing={1.5}>
+
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="body2" color="text.secondary">
+                                            Items ({itemCount})
+                                        </Typography>
+                                        <Typography variant="body2" fontWeight={600}>
+                                            ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        </Typography>
+                                    </Stack>
+
+                                    <Stack direction="row" justifyContent="space-between">
+                                        <Typography variant="body2" color="text.secondary">
+                                            Shipping
+                                        </Typography>
+                                        <Chip label="Free" color="success" size="small" sx={{ fontWeight: 700, fontSize: "0.7rem", height: 20 }} />
+                                    </Stack>
+
+                                </Stack>
+
+                                <Divider sx={{ my: 2 }} />
+
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                                    <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
+                                        Total
+                                    </Typography>
+                                    <Typography variant="h5" fontWeight="bold" color="success.main">
+                                        ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    </Typography>
+                                </Stack>
+
+                                <Button
+                                    variant="contained"
+                                    color="success"
+                                    fullWidth
+                                    size="large"
+                                    onClick={handleCheckout}
+                                    disabled={actionLoading}
+                                    startIcon={actionLoading
+                                        ? <CircularProgress size={18} color="inherit" />
+                                        : <LockOutlinedIcon />
+                                    }
+                                    sx={{
+                                        py: 1.5,
+                                        fontWeight: 700,
+                                        fontSize: "1rem",
+                                        textTransform: "none",
+                                        borderRadius: 2,
+                                    }}
+                                >
+                                    {actionLoading ? "Processing..." : "Proceed to Checkout"}
+                                </Button>
+
+                                <Button
+                                    variant="text"
+                                    fullWidth
+                                    startIcon={<ShoppingBagOutlinedIcon />}
+                                    onClick={() => navigate("/")}
+                                    sx={{ mt: 1.5, textTransform: "none", color: "text.secondary", fontWeight: 600 }}
+                                >
+                                    Continue Shopping
+                                </Button>
+
+                            </CardContent>
+                        </Card>
+
+                    </Box>
+
+                )}
+
+            </Container>
+
+        </Box>
     );
 };
 
