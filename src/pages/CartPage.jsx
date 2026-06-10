@@ -113,22 +113,8 @@ const CartPage = () => {
         }
     };
 
-    const handleCheckout = async () => {
-        setActionLoading(true);
-        try {
-            await api.post(
-                `/order/${user.userId}/checkout`,
-                {},
-                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
-            );
-            toast.success("Checkout successful");
-            await fetchCart();
-        } catch (error) {
-            console.log(error);
-            toast.error("Checkout failed");
-        } finally {
-            setActionLoading(false);
-        }
+    const handleCheckout = () => {
+        navigate("/checkout");
     };
 
     /*

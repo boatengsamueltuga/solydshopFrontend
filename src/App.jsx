@@ -13,6 +13,9 @@ import RegisterPage from "./pages/RegisterPage";
 // Added CartPage import
 import CartPage from "./pages/CartPage";
 
+// Added CheckoutPage import
+import CheckoutPage from "./pages/CheckoutPage";
+
 // Added OrdersPage import
 import OrdersPage from "./pages/OrdersPage";
 
@@ -95,6 +98,16 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <CartPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Added Checkout Route */}
+                <Route
+                    path="/checkout"
+                    element={
+                        <ProtectedRoute>
+                            <CheckoutPage />
                         </ProtectedRoute>
                     }
                 />
