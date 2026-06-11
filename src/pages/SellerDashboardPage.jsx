@@ -71,7 +71,7 @@ const SellerDashboardPage = () => {
     // Fetch categories for dropdown
     const fetchCategories = async () => {
         try {
-            const response = await api.get("/public/categories");
+            const response = await api.get("/public/categories?pageSize=1000");
             setCategories(response.data.content);
         } catch (error) {
             console.log(error);
@@ -434,6 +434,24 @@ const SellerDashboardPage = () => {
                                     value={formData.categoryId}
                                     label="Category"
                                     onChange={handleChange}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            style: { maxHeight: 240, overflow: "auto" },
+                                        },
+                                        sx: {
+                                            "& .MuiPaper-root": {
+                                                maxHeight: "240px !important",
+                                                overflow: "auto !important",
+                                            },
+                                            "& .MuiMenuItem-root.Mui-selected": {
+                                                backgroundColor: "#1976d2 !important",
+                                                color: "#fff !important",
+                                            },
+                                            "& .MuiMenuItem-root.Mui-selected:hover": {
+                                                backgroundColor: "#1565c0 !important",
+                                            },
+                                        },
+                                    }}
                                 >
                                     <MenuItem value=""><em>Select a category</em></MenuItem>
                                     {categories.map((cat) => (

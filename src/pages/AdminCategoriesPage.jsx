@@ -54,7 +54,7 @@ const AdminCategoriesPage = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await api.get("/public/categories");
+            const response = await api.get("/public/categories?pageSize=1000");
             setCategories(response.data.content);
         } catch (error) {
             console.log(error);
@@ -106,7 +106,6 @@ const AdminCategoriesPage = () => {
             setIsCreateOpen(false);
         } catch (error) {
             console.log(error);
-            toast.error("Failed to create category.");
         }
     };
 
@@ -130,7 +129,6 @@ const AdminCategoriesPage = () => {
             setIsEditOpen(false);
         } catch (error) {
             console.log(error);
-            toast.error("Failed to update category.");
         }
     };
 

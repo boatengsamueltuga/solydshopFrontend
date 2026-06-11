@@ -99,7 +99,7 @@ const HomePage = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await api.get("/public/categories");
+            const response = await api.get("/public/categories?pageSize=1000");
             setCategories(response.data.content);
         } catch (error) {
             console.log(error);
@@ -336,6 +336,24 @@ const HomePage = () => {
                             label="Category"
                             value={categoryId}
                             onChange={(e) => setCategoryId(e.target.value)}
+                            MenuProps={{
+                                PaperProps: {
+                                    style: { maxHeight: 240, overflow: "auto" },
+                                },
+                                sx: {
+                                    "& .MuiPaper-root": {
+                                        maxHeight: "240px !important",
+                                        overflow: "auto !important",
+                                    },
+                                    "& .MuiMenuItem-root.Mui-selected": {
+                                        backgroundColor: "#1976d2 !important",
+                                        color: "#fff !important",
+                                    },
+                                    "& .MuiMenuItem-root.Mui-selected:hover": {
+                                        backgroundColor: "#1565c0 !important",
+                                    },
+                                },
+                            }}
                         >
                             <MenuItem value="">All Categories</MenuItem>
                             {categories.map((cat) => (
@@ -362,24 +380,44 @@ const HomePage = () => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        mb: 3,
+                        mb: 4,
                         flexWrap: "wrap",
-                        gap: 1,
+                        gap: 2,
                     }}
                 >
-                    <Typography variant="h5" fontWeight="bold" color="text.primary">
-                        {loading
-                            ? "Searching…"
-                            : `${products.length} Product${products.length !== 1 ? "s" : ""} Found`}
-                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Box
+                            sx={{
+                                width: 5,
+                                height: 46,
+                                bgcolor: "primary.main",
+                                borderRadius: 1,
+                                flexShrink: 0,
+                            }}
+                        />
+                        <Box>
+                            <Typography
+                                variant="h6"
+                                fontWeight={800}
+                                color="text.primary"
+                                sx={{ lineHeight: 1.2, letterSpacing: -0.3 }}
+                            >
+                                Browse the Catalog
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3 }}>
+                                In-stock parts — ready to ship to your job site
+                            </Typography>
+                        </Box>
+                    </Box>
 
                     {hasActiveFilters && !loading && (
                         <Button
                             size="small"
-                            color="inherit"
+                            variant="outlined"
+                            color="primary"
                             onClick={clearFilters}
                             startIcon={<FilterAltOffIcon />}
-                            sx={{ color: "text.secondary" }}
+                            sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
                         >
                             Clear Filters
                         </Button>

@@ -26,7 +26,19 @@ import {
     FaSignOutAlt,
 } from "react-icons/fa";
 
-import { Button, IconButton } from "@mui/material";
+import { Avatar, Button, IconButton, Tooltip } from "@mui/material";
+
+const getRoleColor = (roles) => {
+    if (roles?.includes("ROLE_ADMIN"))  return "#d32f2f";
+    if (roles?.includes("ROLE_SELLER")) return "#ed6c02";
+    return "#1976d2";
+};
+
+const getRoleLabel = (roles) => {
+    if (roles?.includes("ROLE_ADMIN"))  return "Admin";
+    if (roles?.includes("ROLE_SELLER")) return "Seller";
+    return "User";
+};
 
 const Navbar = () => {
 
@@ -149,6 +161,27 @@ const Navbar = () => {
                     )}
 
                     {isAuthenticated && (
+                        <Tooltip
+                            title={`${user?.email} · ${getRoleLabel(user?.roles)}`}
+                            arrow
+                        >
+                            <Avatar
+                                sx={{
+                                    bgcolor: getRoleColor(user?.roles),
+                                    width: 38,
+                                    height: 38,
+                                    fontSize: "1rem",
+                                    fontWeight: "bold",
+                                    cursor: "default",
+                                    ml: 1,
+                                }}
+                            >
+                                {user?.email?.[0]?.toUpperCase()}
+                            </Avatar>
+                        </Tooltip>
+                    )}
+
+                    {isAuthenticated && (
                         <Button variant="outlined" onClick={handleLogout} sx={logoutSx} startIcon={<FaSignOutAlt />}>
                             Logout
                         </Button>
@@ -171,6 +204,26 @@ const Navbar = () => {
             {/* Mobile dropdown menu */}
             {menuOpen && (
                 <div className="flex flex-col pt-4 pb-2 border-t border-gray-700 mt-4 md:hidden">
+
+                    {isAuthenticated && (
+                        <div className="flex items-center gap-3 px-2 pb-3 mb-1 border-b border-gray-700">
+                            <Avatar
+                                sx={{
+                                    bgcolor: getRoleColor(user?.roles),
+                                    width: 40,
+                                    height: 40,
+                                    fontSize: "1.1rem",
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                {user?.email?.[0]?.toUpperCase()}
+                            </Avatar>
+                            <div>
+                                <p className="text-white text-sm font-semibold leading-tight">{user?.email}</p>
+                                <p className="text-gray-400 text-xs">{getRoleLabel(user?.roles)}</p>
+                            </div>
+                        </div>
+                    )}
 
                     <Button component={Link} to="/" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaHome />}>
                         Home

@@ -922,6 +922,20 @@ const navigate = useNavigate();
                                     label="Category"
                                     value={productForm.categoryId}
                                     onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            style: { maxHeight: 240, overflow: "auto" },
+                                        },
+                                        sx: {
+                                            "& .MuiMenuItem-root.Mui-selected": {
+                                                backgroundColor: "#1976d2 !important",
+                                                color: "#fff !important",
+                                            },
+                                            "& .MuiMenuItem-root.Mui-selected:hover": {
+                                                backgroundColor: "#1565c0 !important",
+                                            },
+                                        },
+                                    }}
                                 >
                                     <MenuItem value=""><em>Select category</em></MenuItem>
                                     {categories.map((cat) => (

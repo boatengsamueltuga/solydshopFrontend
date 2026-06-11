@@ -317,6 +317,20 @@ const AdminOrdersPage = () => {
                                     label="Update Status"
                                     value={newStatus}
                                     onChange={(e) => setNewStatus(e.target.value)}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            style: { maxHeight: 240, overflow: "auto" },
+                                        },
+                                        sx: {
+                                            "& .MuiMenuItem-root.Mui-selected": {
+                                                backgroundColor: "#1976d2 !important",
+                                                color: "#fff !important",
+                                            },
+                                            "& .MuiMenuItem-root.Mui-selected:hover": {
+                                                backgroundColor: "#1565c0 !important",
+                                            },
+                                        },
+                                    }}
                                 >
                                     {["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map((s) => (
                                         <MenuItem key={s} value={s}>{s}</MenuItem>

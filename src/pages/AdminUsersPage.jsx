@@ -10,13 +10,18 @@ import {
     DialogContent,
     DialogActions,
     Divider,
+    FormControl,
     IconButton,
+    InputLabel,
+    MenuItem,
+    Select,
     Typography,
 } from "@mui/material";
 
-import CloseIcon      from "@mui/icons-material/Close";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import DeleteIcon     from "@mui/icons-material/Delete";
+import CloseIcon        from "@mui/icons-material/Close";
+import VisibilityIcon   from "@mui/icons-material/Visibility";
+import DeleteIcon       from "@mui/icons-material/Delete";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 import api from "../api/api";
 import Loader from "../components/Loader";
@@ -35,6 +40,7 @@ const AdminUsersPage = () => {
     const [loading,      setLoading]      = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newRole,      setNewRole]      = useState("");
 
     const [isMobile,  setIsMobile]  = useState(window.innerWidth < 600);
     const [isCompact, setIsCompact] = useState(window.innerWidth < 1100);
@@ -78,7 +84,20 @@ const AdminUsersPage = () => {
 
     const handleViewUser = (user) => {
         setSelectedUser(user);
+        setNewRole(user.roles?.[0] ?? "ROLE_USER");
         setIsDialogOpen(true);
+    };
+
+    const handleUpdateRole = async () => {
+        try {
+            await api.put(`/admin/users/${selectedUser.userId}/role?role=${newRole}`);
+            toast.success("Role updated successfully");
+            fetchUsers();
+            setIsDialogOpen(false);
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to update role");
+        }
     };
 
     const handleDeleteUser = (userId) => {
@@ -305,6 +324,39 @@ const AdminUsersPage = () => {
                                     <Typography variant="body2" color="secondary.dark" fontWeight={500}>{selectedUser.email}</Typography>
                                 </Box>
                             </Box>
+
+                            <Divider sx={{ my: 2 }} />
+
+                            <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
+                                Assign Role
+                            </Typography>
+
+                            <FormControl fullWidth size="small">
+                                <InputLabel sx={{ fontWeight: "bold" }}>Role</InputLabel>
+                                <Select
+                                    label="Role"
+                                    value={newRole}
+                                    onChange={(e) => setNewRole(e.target.value)}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            style: { maxHeight: 240, overflow: "auto" },
+                                        },
+                                        sx: {
+                                            "& .MuiMenuItem-root.Mui-selected": {
+                                                backgroundColor: "#1976d2 !important",
+                                                color: "#fff !important",
+                                            },
+                                            "& .MuiMenuItem-root.Mui-selected:hover": {
+                                                backgroundColor: "#1565c0 !important",
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="ROLE_USER">User</MenuItem>
+                                    <MenuItem value="ROLE_SELLER">Seller</MenuItem>
+                                    <MenuItem value="ROLE_ADMIN">Admin</MenuItem>
+                                </Select>
+                            </FormControl>
                         </DialogContent>
 
                         <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
@@ -325,7 +377,15 @@ const AdminUsersPage = () => {
                                 color="error"
                                 startIcon={<DeleteIcon />}
                             >
-                                Delete User
+                                Delete
+                            </Button>
+                            <Button
+                                onClick={handleUpdateRole}
+                                variant="contained"
+                                color="secondary"
+                                startIcon={<ManageAccountsIcon />}
+                            >
+                                Update Role
                             </Button>
                         </DialogActions>
                     </>
