@@ -21,13 +21,18 @@ import {
     CardMedia,
     Chip,
     Container,
+    Dialog,
+    DialogContent,
+    Divider,
     FormControl,
+    IconButton,
     InputAdornment,
     InputLabel,
     MenuItem,
     Paper,
     Select,
     Skeleton,
+    Stack,
     TextField,
     Typography,
 } from "@mui/material";
@@ -36,6 +41,7 @@ import SearchIcon        from "@mui/icons-material/Search";
 import ShoppingCartIcon  from "@mui/icons-material/ShoppingCart";
 import StorefrontIcon    from "@mui/icons-material/Storefront";
 import FilterAltOffIcon  from "@mui/icons-material/FilterAltOff";
+import CloseIcon         from "@mui/icons-material/Close";
 
 /*
 |----------------------------------------------------------
@@ -79,8 +85,9 @@ const HomePage = () => {
 
     const { user } = useSelector((state) => state.auth);
 
-    const [keyword,    setKeyword]    = useState("");
-    const [categoryId, setCategoryId] = useState("");
+    const [keyword,          setKeyword]          = useState("");
+    const [categoryId,       setCategoryId]       = useState("");
+    const [quickViewProduct, setQuickViewProduct] = useState(null);
     const [categories, setCategories] = useState([]);
     const [heroIndex,  setHeroIndex]  = useState(0);
 
@@ -185,7 +192,7 @@ const HomePage = () => {
     */
 
     return (
-
+        <>
         <Box sx={{ bgcolor: "#f5f7fa", minHeight: "100vh" }}>
 
             {/* ── Hero ── */}
@@ -314,7 +321,7 @@ const HomePage = () => {
                     }}
                 >
                     <TextField
-                        placeholder="Search products..."
+                        placeholder="Search by name, model number, or part number..."
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
                         onKeyDown={handleKeyDown}
@@ -456,15 +463,51 @@ const HomePage = () => {
                                     overflow: "hidden",
                                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
                                     "&:hover": { transform: "translateY(-3px)", boxShadow: 6 },
+                                    "&:hover .qv-overlay": { opacity: 1 },
                                 }}
                             >
-                                <CardMedia
-                                    component="img"
-                                    height="45"
-                                    image={product.imageUrl}
-                                    alt={product.productName}
-                                    sx={{ objectFit: "cover" }}
-                                />
+                                {/* Image + Quick View overlay */}
+                                <Box sx={{ position: "relative" }}>
+                                    <CardMedia
+                                        component="img"
+                                        height="45"
+                                        image={product.imageUrl}
+                                        alt={product.productName}
+                                        sx={{ objectFit: "cover", display: "block" }}
+                                    />
+                                    <Box
+                                        className="qv-overlay"
+                                        sx={{
+                                            position: "absolute",
+                                            inset: 0,
+                                            bgcolor: "rgba(0,0,0,0.45)",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            opacity: 0,
+                                            transition: "opacity 0.2s ease",
+                                        }}
+                                    >
+                                        <Button
+                                            size="small"
+                                            onClick={() => setQuickViewProduct(product)}
+                                            sx={{
+                                                bgcolor: "white",
+                                                color: "text.primary",
+                                                fontWeight: 700,
+                                                fontSize: "0.65rem",
+                                                textTransform: "none",
+                                                borderRadius: 2,
+                                                px: 1.5,
+                                                py: 0.4,
+                                                minWidth: 0,
+                                                "&:hover": { bgcolor: "grey.100" },
+                                            }}
+                                        >
+                                            Quick View
+                                        </Button>
+                                    </Box>
+                                </Box>
 
                                 <CardContent sx={{ flexGrow: 1, p: 1, pb: "4px !important" }}>
                                     <Typography
@@ -487,15 +530,25 @@ const HomePage = () => {
                                         sx={{
                                             fontSize: { xs: "0.63rem", md: "0.7rem" },
                                             color: "text.secondary",
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 1,
-                                            WebkitBoxOrient: "vertical",
-                                            overflow: "hidden",
                                             mb: 0.4,
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
                                         }}
                                     >
                                         {product.description}
                                     </Typography>
+
+                                    {product.modelNumber && (
+                                        <Typography sx={{ fontSize: "0.6rem", color: "text.disabled", mb: 0.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                            Model: {product.modelNumber}
+                                        </Typography>
+                                    )}
+                                    {product.partNumber && (
+                                        <Typography sx={{ fontSize: "0.6rem", color: "text.disabled", mb: 0.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                            Part #: {product.partNumber}
+                                        </Typography>
+                                    )}
 
                                     <Typography
                                         fontWeight="bold"
@@ -541,6 +594,95 @@ const HomePage = () => {
             </Container>
 
         </Box>
+
+        {/* ── Quick View Modal ── */}
+
+        <Dialog
+            open={Boolean(quickViewProduct)}
+            onClose={() => setQuickViewProduct(null)}
+            maxWidth="md"
+            fullWidth
+            PaperProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}
+        >
+            {quickViewProduct && (
+                <>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 2, borderBottom: "1px solid", borderColor: "divider", bgcolor: "grey.50" }}>
+                        <Typography variant="h6" fontWeight="bold">Quick View</Typography>
+                        <IconButton size="small" onClick={() => setQuickViewProduct(null)}>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
+
+                    <DialogContent sx={{ p: 0 }}>
+                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}>
+
+                            {/* Image */}
+                            <Box sx={{ width: { xs: "100%", sm: "35%" }, bgcolor: "grey.100", display: "flex", alignItems: "center", justifyContent: "center", p: 1.5, minHeight: 220, flexShrink: 0 }}>
+                                <Box component="img" src={quickViewProduct.imageUrl} alt={quickViewProduct.productName} sx={{ maxWidth: "100%", maxHeight: 200, objectFit: "contain" }} />
+                            </Box>
+
+                            {/* Details */}
+                            <Box sx={{ flex: 1, p: 1.5, display: "flex", flexDirection: "column", gap: 0.75 }}>
+                                {quickViewProduct.categoryName && (
+                                    <Chip label={quickViewProduct.categoryName} size="small" color="primary" variant="outlined" sx={{ alignSelf: "flex-start" }} />
+                                )}
+
+                                <Typography variant="h6" fontWeight="bold" sx={{ lineHeight: 1.3, wordBreak: "break-word" }}>
+                                    {quickViewProduct.productName}
+                                </Typography>
+
+                                {(quickViewProduct.modelNumber || quickViewProduct.partNumber) && (
+                                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                                        {quickViewProduct.modelNumber && (
+                                            <Chip label={`Model: ${quickViewProduct.modelNumber}`} size="small" variant="outlined" />
+                                        )}
+                                        {quickViewProduct.partNumber && (
+                                            <Chip label={`Part #: ${quickViewProduct.partNumber}`} size="small" variant="outlined" />
+                                        )}
+                                    </Stack>
+                                )}
+
+                                <Typography variant="h6" fontWeight="bold" color="success.main">
+                                    ${Number(quickViewProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                </Typography>
+
+                                <Chip
+                                    label={quickViewProduct.quantity > 0 ? `In Stock · ${quickViewProduct.quantity} units` : "Out of Stock"}
+                                    color={quickViewProduct.quantity > 0 ? "success" : "error"}
+                                    variant="filled"
+                                    sx={{ alignSelf: "flex-start" }}
+                                />
+
+                                <Divider />
+
+                                <Box>
+                                    <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
+                                        Description
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.7, wordBreak: "break-word", overflowWrap: "break-word", maxHeight: 100, overflowY: "auto", pr: 0.5 }}>
+                                        {quickViewProduct.description}
+                                    </Typography>
+                                </Box>
+
+                                <Button
+                                    variant="contained"
+                                    fullWidth
+                                    size="large"
+                                    startIcon={<ShoppingCartIcon />}
+                                    disabled={quickViewProduct.quantity === 0}
+                                    onClick={() => { handleAddToCart(quickViewProduct.productId); setQuickViewProduct(null); }}
+                                    sx={{ mt: "auto", borderRadius: 2, fontWeight: 700, textTransform: "none", py: 0.8 }}
+                                >
+                                    {quickViewProduct.quantity === 0 ? "Out of Stock" : "Add to Cart"}
+                                </Button>
+                            </Box>
+
+                        </Box>
+                    </DialogContent>
+                </>
+            )}
+        </Dialog>
+        </>
     );
 };
 

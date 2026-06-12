@@ -15,8 +15,11 @@ import {
     Chip,
     CircularProgress,
     Container,
+    Dialog,
+    DialogContent,
     Divider,
     FormControl,
+    IconButton,
     InputAdornment,
     InputLabel,
     MenuItem,
@@ -51,10 +54,13 @@ const SellerDashboardPage = () => {
     const [actionLoading,    setActionLoading]    = useState(false);
     const [editingProductId, setEditingProductId] = useState(null);
     const [selectedFile,     setSelectedFile]     = useState(null);
+    const [quickViewProduct, setQuickViewProduct] = useState(null);
 
     const [formData, setFormData] = useState({
         productName: "",
         description: "",
+        modelNumber: "",
+        partNumber:  "",
         imageUrl:    "",
         price:       "",
         quantity:    "",
@@ -140,6 +146,8 @@ const SellerDashboardPage = () => {
             const productData = {
                 productName: formData.productName,
                 description: formData.description,
+                modelNumber: formData.modelNumber || null,
+                partNumber:  formData.partNumber  || null,
                 imageUrl,
                 price:      Number(formData.price),
                 quantity:   Number(formData.quantity),
@@ -163,7 +171,7 @@ const SellerDashboardPage = () => {
                 toast.success("Product created successfully");
             }
 
-            setFormData({ productName: "", description: "", imageUrl: "", price: "", quantity: "", categoryId: "" });
+            setFormData({ productName: "", description: "", modelNumber: "", partNumber: "", imageUrl: "", price: "", quantity: "", categoryId: "" });
             setSelectedFile(null);
             setEditingProductId(null);
 
@@ -185,6 +193,8 @@ const SellerDashboardPage = () => {
         setFormData({
             productName: product.productName,
             description: product.description,
+            modelNumber: product.modelNumber || "",
+            partNumber:  product.partNumber  || "",
             imageUrl:    product.imageUrl,
             price:       product.price,
             quantity:    product.quantity,
@@ -197,7 +207,7 @@ const SellerDashboardPage = () => {
     const handleCancelEdit = () => {
         setEditingProductId(null);
         setSelectedFile(null);
-        setFormData({ productName: "", description: "", imageUrl: "", price: "", quantity: "", categoryId: "" });
+        setFormData({ productName: "", description: "", modelNumber: "", partNumber: "", imageUrl: "", price: "", quantity: "", categoryId: "" });
     };
 
     // Delete product
@@ -251,7 +261,7 @@ const SellerDashboardPage = () => {
     */
 
     return (
-
+        <>
         <Box sx={{ bgcolor: "grey.50", minHeight: "100vh" }}>
 
             {/* ── Banner ── */}
@@ -462,6 +472,28 @@ const SellerDashboardPage = () => {
                                 </Select>
                             </FormControl>
 
+                            {/* Model Number */}
+                            <TextField
+                                label="Model Number"
+                                name="modelNumber"
+                                value={formData.modelNumber}
+                                onChange={handleChange}
+                                disabled={actionLoading}
+                                fullWidth
+                                placeholder="e.g. CAT 320D"
+                            />
+
+                            {/* Part Number */}
+                            <TextField
+                                label="Part Number"
+                                name="partNumber"
+                                value={formData.partNumber}
+                                onChange={handleChange}
+                                disabled={actionLoading}
+                                fullWidth
+                                placeholder="e.g. 3066T-1234"
+                            />
+
                             {/* Image Upload — full width */}
                             <Box sx={{ gridColumn: { md: "1 / -1" } }}>
                                 <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase" letterSpacing={1} display="block" sx={{ mb: 1.25 }}>
@@ -528,17 +560,33 @@ const SellerDashboardPage = () => {
                             )}
 
                             {/* Description — full width */}
-                            <TextField
-                                label="Description"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                disabled={actionLoading}
-                                multiline
-                                rows={3}
-                                fullWidth
-                                sx={{ gridColumn: { md: "1 / -1" } }}
-                            />
+                            <Box sx={{ gridColumn: { md: "1 / -1" } }}>
+                                <TextField
+                                    label="Description"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={(e) => {
+                                        if (e.target.value.length <= 1000)
+                                            setFormData({ ...formData, description: e.target.value });
+                                    }}
+                                    disabled={actionLoading}
+                                    multiline
+                                    rows={3}
+                                    fullWidth
+                                    inputProps={{ maxLength: 1000 }}
+                                />
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        display: "block",
+                                        textAlign: "right",
+                                        mt: 0.5,
+                                        color: formData.description.length >= 900 ? "error.main" : "text.disabled",
+                                    }}
+                                >
+                                    {formData.description.length} / 1000
+                                </Typography>
+                            </Box>
 
                             {/* Submit */}
                             <Box sx={{ gridColumn: { md: "1 / -1" }, display: "flex", justifyContent: "flex-end" }}>
@@ -649,39 +697,56 @@ const SellerDashboardPage = () => {
                                     flexDirection: "column",
                                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
                                     "&:hover": { transform: "translateY(-3px)", boxShadow: 6 },
+                                    "&:hover .qv-overlay": { opacity: 1 },
                                 }}
                             >
 
-                                {/* Product Image */}
-                                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", bgcolor: "grey.50", p: 0.5 }}>
+                                {/* Product Image + Quick View overlay */}
+                                <Box sx={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", bgcolor: "grey.50", p: 0.5 }}>
                                     {product.imageUrl ? (
                                         <Box
                                             component="img"
                                             src={product.imageUrl}
                                             alt={product.productName}
-                                            sx={{
-                                                width: 80,
-                                                height: 80,
-                                                objectFit: "cover",
-                                                borderRadius: 1,
-                                                display: "block",
-                                            }}
+                                            sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, display: "block" }}
                                         />
                                     ) : (
-                                        <Box
-                                            sx={{
-                                                width: 80,
-                                                height: 80,
-                                                bgcolor: "grey.100",
-                                                borderRadius: 1,
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                        >
+                                        <Box sx={{ width: 80, height: 80, bgcolor: "grey.100", borderRadius: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
                                             <ImageOutlinedIcon sx={{ fontSize: 28, color: "text.disabled" }} />
                                         </Box>
                                     )}
+                                    <Box
+                                        className="qv-overlay"
+                                        sx={{
+                                            position: "absolute",
+                                            inset: 0,
+                                            bgcolor: "rgba(0,0,0,0.45)",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            opacity: 0,
+                                            transition: "opacity 0.2s ease",
+                                        }}
+                                    >
+                                        <Button
+                                            size="small"
+                                            onClick={() => setQuickViewProduct(product)}
+                                            sx={{
+                                                bgcolor: "white",
+                                                color: "text.primary",
+                                                fontWeight: 700,
+                                                fontSize: "0.6rem",
+                                                textTransform: "none",
+                                                borderRadius: 2,
+                                                px: 1.5,
+                                                py: 0.4,
+                                                minWidth: 0,
+                                                "&:hover": { bgcolor: "grey.100" },
+                                            }}
+                                        >
+                                            Quick View
+                                        </Button>
+                                    </Box>
                                 </Box>
 
                                 <CardContent sx={{ flexGrow: 1, p: 1, pb: "4px !important" }}>
@@ -706,15 +771,25 @@ const SellerDashboardPage = () => {
                                         sx={{
                                             fontSize: { xs: "0.63rem", md: "0.7rem" },
                                             color: "text.secondary",
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 1,
-                                            WebkitBoxOrient: "vertical",
-                                            overflow: "hidden",
                                             mb: 0.4,
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
                                         }}
                                     >
                                         {product.description}
                                     </Typography>
+
+                                    {product.modelNumber && (
+                                        <Typography sx={{ fontSize: "0.6rem", color: "text.disabled", mb: 0.2 }}>
+                                            Model: {product.modelNumber}
+                                        </Typography>
+                                    )}
+                                    {product.partNumber && (
+                                        <Typography sx={{ fontSize: "0.6rem", color: "text.disabled", mb: 0.2 }}>
+                                            Part #: {product.partNumber}
+                                        </Typography>
+                                    )}
 
                                     <Typography
                                         fontWeight="bold"
@@ -782,6 +857,93 @@ const SellerDashboardPage = () => {
             </Container>
 
         </Box>
+
+        {/* ── Quick View Modal ── */}
+        <Dialog
+            open={Boolean(quickViewProduct)}
+            onClose={() => setQuickViewProduct(null)}
+            maxWidth="md"
+            fullWidth
+            PaperProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}
+        >
+            {quickViewProduct && (
+                <>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 2, borderBottom: "1px solid", borderColor: "divider", bgcolor: "grey.50" }}>
+                        <Typography variant="h6" fontWeight="bold">Quick View</Typography>
+                        <IconButton size="small" onClick={() => setQuickViewProduct(null)}>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
+
+                    <DialogContent sx={{ p: 0 }}>
+                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}>
+
+                            {/* Image */}
+                            <Box sx={{ width: { xs: "100%", sm: "35%" }, bgcolor: "grey.100", display: "flex", alignItems: "center", justifyContent: "center", p: 1.5, minHeight: 220, flexShrink: 0 }}>
+                                <Box component="img" src={quickViewProduct.imageUrl} alt={quickViewProduct.productName} sx={{ maxWidth: "100%", maxHeight: 200, objectFit: "contain" }} />
+                            </Box>
+
+                            {/* Details */}
+                            <Box sx={{ flex: 1, p: 1.5, display: "flex", flexDirection: "column", gap: 0.75 }}>
+                                {quickViewProduct.categoryName && (
+                                    <Chip label={quickViewProduct.categoryName} size="small" color="primary" variant="outlined" sx={{ alignSelf: "flex-start" }} />
+                                )}
+
+                                <Typography variant="h6" fontWeight="bold" sx={{ lineHeight: 1.3, wordBreak: "break-word" }}>
+                                    {quickViewProduct.productName}
+                                </Typography>
+
+                                {(quickViewProduct.modelNumber || quickViewProduct.partNumber) && (
+                                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                                        {quickViewProduct.modelNumber && (
+                                            <Chip label={`Model: ${quickViewProduct.modelNumber}`} size="small" variant="outlined" />
+                                        )}
+                                        {quickViewProduct.partNumber && (
+                                            <Chip label={`Part #: ${quickViewProduct.partNumber}`} size="small" variant="outlined" />
+                                        )}
+                                    </Stack>
+                                )}
+
+                                <Typography variant="h6" fontWeight="bold" color="success.main">
+                                    ${Number(quickViewProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                </Typography>
+
+                                <Chip
+                                    label={quickViewProduct.quantity > 0 ? `In Stock · ${quickViewProduct.quantity} units` : "Out of Stock"}
+                                    color={quickViewProduct.quantity > 0 ? "success" : "error"}
+                                    variant="filled"
+                                    sx={{ alignSelf: "flex-start" }}
+                                />
+
+                                <Divider />
+
+                                <Box>
+                                    <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
+                                        Description
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.7, wordBreak: "break-word", overflowWrap: "break-word", maxHeight: 100, overflowY: "auto", pr: 0.5 }}>
+                                        {quickViewProduct.description}
+                                    </Typography>
+                                </Box>
+
+                                <Button
+                                    variant="contained"
+                                    color="warning"
+                                    fullWidth
+                                    startIcon={<EditOutlinedIcon />}
+                                    onClick={() => { setQuickViewProduct(null); handleEdit(quickViewProduct); }}
+                                    sx={{ mt: "auto", borderRadius: 2, fontWeight: 700, textTransform: "none", py: 0.8 }}
+                                >
+                                    Edit Product
+                                </Button>
+                            </Box>
+
+                        </Box>
+                    </DialogContent>
+                </>
+            )}
+        </Dialog>
+        </>
     );
 };
 

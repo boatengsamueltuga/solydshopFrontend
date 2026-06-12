@@ -14,7 +14,7 @@ import {
     DialogContentText,
     DialogActions,
     Divider,
-    Grid,
+
     IconButton,
     InputAdornment,
     InputLabel,
@@ -66,6 +66,8 @@ const AdminProductsPage = () => {
     const [productForm, setProductForm] = useState({
         productName: "",
         description: "",
+        modelNumber: "",
+        partNumber:  "",
         imageUrl:    "",
         price:       "",
         quantity:    "",
@@ -76,6 +78,8 @@ const AdminProductsPage = () => {
         setProductForm({
             productName: "",
             description: "",
+            modelNumber: "",
+            partNumber:  "",
             imageUrl:    "",
             price:       "",
             quantity:    "",
@@ -133,6 +137,8 @@ const AdminProductsPage = () => {
         setProductForm({
             productName: product.productName,
             description: product.description,
+            modelNumber: product.modelNumber || "",
+            partNumber:  product.partNumber  || "",
             imageUrl:    product.imageUrl,
             price:       product.price,
             quantity:    product.quantity,
@@ -208,6 +214,8 @@ const AdminProductsPage = () => {
         const payload = {
             productName: productForm.productName,
             description: productForm.description,
+            modelNumber: productForm.modelNumber || null,
+            partNumber:  productForm.partNumber  || null,
             imageUrl:    productForm.imageUrl,
             price:       Number(productForm.price),
             quantity:    Number(productForm.quantity),
@@ -279,8 +287,32 @@ const AdminProductsPage = () => {
         ...(!isMobile ? [{
             field: "categoryName",
             headerName: "Category",
-            minWidth: 160,
+            minWidth: 140,
             flex: 1,
+        }] : []),
+
+        ...(!isMobile ? [{
+            field: "modelNumber",
+            headerName: "Model No.",
+            minWidth: 120,
+            flex: 1,
+            renderCell: (params) => (
+                <Typography variant="body2" color={params.row.modelNumber ? "text.primary" : "text.disabled"}>
+                    {params.row.modelNumber || "—"}
+                </Typography>
+            ),
+        }] : []),
+
+        ...(!isMobile ? [{
+            field: "partNumber",
+            headerName: "Part No.",
+            minWidth: 120,
+            flex: 1,
+            renderCell: (params) => (
+                <Typography variant="body2" color={params.row.partNumber ? "text.primary" : "text.disabled"}>
+                    {params.row.partNumber || "—"}
+                </Typography>
+            ),
         }] : []),
 
         {
@@ -527,7 +559,7 @@ const AdminProductsPage = () => {
 
                                 <Box
                                     sx={{
-                                        width: { xs: "100%", sm: "42%" },
+                                        width: { xs: "100%", sm: "35%" },
                                         minHeight: { xs: 220, sm: 320 },
                                         bgcolor: "grey.100",
                                         display: "flex",
@@ -562,12 +594,41 @@ const AdminProductsPage = () => {
                                             <Chip label={selectedProduct.categoryName} color="primary" variant="outlined" />
                                         )}
                                     </Box>
+                                    {(selectedProduct.modelNumber || selectedProduct.partNumber) && (
+                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                                            {selectedProduct.modelNumber && (
+                                                <Box>
+                                                    <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
+                                                        Model Number
+                                                    </Typography>
+                                                    <Typography variant="body2" fontWeight={600}>{selectedProduct.modelNumber}</Typography>
+                                                </Box>
+                                            )}
+                                            {selectedProduct.partNumber && (
+                                                <Box>
+                                                    <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
+                                                        Part Number
+                                                    </Typography>
+                                                    <Typography variant="body2" fontWeight={600}>{selectedProduct.partNumber}</Typography>
+                                                </Box>
+                                            )}
+                                        </Box>
+                                    )}
                                     <Divider />
                                     <Box>
                                         <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
                                             Description
                                         </Typography>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.7 }}>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{
+                                                mt: 0.5,
+                                                lineHeight: 1.7,
+                                                wordBreak: "break-word",
+                                                overflowWrap: "break-word",
+                                            }}
+                                        >
                                             {selectedProduct.description}
                                         </Typography>
                                     </Box>
@@ -595,7 +656,7 @@ const AdminProductsPage = () => {
             <MuiDialog
                 open={isFormOpen}
                 onClose={() => { resetForm(); setIsFormOpen(false); }}
-                maxWidth="sm"
+                maxWidth="lg"
                 fullWidth
                 PaperProps={{ sx: { borderRadius: 3 } }}
             >
@@ -621,74 +682,77 @@ const AdminProductsPage = () => {
                 </Box>
 
                 <DialogContent sx={{ pt: 3 }}>
-                    <Grid container spacing={2}>
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
 
-                        <Grid item xs={12} sm={7}>
-                            <TextField
-                                label="Product Name"
-                                size="small"
-                                fullWidth
-                                value={productForm.productName}
-                                onChange={(e) => setProductForm({ ...productForm, productName: e.target.value })}
-                            />
-                        </Grid>
+                        <TextField
+                            label="Product Name"
+                            size="small"
+                            fullWidth
+                            value={productForm.productName}
+                            onChange={(e) => setProductForm({ ...productForm, productName: e.target.value })}
+                        />
 
-                        <Grid item xs={6} sm={2.5}>
-                            <TextField
-                                label="Price"
-                                size="small"
-                                type="number"
-                                fullWidth
-                                value={productForm.price}
-                                onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
-                                InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
-                            />
-                        </Grid>
+                        <TextField
+                            label="Price"
+                            size="small"
+                            type="number"
+                            fullWidth
+                            value={productForm.price}
+                            onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                            InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
+                        />
 
-                        <Grid item xs={6} sm={2.5}>
-                            <TextField
-                                label="Qty"
-                                size="small"
-                                type="number"
-                                fullWidth
-                                value={productForm.quantity}
-                                onChange={(e) => setProductForm({ ...productForm, quantity: e.target.value })}
-                            />
-                        </Grid>
+                        <TextField
+                            label="Qty"
+                            size="small"
+                            type="number"
+                            fullWidth
+                            value={productForm.quantity}
+                            onChange={(e) => setProductForm({ ...productForm, quantity: e.target.value })}
+                        />
 
-                        <Grid item xs={12}>
-                            <FormControl size="small" fullWidth>
-                                <InputLabel>Category</InputLabel>
-                                <Select
-                                    label="Category"
-                                    value={productForm.categoryId}
-                                    onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            style: { maxHeight: 240, overflow: "auto" },
-                                        },
-                                        sx: {
-                                            "& .MuiMenuItem-root.Mui-selected": {
-                                                backgroundColor: "#1976d2 !important",
-                                                color: "#fff !important",
-                                            },
-                                            "& .MuiMenuItem-root.Mui-selected:hover": {
-                                                backgroundColor: "#1565c0 !important",
-                                            },
-                                        },
-                                    }}
-                                >
-                                    <MenuItem value=""><em>Select category</em></MenuItem>
-                                    {categories.map((cat) => (
-                                        <MenuItem key={cat.categoryId} value={String(cat.categoryId)}>
-                                            {cat.categoryName}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
+                        <FormControl size="small" fullWidth>
+                            <InputLabel>Category</InputLabel>
+                            <Select
+                                label="Category"
+                                value={productForm.categoryId}
+                                onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
+                                MenuProps={{
+                                    PaperProps: { style: { maxHeight: 240, overflow: "auto" } },
+                                    sx: {
+                                        "& .MuiMenuItem-root.Mui-selected": { backgroundColor: "#1976d2 !important", color: "#fff !important" },
+                                        "& .MuiMenuItem-root.Mui-selected:hover": { backgroundColor: "#1565c0 !important" },
+                                    },
+                                }}
+                            >
+                                <MenuItem value=""><em>Select category</em></MenuItem>
+                                {categories.map((cat) => (
+                                    <MenuItem key={cat.categoryId} value={String(cat.categoryId)}>
+                                        {cat.categoryName}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                        <Grid item xs={12}>
+                        <TextField
+                            label="Model Number"
+                            size="small"
+                            fullWidth
+                            placeholder="e.g. CAT 320D"
+                            value={productForm.modelNumber}
+                            onChange={(e) => setProductForm({ ...productForm, modelNumber: e.target.value })}
+                        />
+
+                        <TextField
+                            label="Part Number"
+                            size="small"
+                            fullWidth
+                            placeholder="e.g. 3066T-1234"
+                            value={productForm.partNumber}
+                            onChange={(e) => setProductForm({ ...productForm, partNumber: e.target.value })}
+                        />
+
+                        <Box sx={{ gridColumn: "1 / -1" }}>
                             <input type="file" id="productImageInput" hidden accept="image/*" onChange={handleImageUpload} />
                             <Stack direction="row" alignItems="center" spacing={2} flexWrap="wrap">
                                 <Button
@@ -704,25 +768,23 @@ const AdminProductsPage = () => {
                                     <Chip label="Image uploaded" color="success" variant="outlined" size="small" />
                                 )}
                             </Stack>
-                        </Grid>
+                        </Box>
 
                         {productForm.imageUrl && (
-                            <Grid item xs={12}>
-                                <Paper
-                                    variant="outlined"
-                                    sx={{ borderRadius: 2, overflow: "hidden", height: 100, display: "flex", alignItems: "center", justifyContent: "center", bgcolor: "grey.50" }}
-                                >
-                                    <Box
-                                        component="img"
-                                        src={productForm.imageUrl}
-                                        alt="Preview"
-                                        sx={{ maxHeight: 90, maxWidth: "100%", objectFit: "contain" }}
-                                    />
-                                </Paper>
-                            </Grid>
+                            <Paper
+                                variant="outlined"
+                                sx={{ gridColumn: "1 / -1", borderRadius: 2, overflow: "hidden", height: 100, display: "flex", alignItems: "center", justifyContent: "center", bgcolor: "grey.50" }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={productForm.imageUrl}
+                                    alt="Preview"
+                                    sx={{ maxHeight: 90, maxWidth: "100%", objectFit: "contain" }}
+                                />
+                            </Paper>
                         )}
 
-                        <Grid item xs={12}>
+                        <Box sx={{ gridColumn: "1 / -1" }}>
                             <TextField
                                 label="Description"
                                 size="small"
@@ -730,11 +792,26 @@ const AdminProductsPage = () => {
                                 multiline
                                 rows={4}
                                 value={productForm.description}
-                                onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                                onChange={(e) => {
+                                    if (e.target.value.length <= 1000)
+                                        setProductForm({ ...productForm, description: e.target.value });
+                                }}
+                                inputProps={{ maxLength: 1000 }}
                             />
-                        </Grid>
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    display: "block",
+                                    textAlign: "right",
+                                    mt: 0.5,
+                                    color: productForm.description.length >= 900 ? "error.main" : "text.disabled",
+                                }}
+                            >
+                                {productForm.description.length} / 1000
+                            </Typography>
+                        </Box>
 
-                    </Grid>
+                    </Box>
                 </DialogContent>
 
                 <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
