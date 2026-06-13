@@ -2,11 +2,13 @@ import { useState } from "react";
 
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import api from "../api/api";
 
 import toast from "react-hot-toast";
+
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import {
     loginStart,
@@ -30,6 +32,8 @@ const LoginPage = () => {
         email: "",
         password: ""
     });
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
 
@@ -111,15 +115,24 @@ const LoginPage = () => {
                         className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
                     />
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        disabled={loading}
-                        className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
-                    />
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            disabled={loading}
+                            className="w-full p-3 pr-11 rounded bg-gray-800 outline-none disabled:opacity-50"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+                        >
+                            {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                        </button>
+                    </div>
 
                     <button
                         type="submit"
@@ -134,6 +147,15 @@ const LoginPage = () => {
                             ? "Logging in..."
                             : "Login"}
                     </button>
+
+                    <div className="text-right">
+                        <Link
+                            to="/forgot-password"
+                            className="text-sm text-blue-400 hover:underline"
+                        >
+                            Forgot Password?
+                        </Link>
+                    </div>
 
                 </form>
 

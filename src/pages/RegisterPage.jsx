@@ -5,10 +5,20 @@ import api from "../api/api";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 
+import { FaEye, FaEyeSlash, FaCheck, FaTimes } from "react-icons/fa";
+
+const passwordRules = [
+    { id: "length",    label: "At least 8 characters",       test: (p) => p.length >= 8 },
+    { id: "uppercase", label: "At least 1 uppercase letter", test: (p) => /[A-Z]/.test(p) },
+    { id: "lowercase", label: "At least 1 lowercase letter", test: (p) => /[a-z]/.test(p) },
+    { id: "number",    label: "At least 1 number",           test: (p) => /[0-9]/.test(p) },
+    { id: "special",   label: "At least 1 special character (@$!%*?&#)", test: (p) => /[@$!%*?&#]/.test(p) },
+];
+
 const RegisterPage = () => {
 
-    // Registration loading state
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -24,9 +34,16 @@ const RegisterPage = () => {
         });
     };
 
+    const allRulesPassed = passwordRules.every((rule) => rule.test(formData.password));
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
+
+        if (!allRulesPassed) {
+            toast.error("Password does not meet the requirements.");
+            return;
+        }
 
         setLoading(true);
 
@@ -51,11 +68,11 @@ const RegisterPage = () => {
 
             console.log(error);
 
-                 toast.error(
-                 error.response?.data?.message ||
-                 error.response?.data ||
-                 "Registration failed"
-);
+            toast.error(
+                error.response?.data?.message ||
+                error.response?.data ||
+                "Registration failed"
+            );
 
         } finally {
 
@@ -98,15 +115,39 @@ const RegisterPage = () => {
                         className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
                     />
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        disabled={loading}
-                        className="p-3 rounded bg-gray-800 outline-none disabled:opacity-50"
-                    />
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            disabled={loading}
+                            className="w-full p-3 pr-11 rounded bg-gray-800 outline-none disabled:opacity-50"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+                        >
+                            {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                        </button>
+                    </div>
+
+                    {/* Password rules checklist */}
+                    {formData.password.length > 0 && (
+                        <ul className="text-sm flex flex-col gap-1 bg-gray-800 p-3 rounded">
+                            {passwordRules.map((rule) => {
+                                const passed = rule.test(formData.password);
+                                return (
+                                    <li key={rule.id} className={`flex items-center gap-2 ${passed ? "text-green-400" : "text-red-400"}`}>
+                                        {passed ? <FaCheck size={12} /> : <FaTimes size={12} />}
+                                        {rule.label}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
 
                     <button
                         type="submit"

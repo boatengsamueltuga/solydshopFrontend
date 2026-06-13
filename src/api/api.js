@@ -123,11 +123,13 @@ api.interceptors.response.use(
 
             /*
             ---------------------------------------------------------------
-            | Prevent Redirect Loop
+            | Prevent Redirect Loop & Skip Public Auth Pages
             ---------------------------------------------------------------
             */
 
-            if (window.location.pathname !== "/login") {
+            const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
+
+            if (!publicPaths.includes(window.location.pathname)) {
 
                 toast.error(
                     "Session expired. Please login again.",
@@ -172,6 +174,26 @@ api.interceptors.response.use(
                 message,
                 {
                     id: "not-found-error"
+                }
+            );
+        }
+
+
+
+        /*
+        ---------------------------------------------------------------
+        | 429 Too Many Requests
+        ---------------------------------------------------------------
+        */
+
+        else if (status === 429) {
+
+            toast.error(
+                typeof error.response.data === "string"
+                    ? error.response.data
+                    : "Too many requests. Please wait before trying again.",
+                {
+                    id: "rate-limit-error"
                 }
             );
         }
