@@ -23,6 +23,7 @@ import {
     Divider,
     Paper,
     Stack,
+    TextField,
     Typography,
 } from "@mui/material";
 
@@ -35,7 +36,7 @@ import ArrowBackIcon       from "@mui/icons-material/ArrowBack";
 | Inner form — must be rendered inside <Elements>
 |----------------------------------------------------------
 */
-const CheckoutForm = ({ totalPrice, userId }) => {
+const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) => {
     const stripe   = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -85,7 +86,7 @@ const CheckoutForm = ({ totalPrice, userId }) => {
 
             await api.post(
                 `/order/${userId}/checkout`,
-                {},
+                { shippingAddress },
                 { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
 
@@ -102,6 +103,36 @@ const CheckoutForm = ({ totalPrice, userId }) => {
 
     return (
         <form onSubmit={handleSubmit}>
+
+            {/* Shipping address summary */}
+            <Box
+                sx={{
+                    bgcolor: "grey.50",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    p: 2,
+                    mb: 3,
+                }}
+            >
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                    <Box>
+                        <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
+                            Ships to
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: "pre-line" }}>
+                            {shippingAddress}
+                        </Typography>
+                    </Box>
+                    <Button
+                        size="small"
+                        onClick={onEditAddress}
+                        sx={{ ml: 2, textTransform: "none", flexShrink: 0, fontWeight: 600 }}
+                    >
+                        Edit
+                    </Button>
+                </Stack>
+            </Box>
 
             <Box sx={{ mb: 3 }}>
                 <PaymentElement />
@@ -141,6 +172,153 @@ const CheckoutForm = ({ totalPrice, userId }) => {
 
 /*
 |----------------------------------------------------------
+| Address form — step 1
+|----------------------------------------------------------
+*/
+const AddressForm = ({ onContinue }) => {
+    const [companyName,  setCompanyName]  = useState("");
+    const [contactName,  setContactName]  = useState("");
+    const [address1,     setAddress1]     = useState("");
+    const [address2,     setAddress2]     = useState("");
+    const [city,         setCity]         = useState("");
+    const [state,        setState]        = useState("");
+    const [zip,          setZip]          = useState("");
+    const [country,      setCountry]      = useState("");
+    const [phone,        setPhone]        = useState("");
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (
+            !contactName.trim() ||
+            !address1.trim()    ||
+            !city.trim()        ||
+            !state.trim()       ||
+            !zip.trim()         ||
+            !country.trim()
+        ) {
+            toast.error("Please fill in all required fields");
+            return;
+        }
+
+        const lines = [];
+        if (companyName.trim()) lines.push(companyName.trim());
+        lines.push(contactName.trim());
+        lines.push(address1.trim());
+        if (address2.trim()) lines.push(address2.trim());
+        lines.push(`${city.trim()}, ${state.trim()} ${zip.trim()}`);
+        lines.push(country.trim());
+        if (phone.trim()) lines.push(`Phone: ${phone.trim()}`);
+        const formatted = lines.join("\n");
+
+        onContinue(formatted);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+                Shipping Address
+            </Typography>
+
+            <Stack spacing={2}>
+                <TextField
+                    label="Company Name"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    fullWidth
+                    size="small"
+                />
+                <TextField
+                    label="Contact Name"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    fullWidth
+                    size="small"
+                    required
+                />
+                <TextField
+                    label="Address Line 1"
+                    value={address1}
+                    onChange={(e) => setAddress1(e.target.value)}
+                    fullWidth
+                    size="small"
+                    required
+                />
+                <TextField
+                    label="Address Line 2"
+                    value={address2}
+                    onChange={(e) => setAddress2(e.target.value)}
+                    fullWidth
+                    size="small"
+                />
+                <Stack direction="row" spacing={2}>
+                    <TextField
+                        label="City"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        fullWidth
+                        size="small"
+                        required
+                    />
+                    <TextField
+                        label="State / Province"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        fullWidth
+                        size="small"
+                        required
+                    />
+                </Stack>
+                <Stack direction="row" spacing={2}>
+                    <TextField
+                        label="ZIP / Postal Code"
+                        value={zip}
+                        onChange={(e) => setZip(e.target.value)}
+                        fullWidth
+                        size="small"
+                        required
+                    />
+                    <TextField
+                        label="Country"
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        fullWidth
+                        size="small"
+                        required
+                    />
+                </Stack>
+                <TextField
+                    label="Phone (optional)"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    fullWidth
+                    size="small"
+                />
+            </Stack>
+
+            <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                size="large"
+                sx={{
+                    mt: 3,
+                    py: 1.5,
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    textTransform: "none",
+                    borderRadius: 2,
+                }}
+            >
+                Continue to Payment →
+            </Button>
+        </form>
+    );
+};
+
+/*
+|----------------------------------------------------------
 | Page wrapper — fetches cart total, then renders Elements
 |----------------------------------------------------------
 */
@@ -153,8 +331,10 @@ const CheckoutPage = () => {
         []
     );
 
-    const [totalPrice, setTotalPrice] = useState(null);
-    const [loading,    setLoading]    = useState(true);
+    const [totalPrice,      setTotalPrice]      = useState(null);
+    const [loading,         setLoading]         = useState(true);
+    const [step,            setStep]            = useState("address");   // "address" | "payment"
+    const [shippingAddress, setShippingAddress] = useState("");
 
     useEffect(() => {
         if (!user?.userId) return;
@@ -186,6 +366,15 @@ const CheckoutPage = () => {
         amount:             Math.round(totalPrice * 100),
         currency:           "usd",
         paymentMethodTypes: ["card"],
+    };
+
+    const handleAddressContinue = (formatted) => {
+        setShippingAddress(formatted);
+        setStep("payment");
+    };
+
+    const handleEditAddress = () => {
+        setStep("address");
     };
 
     return (
@@ -261,14 +450,28 @@ const CheckoutPage = () => {
 
                         <Divider sx={{ mb: 3 }} />
 
-                        {/* Stripe payment form */}
-                        <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                            Payment Details
-                        </Typography>
+                        {/* Step 1: Address form */}
+                        {step === "address" && (
+                            <AddressForm onContinue={handleAddressContinue} />
+                        )}
 
-                        <Elements stripe={stripePromise} options={elementsOptions}>
-                            <CheckoutForm totalPrice={totalPrice} userId={user.userId} />
-                        </Elements>
+                        {/* Step 2: Stripe payment form */}
+                        {step === "payment" && (
+                            <>
+                                <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+                                    Payment Details
+                                </Typography>
+
+                                <Elements stripe={stripePromise} options={elementsOptions}>
+                                    <CheckoutForm
+                                        totalPrice={totalPrice}
+                                        userId={user.userId}
+                                        shippingAddress={shippingAddress}
+                                        onEditAddress={handleEditAddress}
+                                    />
+                                </Elements>
+                            </>
+                        )}
 
                     </Box>
                 </Paper>
