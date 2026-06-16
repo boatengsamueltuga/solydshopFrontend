@@ -49,6 +49,8 @@ const navigate = useNavigate();
 
     const [orders, setOrders] = useState([]);
 
+    const [users, setUsers] = useState([]);
+
     const [loading, setLoading] = useState(true);
 
     /*
@@ -200,6 +202,20 @@ const navigate = useNavigate();
         }
     };
 
+    const fetchUsers = async () => {
+
+        try {
+
+            const response = await api.get("/admin/users");
+
+            setUsers(response.data);
+
+        } catch (error) {
+
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
 
         fetchProducts();
@@ -207,6 +223,8 @@ const navigate = useNavigate();
         fetchCategories();
 
         fetchOrders();
+
+        fetchUsers();
 
     }, []);
 
@@ -773,7 +791,7 @@ const navigate = useNavigate();
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-sm md:text-lg text-gray-500">Users</p>
-                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">0</h2>
+                            <h2 className="text-2xl md:text-4xl font-bold mt-2 md:mt-3">{users.length}</h2>
                         </div>
                         <FaUsers className="text-3xl md:text-5xl text-purple-600" />
                     </div>

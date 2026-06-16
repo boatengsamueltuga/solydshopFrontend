@@ -278,6 +278,8 @@ const CartPage = () => {
 
                                                 <Avatar
                                                     variant="rounded"
+                                                    src={item.imageUrl || undefined}
+                                                    alt={item.productName}
                                                     sx={{ width: 64, height: 64, bgcolor: "grey.100", flexShrink: 0 }}
                                                 >
                                                     <InventoryOutlinedIcon sx={{ color: "text.disabled", fontSize: 28 }} />

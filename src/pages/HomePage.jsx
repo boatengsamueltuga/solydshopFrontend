@@ -582,7 +582,15 @@ const HomePage = () => {
                                             className="w-12 h-12 rounded flex-shrink-0 overflow-hidden flex items-center justify-center"
                                             style={{ background: C.surfaceHigh, border: `1px solid ${C.border}` }}
                                         >
-                                            <span aria-hidden="true" className="text-xl" style={{ color: C.textDim }}>&#128230;</span>
+                                            {item.imageUrl ? (
+                                                <img
+                                                    src={item.imageUrl}
+                                                    alt={item.productName}
+                                                    className="w-full h-full object-contain"
+                                                />
+                                            ) : (
+                                                <span aria-hidden="true" className="text-xl" style={{ color: C.textDim }}>&#128230;</span>
+                                            )}
                                         </div>
 
                                         {/* Details */}
