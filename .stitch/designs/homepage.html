@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SolydShop - Industrial Procurement</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#88cff9",
+                        "surface-bright": "#2b3a4e",
+                        "surface-container-highest": "#273649",
+                        "on-tertiary-container": "#425779",
+                        "on-secondary": "#00354a",
+                        "on-secondary-fixed-variant": "#004c69",
+                        "primary": "#d2ecff",
+                        "primary-container": "#8ed5ff",
+                        "surface": "#041426",
+                        "secondary": "#7bd0ff",
+                        "on-primary-fixed-variant": "#004c69",
+                        "surface-container-high": "#1c2b3e",
+                        "outline-variant": "#40484e",
+                        "on-secondary-fixed": "#001e2c",
+                        "on-surface-variant": "#bfc8cf",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "on-surface": "#d4e3fd",
+                        "outline": "#8a9298",
+                        "secondary-fixed": "#c4e7ff",
+                        "on-primary-container": "#005d7f",
+                        "primary-fixed": "#c4e7ff",
+                        "surface-tint": "#88cff9",
+                        "inverse-primary": "#03658a",
+                        "surface-dim": "#041426",
+                        "error": "#ffb4ab",
+                        "on-primary-fixed": "#001e2c",
+                        "surface-variant": "#273649",
+                        "surface-container-lowest": "#010f21",
+                        "tertiary": "#dfe9ff",
+                        "on-error-container": "#ffdad6",
+                        "on-primary": "#00344a",
+                        "on-tertiary-fixed-variant": "#324769",
+                        "on-background": "#d4e3fd",
+                        "surface-container-low": "#0c1c2f",
+                        "on-tertiary-fixed": "#021b3b",
+                        "tertiary-fixed": "#d6e3ff",
+                        "secondary-fixed-dim": "#7bd0ff",
+                        "tertiary-fixed-dim": "#b2c7ef",
+                        "surface-container": "#112033",
+                        "inverse-on-surface": "#223145",
+                        "tertiary-container": "#b8cdf5",
+                        "secondary-container": "#00a6e0",
+                        "on-tertiary": "#1b3151",
+                        "background": "#041426",
+                        "on-secondary-container": "#00374d",
+                        "inverse-surface": "#d4e3fd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin": "24px",
+                        "xl": "32px",
+                        "container-max": "1440px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["36px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["10px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-sm": ["12px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom Industrial Theme Overrides */
+        body { background-color: #0D1B2A; color: #d4e3fd; }
+        .b2b-surface { background-color: #1B2A3D; }
+        .b2b-border { border-color: #2D4263; }
+        .b2b-cta { background-color: #38bdf8; color: #003a57; }
+        .b2b-accent-text { color: #8ed5ff; }
+        
+        /* Scrollbar styling for data density */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0D1B2A; }
+        ::-webkit-scrollbar-thumb { background: #2D4263; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #40484e; }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin h-16 bg-surface border-b border-outline-variant shadow-none">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary-container">SolydShop</span>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1 flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">home</span> Home
+            </a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary-container transition-colors flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">shopping_cart</span> Cart
+            </a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary-container transition-colors flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">receipt_long</span> Orders
+            </a>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
+<input class="bg-surface-container-high border b2b-border rounded text-body-sm pl-8 pr-2 py-1 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container w-48 text-on-surface placeholder-on-surface-variant" placeholder="Search Part No. / SKU" type="text"/>
+</div>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary-container transition-colors">Logout</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest b2b-border border overflow-hidden flex items-center justify-center">
+<img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUa-2Jdg5EVt2RdarWDmNsmz_cmxGT5rUsAERNxRCsAUqN9ppav9H87sU1QWseRUxhVnLSWE6v9Xbc2jPDkHNML0IS4HUJcWKQ6ozuiggxxpWGPThBV5QX5hNIdK6JCl5iZ3JQKut91sd7ImPRWUTH2bWCz7XIWlAyFNbk1SFwFpvWrzONV4ei5pAoC23IijYdROwt7hqs1j6aOSzxSIH8Srv98CYZ5z_Afphd2_eS085K4Ue_eAawykY6Fh740O6JvaloegKC54w"/>
+</div>
+</div>
+</nav>
+<!-- Main Layout Grid -->
+<main class="flex-grow pt-[80px] pb-xl px-margin max-w-container-max mx-auto w-full grid grid-cols-12 gap-gutter h-[calc(100vh-80px)] overflow-hidden">
+<!-- LEFT: Filters Panel (3 cols) -->
+<aside class="col-span-12 md:col-span-3 b2b-surface border b2b-border rounded-lg flex flex-col h-full overflow-hidden">
+<div class="p-md border-b b2b-border bg-surface-container-high">
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined">filter_alt</span> Filters
+                </h2>
+</div>
+<div class="p-md flex-grow overflow-y-auto space-y-lg">
+<!-- Category Search -->
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-sm uppercase">Category Search</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface border b2b-border rounded text-body-sm pl-8 pr-2 py-1.5 focus:border-primary-container text-on-surface" placeholder="Filter categories..." type="text"/>
+</div>
+</div>
+<!-- Checkboxes -->
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-sm uppercase">Equipment Sub-System</label>
+<div class="space-y-sm">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input checked="" class="rounded border-outline-variant bg-surface text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface group-hover:text-primary transition-colors">All Categories</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="rounded border-outline-variant bg-surface text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">Engine Parts</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="rounded border-outline-variant bg-surface text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">Hydraulic System</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="rounded border-outline-variant bg-surface text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">Undercarriage Parts</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="rounded border-outline-variant bg-surface text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">Electrical Parts</span>
+</label>
+</div>
+</div>
+<!-- Price Slider -->
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-sm uppercase">Price Range (USD)</label>
+<input class="w-full accent-primary-container h-1 bg-surface-container-highest rounded-lg appearance-none cursor-pointer" max="100000" min="0" type="range" value="50000"/>
+<div class="flex justify-between mt-xs font-label-sm text-label-sm text-on-surface-variant">
+<span>$0</span>
+<span>$100k+</span>
+</div>
+</div>
+<!-- Availability Chips -->
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-sm uppercase">Availability</label>
+<div class="flex flex-wrap gap-xs">
+<button class="bg-[#0f3a2b] text-[#86efac] border border-[#166534] px-2 py-1 rounded-sm font-label-sm text-label-sm hover:bg-[#166534] transition-colors">In Stock</button>
+<button class="bg-surface-container-highest border b2b-border text-on-surface-variant px-2 py-1 rounded-sm font-label-sm text-label-sm hover:bg-surface-container-high transition-colors">On Demand</button>
+</div>
+</div>
+</div>
+<div class="p-md border-t b2b-border bg-surface-container-low flex gap-sm">
+<button class="flex-1 b2b-cta rounded font-label-md text-label-md py-2 hover:opacity-90 transition-opacity">Apply Filters</button>
+<button class="px-3 border b2b-border rounded text-primary-container font-label-md text-label-md hover:bg-surface-container-highest transition-colors">Reset</button>
+</div>
+</aside>
+<!-- CENTER: Featured Products (6 cols) -->
+<section class="col-span-12 md:col-span-6 flex flex-col h-full overflow-hidden">
+<div class="mb-md flex justify-between items-end border-b b2b-border pb-xs">
+<h1 class="font-headline-md text-headline-md text-on-surface relative inline-block">
+                    Featured Components
+                    <span class="absolute bottom-[-5px] left-0 w-1/2 h-1 bg-primary-container rounded-t"></span>
+</h1>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">filter_list</span>
+<select class="w-full bg-surface-container-high border b2b-border rounded text-body-sm pl-2 pr-8 py-1.5 focus:border-primary-container text-on-surface appearance-none cursor-pointer">
+<option>Sort by: Relevance</option>
+<option>Sort by: Price (Low to High)</option>
+<option>Sort by: Lead Time</option>
+</select>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="flex-grow overflow-y-auto pr-sm pb-xl">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-sm">
+<!-- Product Card 1 -->
+<article class="b2b-surface border b2b-border rounded flex flex-col group relative overflow-hidden hover:border-primary-container transition-colors duration-200">
+<div class="h-32 bg-surface-container-lowest relative p-2 flex items-center justify-center border-b b2b-border">
+<span class="absolute top-2 left-2 bg-surface border b2b-border text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded-sm z-10">SKU: HYD-992-V</span>
+<div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 backdrop-blur-[2px]">
+<button class="bg-surface/80 border b2b-border text-primary-container font-label-md text-label-md px-3 py-1 rounded backdrop-blur-sm flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">visibility</span> Quick View
+                                </button>
+</div>
+<img alt="Heavy duty hydraulic pump" class="max-h-full object-contain filter brightness-90 contrast-125" data-alt="A macro studio shot of a heavy-duty industrial hydraulic pump. The pump is constructed of brushed steel and matte black iron, sitting on a dark metallic surface. Lighting is stark and technical, creating strong highlights on the metal to emphasize durability and precision engineering. The overall aesthetic is dark-mode industrial, featuring deep navy and charcoal shadows with a cool, sharp atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK5GHtPN5nJv7JzChuqy3FuD1EG8nOSK4bpBi0UanBBC8N37H-V7HOESN3sCdr4o3NEHwntGqDT5v2fwmtLwX6sCsZzZxuJXGRy2JguzQgLud0pmCoyjiqFl72BL60jz3Jb16zGsdRJmA45FCs4eeH_ZRnO_EOQD9w_Jrio2UkiBNrLd3D2kF0EVVi-I4skZUaQn-FSqZqtZZp5VMPk2yhB_blOIBlYsGw_tsmKMDwjZM6JkR_IBW4vghXvVIW24idq7RmUzVJ6_o"/>
+</div>
+<div class="p-sm flex flex-col flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface line-clamp-2 mb-xs">High-Pressure Hydraulic Gear Pump, 3000 PSI</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-sm flex-grow">Cast iron construction, suitable for heavy mobile equipment. Includes mounting flange.</p>
+<div class="flex justify-between items-end mt-auto pt-sm border-t border-outline-variant/30">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Unit Price</span>
+<span class="font-headline-sm text-headline-sm b2b-accent-text">$1,245.00</span>
+</div>
+<button class="w-8 h-8 rounded bg-surface border b2b-border text-primary-container flex items-center justify-center hover:bg-primary-container hover:text-surface transition-colors" title="Add to Cart">
+<span class="material-symbols-outlined" style="font-size: 20px;">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 2 -->
+<article class="b2b-surface border b2b-border rounded flex flex-col group relative overflow-hidden hover:border-primary-container transition-colors duration-200">
+<div class="h-32 bg-surface-container-lowest relative p-2 flex items-center justify-center border-b b2b-border">
+<span class="absolute top-2 left-2 bg-surface border b2b-border text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded-sm z-10">SKU: ENG-405-X</span>
+<div class="absolute top-2 right-2 bg-[#0f3a2b] text-[#86efac] border border-[#166534] px-1 py-0.5 rounded-sm font-label-sm text-[8px] z-10">IN STOCK</div>
+<div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 backdrop-blur-[2px]">
+<button class="bg-surface/80 border b2b-border text-primary-container font-label-md text-label-md px-3 py-1 rounded backdrop-blur-sm flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">visibility</span> Quick View
+                                </button>
+</div>
+<img alt="Industrial bearing assembly" class="max-h-full object-contain filter brightness-90 contrast-125" data-alt="A close-up, highly detailed view of an industrial bearing assembly resting on a dark carbon-fiber textured surface. The bearing gleams with a polished chrome finish against the moody, dark-mode background. The lighting is clinical and sharp, highlighting the precision rollers and grease fittings. The scene conveys high-end manufacturing quality and robust technical performance within an industrial setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdOsvZHyo_oHka9fCca6ozaIWZEOzIfya_WKyRAJZRQadZhuEFbdLvAHct1ajW1pQlXfK3lzIPPwHBuDhnM-i5gclVHFonqT2PzdlVJssYo-f1ccALxEOEGei47nooG5_WYrQcq3SxFosh3Sj0yWXeZUKp6NO3ANACSfIhb8Ifb-PZ875obAuisgj-_PJT86Z_r91kGPr9lEQ8yTsU_s8T3fHxpYa8bgpVJi1FwNIZjQrFdCm5eIVwHlpSR_3is1I6yGDF2ALqufo"/>
+</div>
+<div class="p-sm flex flex-col flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface line-clamp-2 mb-xs">Spherical Roller Bearing, 120mm Bore</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-sm flex-grow">High radial load capacity. Brass cage. Optimized for vibratory applications.</p>
+<div class="flex justify-between items-end mt-auto pt-sm border-t border-outline-variant/30">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Unit Price</span>
+<span class="font-headline-sm text-headline-sm b2b-accent-text">$485.50</span>
+</div>
+<button class="w-8 h-8 rounded bg-surface border b2b-border text-primary-container flex items-center justify-center hover:bg-primary-container hover:text-surface transition-colors" title="Add to Cart">
+<span class="material-symbols-outlined" style="font-size: 20px;">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 3 -->
+<article class="b2b-surface border b2b-border rounded flex flex-col group relative overflow-hidden hover:border-primary-container transition-colors duration-200 opacity-75">
+<div class="h-32 bg-surface-container-lowest relative p-2 flex items-center justify-center border-b b2b-border">
+<span class="absolute top-2 left-2 bg-surface border b2b-border text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded-sm z-10">SKU: ELE-112-C</span>
+<div class="absolute top-2 right-2 bg-surface-container-highest border b2b-border text-on-surface-variant px-1 py-0.5 rounded-sm font-label-sm text-[8px] z-10">2 WK LEAD</div>
+<div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 backdrop-blur-[2px]">
+<button class="bg-surface/80 border b2b-border text-primary-container font-label-md text-label-md px-3 py-1 rounded backdrop-blur-sm flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 16px;">visibility</span> Quick View
+                                </button>
+</div>
+<img alt="Industrial electrical contactor" class="max-h-full object-contain filter brightness-90 contrast-125" data-alt="A clean, technical photograph of an industrial electrical contactor switch mounted on a DIN rail. The component features a grey and black polymer housing with exposed brass terminals. The lighting is cool and directional, casting subtle shadows on the dark grey background. The image maintains a strict technical, data-driven aesthetic suitable for a high-performance B2B procurement catalog." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDX_nhe7130u3E9LBqnE4jdxMEXU2tsdkbuM0SzlHnywckp5lSe14QTAO3tkN0oJC3i6xdBCjtUs_SnoCDxnE-roojxb-21_ht5nDNn1z8odIx422gtRl6DL7LzUhgvSNFhq-2qk_xpuI0bh9kIw8WuV9lu3KZjQawhWfk-rHXLZFdu5Leg0VNhZvgQJoRs43fD9ib7Rhatmc7TyLvKy0UCBtfyWkhkJLjneOS6h8dm9wrlfYTc_lMJnCjYfZHTKlG9nhe6RsatWM"/>
+</div>
+<div class="p-sm flex flex-col flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface line-clamp-2 mb-xs">3-Pole Contactor, 150A, 24V DC Coil</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-sm flex-grow">For motor control applications. Auxiliary contacts included. IP20 rating.</p>
+<div class="flex justify-between items-end mt-auto pt-sm border-t border-outline-variant/30">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Unit Price</span>
+<span class="font-headline-sm text-headline-sm b2b-accent-text">$215.00</span>
+</div>
+<button class="w-8 h-8 rounded bg-surface border b2b-border text-primary-container flex items-center justify-center hover:bg-primary-container hover:text-surface transition-colors" title="Add to Cart">
+<span class="material-symbols-outlined" style="font-size: 20px;">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Repeat for layout fill, simplified for token limit -->
+<div class="border border-dashed b2b-border rounded flex items-center justify-center h-full min-h-[250px] opacity-50 bg-surface-container-low">
+<span class="font-label-md text-label-md text-on-surface-variant">Scroll for more results...</span>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT: Your Cart Panel (3 cols) -->
+<aside class="col-span-12 md:col-span-3 b2b-surface border b2b-border rounded-lg flex flex-col h-full overflow-hidden">
+<div class="p-md border-b b2b-border bg-surface-container-high flex justify-between items-center">
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined">shopping_cart</span> Your Cart
+                </h2>
+<span class="bg-primary-container text-surface px-2 py-0.5 rounded font-label-md text-label-md">2 Items</span>
+</div>
+<!-- Cart Items List -->
+<div class="flex-grow overflow-y-auto p-sm space-y-sm">
+<!-- Cart Item 1 -->
+<div class="bg-surface border b2b-border rounded p-sm flex gap-sm relative group">
+<button class="absolute top-1 right-1 text-outline hover:text-error transition-colors" title="Remove">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+<div class="w-12 h-12 bg-surface-container-lowest border b2b-border rounded flex-shrink-0 flex items-center justify-center p-1">
+<img alt="Pump thumb" class="max-h-full object-contain filter brightness-90" data-alt="A small thumbnail image of an industrial hydraulic pump, isolated against a dark background. Technical B2B aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCJDtv6fgp5wnwnVEU2x5mXNqC_GUhxQDV9biGhN6ReWPO7VaL30h-Ndpf5Az2FZOvMcVS0yjAQw5kpyn0UhcL3OfJLs7iIf4B-omTt7n8LciEkm7nu5Ftj-Y0zwLa2ThgMrZSuJAdywDe6Q5ODzmZC1OF_IB_1xfcN_qUyZA4-K2JBHPxxOXxBMDmGSZRRSmhwdPLXUDkrcBlUZq-tjmv5_RgHtqYz4DCBrHpdFqhjUyMbjmBMKXGi7vurHLCUCZ3KvvbQBgVNiQ"/>
+</div>
+<div class="flex flex-col flex-grow">
+<span class="font-label-sm text-label-sm text-on-surface line-clamp-1 pr-4">Hydraulic Gear Pump 3000 PSI</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SKU: HYD-992-V</span>
+<div class="flex justify-between items-center mt-auto pt-1">
+<div class="flex items-center border b2b-border rounded bg-surface-container-low">
+<button class="px-1 text-on-surface-variant hover:text-primary">-</button>
+<span class="font-label-sm text-label-sm w-6 text-center text-on-surface">1</span>
+<button class="px-1 text-on-surface-variant hover:text-primary">+</button>
+</div>
+<span class="font-label-md text-label-md b2b-accent-text">$1,245.00</span>
+</div>
+</div>
+</div>
+<!-- Cart Item 2 -->
+<div class="bg-surface border b2b-border rounded p-sm flex gap-sm relative group">
+<button class="absolute top-1 right-1 text-outline hover:text-error transition-colors" title="Remove">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+<div class="w-12 h-12 bg-surface-container-lowest border b2b-border rounded flex-shrink-0 flex items-center justify-center p-1">
+<img alt="Bearing thumb" class="max-h-full object-contain filter brightness-90" data-alt="A small thumbnail image of a chrome spherical roller bearing, isolated against a dark background. Technical B2B aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf2jYCNGvJAbzvpI_cBvaMwTTUNA4PReFt1vg81f7FVCEKFKvWYYKrwAVBJoFl2FQgkgzBOudI9aoCX9Ny73yvzU1IV7Udzz29H1tAZmiqYtTJt3R-N06OlO0uQb0HK3cYjkWIvVxExlX2aI_C_J2IDv8Qxo3EkmQOSKCeBt0aLjbcp9uQk3yL-1qiRz2pMAOvpHN347tbsBmubAaZNX2Org5Cej5_rHC7BvY83NIy8gZ38PwAQ6PjdTTtolPrAQZYBZUvnFIp55k"/>
+</div>
+<div class="flex flex-col flex-grow">
+<span class="font-label-sm text-label-sm text-on-surface line-clamp-1 pr-4">Spherical Roller Bearing</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SKU: ENG-405-X</span>
+<div class="flex justify-between items-center mt-auto pt-1">
+<div class="flex items-center border b2b-border rounded bg-surface-container-low">
+<button class="px-1 text-on-surface-variant hover:text-primary">-</button>
+<span class="font-label-sm text-label-sm w-6 text-center text-on-surface">4</span>
+<button class="px-1 text-on-surface-variant hover:text-primary">+</button>
+</div>
+<span class="font-label-md text-label-md b2b-accent-text">$1,942.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Cart Summary -->
+<div class="p-md border-t b2b-border bg-surface-container-high space-y-sm">
+<div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
+<span>Subtotal</span>
+<span>$3,187.00</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
+<span>Est. Shipping (Freight)</span>
+<span>$125.00</span>
+</div>
+<div class="flex justify-between font-headline-sm text-headline-sm text-on-surface pt-xs border-t border-outline-variant/30">
+<span>Total</span>
+<span class="text-primary-container">$3,312.00</span>
+</div>
+<button class="w-full b2b-cta rounded font-label-md text-label-md py-2.5 mt-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-xs">
+                    Proceed to Checkout <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-lowest border-t border-outline-variant dark:border-outline-variant mt-auto">
+<div class="font-label-md text-label-md font-bold text-primary">SolydShop</div>
+<div class="flex gap-md font-label-sm text-label-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Technical Support</a>
+<a class="hover:text-primary transition-colors" href="#">Contact Sales</a>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+            © 2024 SolydShop Industrial Procurement. All rights reserved.
+        </div>
+</footer>
+</body></html>

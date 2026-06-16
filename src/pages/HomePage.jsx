@@ -1,688 +1,653 @@
 import { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
+import { useNavigate } from "react-router-dom";
 import api from "../api/api";
-
 import toast from "react-hot-toast";
-
 import {
     fetchProductsStart,
     fetchProductsSuccess,
-    fetchProductsFailure
+    fetchProductsFailure,
 } from "../features/product/productSlice";
 
-import {
-    Box,
-    Button,
-    Card,
-    CardActions,
-    CardContent,
-    CardMedia,
-    Chip,
-    Container,
-    Dialog,
-    DialogContent,
-    Divider,
-    FormControl,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    Skeleton,
-    Stack,
-    TextField,
-    Typography,
-} from "@mui/material";
+// ── Design tokens (Steel Slate Industrial) ──────────────────
+const C = {
+    bg:          "#0D1B2A",
+    surface:     "#1B2A3D",
+    surfaceHigh: "#243447",
+    border:      "#2D4263",
+    text:        "#dee3e8",
+    textMuted:   "#bdc8d1",
+    textDim:     "#87929a",
+    primary:     "#8ed5ff",
+    btnBg:       "#38bdf8",
+    btnText:     "#003a57",
+    error:       "#ffb4ab",
+    footer:      "#091522",
+};
 
-import SearchIcon        from "@mui/icons-material/Search";
-import ShoppingCartIcon  from "@mui/icons-material/ShoppingCart";
-import StorefrontIcon    from "@mui/icons-material/Storefront";
-import FilterAltOffIcon  from "@mui/icons-material/FilterAltOff";
-import CloseIcon         from "@mui/icons-material/Close";
+const getXsrfToken = () =>
+    document.cookie
+        .split("; ")
+        .find((r) => r.startsWith("XSRF-TOKEN="))
+        ?.split("=")[1];
 
-/*
-|----------------------------------------------------------
-| Skeleton placeholder shown while loading
-|----------------------------------------------------------
-*/
-
+// ── Skeleton card ────────────────────────────────────────────
 const SkeletonCard = () => (
-    <Card elevation={2} sx={{ borderRadius: 3, display: "flex", flexDirection: "column" }}>
-        <Skeleton variant="rectangular" height={45} />
-        <CardContent sx={{ flexGrow: 1, p: 1 }}>
-            <Skeleton variant="text" width="85%" />
-            <Skeleton variant="text" width="65%" />
-            <Skeleton variant="text" width="35%" />
-            <Skeleton variant="rounded" width={60} height={18} sx={{ mt: 0.3 }} />
-        </CardContent>
-        <CardActions sx={{ p: 1.5, pt: 0 }}>
-            <Skeleton variant="rounded" width="100%" height={32} />
-        </CardActions>
-    </Card>
+    <div
+        className="rounded-lg overflow-hidden animate-pulse"
+        style={{ background: C.surface, border: `1px solid ${C.border}` }}
+    >
+        <div className="h-48 w-full" style={{ background: C.surfaceHigh }} />
+        <div className="p-4 space-y-3">
+            <div className="h-3 rounded w-4/5" style={{ background: C.surfaceHigh }} />
+            <div className="h-3 rounded w-3/5" style={{ background: C.surfaceHigh }} />
+            <div className="h-8 rounded mt-4" style={{ background: C.surfaceHigh }} />
+        </div>
+    </div>
 );
 
-/*
-|----------------------------------------------------------
-| Page component
-|----------------------------------------------------------
-*/
-
-const HERO_IMAGES = [
-    "https://images.unsplash.com/photo-1628645419184-26a1f2757340?auto=format&fit=crop&w=1920&q=80",
-    "https://images.unsplash.com/photo-1580901369227-308f6f40bdeb?auto=format&fit=crop&w=1920&q=80",
-    "https://images.unsplash.com/photo-1583024011792-b165975b52f5?auto=format&fit=crop&w=1920&q=80",
-    "https://images.unsplash.com/photo-1523848309072-c199db53f137?auto=format&fit=crop&w=1920&q=80",
-];
-
+// ── Main component ───────────────────────────────────────────
 const HomePage = () => {
-
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const { products, loading, error } = useSelector((state) => state.product);
+    const { products, loading } = useSelector((s) => s.product);
+    const { user } = useSelector((s) => s.auth);
 
-    const { user } = useSelector((state) => state.auth);
-
-    const [keyword,          setKeyword]          = useState("");
-    const [categoryId,       setCategoryId]       = useState("");
-    const [quickViewProduct, setQuickViewProduct] = useState(null);
+    const [keyword,    setKeyword]    = useState("");
+    const [categoryId, setCategoryId] = useState("");
     const [categories, setCategories] = useState([]);
-    const [heroIndex,  setHeroIndex]  = useState(0);
+    const [cart,       setCart]       = useState(null);
+    const [cartBusy,   setCartBusy]   = useState(false);
+    const [priceMax,   setPriceMax]   = useState(50000);
+    const [quickViewProduct, setQuickViewProduct] = useState(null);
+    const [filtersOpen, setFiltersOpen] = useState(false);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
-
-    /*
-    |----------------------------------------------------------
-    | Fetch helpers
-    |----------------------------------------------------------
-    */
-
+    // ── Fetchers ────────────────────────────────────────────
     const fetchCategories = async () => {
         try {
-            const response = await api.get("/public/categories?pageSize=1000");
-            setCategories(response.data.content);
-        } catch (error) {
-            console.log(error);
+            const res = await api.get("/public/categories?pageSize=1000");
+            setCategories(res.data.content);
+        } catch (e) {
+            console.log(e);
         }
     };
 
-    const fetchProducts = async (
-        searchKeyword      = keyword,
-        selectedCategoryId = categoryId
-    ) => {
+    const fetchProducts = async (kw = keyword, catId = categoryId) => {
         dispatch(fetchProductsStart());
         try {
             let url = "/public/products?";
-            if (searchKeyword.trim() !== "")   url += `keyword=${searchKeyword}&`;
-            if (selectedCategoryId !== "")      url += `categoryId=${selectedCategoryId}`;
-            const response = await api.get(url);
-            dispatch(fetchProductsSuccess(response.data.content));
-        } catch (error) {
-            dispatch(fetchProductsFailure(error.message));
+            if (kw.trim())  url += `keyword=${kw}&`;
+            if (catId)      url += `categoryId=${catId}`;
+            const res = await api.get(url);
+            dispatch(fetchProductsSuccess(res.data.content));
+        } catch (e) {
+            dispatch(fetchProductsFailure(e.message));
+        }
+    };
+
+    const fetchCart = async () => {
+        if (!user?.userId) return;
+        try {
+            const res = await api.get(`/cart/${user.userId}`);
+            setCart(res.data);
+        } catch (e) {
+            console.log(e);
         }
     };
 
     useEffect(() => {
         fetchProducts();
         fetchCategories();
+        fetchCart();
     }, []);
 
     useEffect(() => {
-        const timeout = setTimeout(() => fetchProducts(), 400);
-        return () => clearTimeout(timeout);
+        const t = setTimeout(() => fetchProducts(), 400);
+        return () => clearTimeout(t);
     }, [keyword, categoryId]);
 
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") fetchProducts();
-    };
-
+    // ── Cart actions ────────────────────────────────────────
     const handleAddToCart = async (productId) => {
+        if (!user) { toast.error("Please login to add items to cart"); return; }
+        setCartBusy(true);
         try {
-            const xsrfToken = document.cookie
-                .split("; ")
-                .find(row => row.startsWith("XSRF-TOKEN="))
-                ?.split("=")[1];
-
             await api.post(
                 `/cart/${user.userId}/items`,
                 { productId, quantity: 1 },
-                { headers: { "X-XSRF-TOKEN": xsrfToken } }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
-
-            toast.success("Product added to cart");
-
-        } catch (error) {
-            console.log(error);
-            toast.error("Failed to add product to cart");
+            toast.success("Added to cart");
+            await fetchCart();
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setCartBusy(false);
         }
     };
 
-    const clearFilters = () => {
-        setKeyword("");
-        setCategoryId("");
+    const handleRemoveFromCart = async (productId) => {
+        if (!user) return;
+        setCartBusy(true);
+        try {
+            await api.delete(
+                `/cart/${user.userId}/items/${productId}`,
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
+            );
+            await fetchCart();
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setCartBusy(false);
+        }
     };
 
-    const hasActiveFilters = keyword.trim() !== "" || categoryId !== "";
+    const handleCategoryToggle = (id) =>
+        setCategoryId((prev) => (prev === String(id) ? "" : String(id)));
 
-    /*
-    |----------------------------------------------------------
-    | Error state
-    |----------------------------------------------------------
-    */
+    const cartItems  = cart?.items ?? [];
+    const cartTotal  = Number(cart?.totalPrice ?? 0);
+    const itemCount  = cartItems.reduce((s, i) => s + i.quantity, 0);
 
-    if (error) {
-        return (
-            <Box sx={{ p: 6, textAlign: "center" }}>
-                <Typography color="error" variant="h6">{error}</Typography>
-            </Box>
-        );
-    }
-
-    /*
-    |----------------------------------------------------------
-    | Render
-    |----------------------------------------------------------
-    */
-
+    // ── Render ──────────────────────────────────────────────
     return (
-        <>
-        <Box sx={{ bgcolor: "#f5f7fa", minHeight: "100vh" }}>
-
-            {/* ── Hero ── */}
-            <Box
-                sx={{
-                    position: "relative",
-                    overflow: "hidden",
-                    color: "white",
-                    py: { xs: 6, md: 10 },
-                    px: 3,
-                    textAlign: "center",
-                }}
-            >
-                {/* Slideshow background layers */}
-                {HERO_IMAGES.map((img, i) => (
-                    <Box
-                        key={img}
-                        sx={{
-                            position: "absolute",
-                            inset: 0,
-                            backgroundImage: `url('${img}')`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            opacity: i === heroIndex ? 1 : 0,
-                            transition: "opacity 1.2s ease-in-out",
-                            zIndex: 0,
-                        }}
-                    />
-                ))}
-                {/* Dark overlay */}
-                <Box sx={{ position: "absolute", inset: 0, bgcolor: "rgba(0,0,0,0.55)", zIndex: 1 }} />
-
-                <Box sx={{ position: "relative", zIndex: 2, maxWidth: 780, mx: "auto" }}>
-
-                    {/* Eyebrow label */}
-                    <Typography
-                        sx={{
-                            display: "inline-block",
-                            fontSize: "0.72rem",
-                            fontWeight: 700,
-                            letterSpacing: 3,
-                            textTransform: "uppercase",
-                            color: "rgba(255,255,255,0.7)",
-                            mb: 2,
-                        }}
-                    >
-                        Heavy Equipment Parts &amp; Supplies
-                    </Typography>
-
-                    {/* Headline */}
-                    <Typography
-                        component="h1"
-                        sx={{
-                            fontSize: { xs: "2.4rem", md: "3.8rem" },
-                            fontWeight: 800,
-                            lineHeight: 1.1,
-                            letterSpacing: -1,
-                            mb: 2.5,
-                            textShadow: "0 2px 12px rgba(0,0,0,0.4)",
-                        }}
-                    >
-                        The Parts That<br />
-                        <Box component="span" sx={{ color: "#facc15" }}>Power Industry</Box>
-                    </Typography>
-
-                    {/* Subtitle */}
-                    <Typography
-                        sx={{
-                            fontSize: { xs: "1rem", md: "1.15rem" },
-                            color: "rgba(255,255,255,0.82)",
-                            maxWidth: 560,
-                            mx: "auto",
-                            lineHeight: 1.7,
-                            mb: 4,
-                            fontWeight: 400,
-                        }}
-                    >
-                        Source genuine components for excavators, bulldozers, cranes &amp; more.
-                        Built for demanding sites — delivered with speed and precision.
-                    </Typography>
-
-                    {/* Feature highlights */}
-                    <Box sx={{ display: "flex", justifyContent: "center", gap: { xs: 1.5, md: 2.5 }, flexWrap: "wrap" }}>
-                        {[
-                            { icon: "✔", label: "Genuine OEM Parts" },
-                            { icon: "⚡", label: "Fast Delivery" },
-                            { icon: "🛡", label: "Quality Guaranteed" },
-                        ].map(({ icon, label }) => (
-                            <Box
-                                key={label}
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 0.8,
-                                    px: 2,
-                                    py: 0.8,
-                                    borderRadius: 2,
-                                    bgcolor: "rgba(255,255,255,0.1)",
-                                    border: "1px solid rgba(255,255,255,0.2)",
-                                    backdropFilter: "blur(6px)",
-                                }}
-                            >
-                                <Typography sx={{ fontSize: "0.85rem" }}>{icon}</Typography>
-                                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "rgba(255,255,255,0.9)", letterSpacing: 0.3 }}>
-                                    {label}
-                                </Typography>
-                            </Box>
-                        ))}
-                    </Box>
-                </Box>
-            </Box>
-
-            <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
-
-                {/* ── Search & Filter bar ── */}
-                <Paper
-                    elevation={3}
-                    sx={{
-                        p: { xs: 2, md: 3 },
-                        mb: 5,
-                        borderRadius: 3,
-                        display: "flex",
-                        flexDirection: { xs: "column", md: "row" },
-                        alignItems: { md: "center" },
-                        gap: 2,
-                    }}
-                >
-                    <TextField
-                        placeholder="Search by name, model number, or part number..."
-                        value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        size="small"
-                        fullWidth
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon color="action" />
-                                </InputAdornment>
-                            ),
-                        }}
-                        sx={{ flex: 2 }}
-                    />
-
-                    <FormControl size="small" sx={{ flex: 1, minWidth: 180 }}>
-                        <InputLabel>Category</InputLabel>
-                        <Select
-                            label="Category"
-                            value={categoryId}
-                            onChange={(e) => setCategoryId(e.target.value)}
-                            MenuProps={{
-                                PaperProps: {
-                                    style: { maxHeight: 240, overflow: "auto" },
-                                },
-                                sx: {
-                                    "& .MuiPaper-root": {
-                                        maxHeight: "240px !important",
-                                        overflow: "auto !important",
-                                    },
-                                    "& .MuiMenuItem-root.Mui-selected": {
-                                        backgroundColor: "#1976d2 !important",
-                                        color: "#fff !important",
-                                    },
-                                    "& .MuiMenuItem-root.Mui-selected:hover": {
-                                        backgroundColor: "#1565c0 !important",
-                                    },
-                                },
-                            }}
-                        >
-                            <MenuItem value="">All Categories</MenuItem>
-                            {categories.map((cat) => (
-                                <MenuItem key={cat.categoryId} value={cat.categoryId}>
-                                    {cat.categoryName}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    <Button
-                        variant="contained"
-                        onClick={() => fetchProducts()}
-                        startIcon={<SearchIcon />}
-                        sx={{ px: 4, py: 1, borderRadius: 2, flexShrink: 0 }}
-                    >
-                        Search
-                    </Button>
-                </Paper>
-
-                {/* ── Results header ── */}
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        mb: 4,
-                        flexWrap: "wrap",
-                        gap: 2,
-                    }}
-                >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Box
-                            sx={{
-                                width: 5,
-                                height: 46,
-                                bgcolor: "primary.main",
-                                borderRadius: 1,
-                                flexShrink: 0,
-                            }}
-                        />
-                        <Box>
-                            <Typography
-                                variant="h6"
-                                fontWeight={800}
-                                color="text.primary"
-                                sx={{ lineHeight: 1.2, letterSpacing: -0.3 }}
-                            >
-                                Browse the Catalog
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3 }}>
-                                In-stock parts — ready to ship to your job site
-                            </Typography>
-                        </Box>
-                    </Box>
-
-                    {hasActiveFilters && !loading && (
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            color="primary"
-                            onClick={clearFilters}
-                            startIcon={<FilterAltOffIcon />}
-                            sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
-                        >
-                            Clear Filters
-                        </Button>
-                    )}
-                </Box>
-
-                {/* ── Product Grid ── */}
-                {loading ? (
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
-                        {Array.from({ length: 8 }).map((_, i) => (
-                            <SkeletonCard key={i} />
-                        ))}
-                    </div>
-
-                ) : products.length === 0 ? (
-                    <Box sx={{ py: 12, textAlign: "center" }}>
-                        <StorefrontIcon sx={{ fontSize: 72, color: "text.disabled", mb: 2 }} />
-                        <Typography variant="h6" color="text.secondary">
-                            No products found
-                        </Typography>
-                        <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
-                            Try adjusting your search or clearing filters
-                        </Typography>
-                    </Box>
-
-                ) : (
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
-                        {products.map((product) => (
-                            <Card
-                                key={product.productId}
-                                elevation={2}
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    borderRadius: 3,
-                                    overflow: "hidden",
-                                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                                    "&:hover": { transform: "translateY(-3px)", boxShadow: 6 },
-                                    "&:hover .qv-overlay": { opacity: 1 },
-                                }}
-                            >
-                                {/* Image + Quick View overlay */}
-                                <Box sx={{ position: "relative" }}>
-                                    <CardMedia
-                                        component="img"
-                                        height="45"
-                                        image={product.imageUrl}
-                                        alt={product.productName}
-                                        sx={{ objectFit: "cover", display: "block" }}
-                                    />
-                                    <Box
-                                        className="qv-overlay"
-                                        sx={{
-                                            position: "absolute",
-                                            inset: 0,
-                                            bgcolor: "rgba(0,0,0,0.45)",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            opacity: 0,
-                                            transition: "opacity 0.2s ease",
-                                        }}
-                                    >
-                                        <Button
-                                            size="small"
-                                            onClick={() => setQuickViewProduct(product)}
-                                            sx={{
-                                                bgcolor: "white",
-                                                color: "text.primary",
-                                                fontWeight: 700,
-                                                fontSize: "0.65rem",
-                                                textTransform: "none",
-                                                borderRadius: 2,
-                                                px: 1.5,
-                                                py: 0.4,
-                                                minWidth: 0,
-                                                "&:hover": { bgcolor: "grey.100" },
-                                            }}
-                                        >
-                                            Quick View
-                                        </Button>
-                                    </Box>
-                                </Box>
-
-                                <CardContent sx={{ flexGrow: 1, p: 1, pb: "4px !important" }}>
-                                    <Typography
-                                        sx={{
-                                            fontSize: { xs: "0.72rem", md: "0.8rem" },
-                                            fontWeight: 600,
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: "vertical",
-                                            overflow: "hidden",
-                                            lineHeight: 1.25,
-                                            mb: 0.3,
-                                            color: "text.primary",
-                                        }}
-                                    >
-                                        {product.productName}
-                                    </Typography>
-
-                                    <Typography
-                                        sx={{
-                                            fontSize: { xs: "0.63rem", md: "0.7rem" },
-                                            color: "text.secondary",
-                                            mb: 0.4,
-                                            whiteSpace: "nowrap",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                        }}
-                                    >
-                                        {product.description}
-                                    </Typography>
-
-                                    {product.modelNumber && (
-                                        <Typography sx={{ fontSize: "0.6rem", color: "text.disabled", mb: 0.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                            Model: {product.modelNumber}
-                                        </Typography>
-                                    )}
-                                    {product.partNumber && (
-                                        <Typography sx={{ fontSize: "0.6rem", color: "text.disabled", mb: 0.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                            Part #: {product.partNumber}
-                                        </Typography>
-                                    )}
-
-                                    <Typography
-                                        fontWeight="bold"
-                                        color="success.main"
-                                        sx={{ fontSize: { xs: "0.82rem", md: "0.9rem" }, mb: 0.4 }}
-                                    >
-                                        ${Number(product.price).toLocaleString()}
-                                    </Typography>
-
-                                    <Chip
-                                        label={product.quantity > 0 ? "In Stock" : "Out of Stock"}
-                                        color={product.quantity > 0 ? "success" : "error"}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ fontSize: "0.58rem", height: 18 }}
-                                    />
-                                </CardContent>
-
-                                <CardActions sx={{ p: 1, pt: 0 }}>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        fullWidth
-                                        startIcon={<ShoppingCartIcon sx={{ fontSize: "0.8rem !important" }} />}
-                                        disabled={product.quantity === 0}
-                                        onClick={() => handleAddToCart(product.productId)}
-                                        sx={{
-                                            borderRadius: 2,
-                                            py: 0.4,
-                                            fontSize: { xs: "0.6rem", md: "0.68rem" },
-                                            textTransform: "none",
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
-                                    </Button>
-                                </CardActions>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-
-            </Container>
-
-        </Box>
-
-        {/* ── Quick View Modal ── */}
-
-        <Dialog
-            open={Boolean(quickViewProduct)}
-            onClose={() => setQuickViewProduct(null)}
-            maxWidth="md"
-            fullWidth
-            PaperProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}
+        <div
+            className="min-h-screen flex flex-col"
+            style={{ background: C.bg, color: C.text, fontFamily: "Inter, sans-serif" }}
         >
-            {quickViewProduct && (
-                <>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 2, borderBottom: "1px solid", borderColor: "divider", bgcolor: "grey.50" }}>
-                        <Typography variant="h6" fontWeight="bold">Quick View</Typography>
-                        <IconButton size="small" onClick={() => setQuickViewProduct(null)}>
-                            <CloseIcon fontSize="small" />
-                        </IconButton>
-                    </Box>
+            {/* ══ Three-column main ══════════════════════════════════ */}
+            <main className="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-12 gap-6 py-6">
 
-                    <DialogContent sx={{ p: 0 }}>
-                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}>
+                {/* ── Mobile filter toggle (only < 640px) ────────── */}
+                <div className="col-span-12 lg:hidden">
+                    <button
+                        onClick={() => setFiltersOpen((o) => !o)}
+                        aria-expanded={filtersOpen}
+                        className="w-full py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-opacity hover:opacity-90 active:scale-[0.98]"
+                        style={{ background: C.surfaceHigh, border: `1px solid ${C.border}`, color: C.text }}
+                    >
+                        <span>&#128269;</span>
+                        {filtersOpen ? "Hide Filters" : "Show Filters"}
+                    </button>
+                </div>
 
-                            {/* Image */}
-                            <Box sx={{ width: { xs: "100%", sm: "35%" }, bgcolor: "grey.100", display: "flex", alignItems: "center", justifyContent: "center", p: 1.5, minHeight: 220, flexShrink: 0 }}>
-                                <Box component="img" src={quickViewProduct.imageUrl} alt={quickViewProduct.productName} sx={{ maxWidth: "100%", maxHeight: 200, objectFit: "contain" }} />
-                            </Box>
+                {/* ── LEFT: Filters ──────────────────────────────── */}
+                {/* mobile (<640): toggled drawer · tablet (640-1024): stacked & visible · desktop (1024+): sticky sidebar */}
+                <aside
+                    className={`${filtersOpen ? "flex" : "hidden"} lg:flex flex-col col-span-12 lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-112px)]`}
+                    style={{ borderRight: `1px solid ${C.border}`, paddingRight: "24px" }}
+                >
+                    {/* Header */}
+                    <div className="mb-6">
+                        <h2 className="text-lg font-bold mb-1" style={{ color: C.primary }}>
+                            Filters
+                        </h2>
+                        <p className="text-xs" style={{ color: C.textMuted }}>
+                            Refine Industrial Search
+                        </p>
+                    </div>
 
-                            {/* Details */}
-                            <Box sx={{ flex: 1, p: 1.5, display: "flex", flexDirection: "column", gap: 0.75 }}>
-                                {quickViewProduct.categoryName && (
-                                    <Chip label={quickViewProduct.categoryName} size="small" color="primary" variant="outlined" sx={{ alignSelf: "flex-start" }} />
-                                )}
+                    <div className="flex-grow overflow-y-auto space-y-5 pr-1"
+                        style={{ scrollbarWidth: "thin", scrollbarColor: `${C.border} ${C.bg}` }}>
 
-                                <Typography variant="h6" fontWeight="bold" sx={{ lineHeight: 1.3, wordBreak: "break-word" }}>
-                                    {quickViewProduct.productName}
-                                </Typography>
-
-                                {(quickViewProduct.modelNumber || quickViewProduct.partNumber) && (
-                                    <Stack direction="row" spacing={1} flexWrap="wrap">
-                                        {quickViewProduct.modelNumber && (
-                                            <Chip label={`Model: ${quickViewProduct.modelNumber}`} size="small" variant="outlined" />
-                                        )}
-                                        {quickViewProduct.partNumber && (
-                                            <Chip label={`Part #: ${quickViewProduct.partNumber}`} size="small" variant="outlined" />
-                                        )}
-                                    </Stack>
-                                )}
-
-                                <Typography variant="h6" fontWeight="bold" color="success.main">
-                                    ${Number(quickViewProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                                </Typography>
-
-                                <Chip
-                                    label={quickViewProduct.quantity > 0 ? `In Stock · ${quickViewProduct.quantity} units` : "Out of Stock"}
-                                    color={quickViewProduct.quantity > 0 ? "success" : "error"}
-                                    variant="filled"
-                                    sx={{ alignSelf: "flex-start" }}
-                                />
-
-                                <Divider />
-
-                                <Box>
-                                    <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
-                                        Description
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.7, wordBreak: "break-word", overflowWrap: "break-word", maxHeight: 100, overflowY: "auto", pr: 0.5 }}>
-                                        {quickViewProduct.description}
-                                    </Typography>
-                                </Box>
-
-                                <Button
-                                    variant="contained"
-                                    fullWidth
-                                    size="large"
-                                    startIcon={<ShoppingCartIcon />}
-                                    disabled={quickViewProduct.quantity === 0}
-                                    onClick={() => { handleAddToCart(quickViewProduct.productId); setQuickViewProduct(null); }}
-                                    sx={{ mt: "auto", borderRadius: 2, fontWeight: 700, textTransform: "none", py: 0.8 }}
+                        {/* Categories */}
+                        <div>
+                            <h3 className="text-sm font-bold mb-2 flex items-center gap-2" style={{ color: C.text }}>
+                                <span>&#128230;</span> Categories
+                            </h3>
+                            <div className="space-y-0.5">
+                                <label
+                                    className="flex items-center gap-2 px-2 py-2 rounded-lg text-sm cursor-pointer transition-colors"
+                                    style={{ color: categoryId === "" ? C.primary : C.textMuted }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(48,53,57,0.4)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                 >
-                                    {quickViewProduct.quantity === 0 ? "Out of Stock" : "Add to Cart"}
-                                </Button>
-                            </Box>
+                                    <input
+                                        type="checkbox"
+                                        checked={categoryId === ""}
+                                        onChange={() => setCategoryId("")}
+                                        className="rounded"
+                                        style={{ accentColor: C.btnBg }}
+                                    />
+                                    All Categories
+                                </label>
+                                {categories.map((cat) => (
+                                    <label
+                                        key={cat.categoryId}
+                                        className="flex items-center gap-2 px-2 py-2 rounded-lg text-sm cursor-pointer transition-colors"
+                                        style={{ color: C.textMuted }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(48,53,57,0.4)")}
+                                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={categoryId === String(cat.categoryId)}
+                                            onChange={() => handleCategoryToggle(cat.categoryId)}
+                                            className="rounded"
+                                            style={{ accentColor: C.btnBg }}
+                                        />
+                                        {cat.categoryName}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
 
-                        </Box>
-                    </DialogContent>
-                </>
+                        {/* Price Range */}
+                        <div className="pt-4" style={{ borderTop: `1px solid ${C.border}` }}>
+                            <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: C.text }}>
+                                <span>&#128176;</span> Price Range
+                            </h3>
+                            <input
+                                type="range"
+                                min={0}
+                                max={100000}
+                                value={priceMax}
+                                onChange={(e) => setPriceMax(e.target.value)}
+                                className="w-full h-1 rounded-lg appearance-none cursor-pointer"
+                                style={{ accentColor: C.btnBg, background: "#39485a" }}
+                            />
+                            <div className="flex justify-between mt-2 text-xs" style={{ color: C.textMuted }}>
+                                <span>$500</span>
+                                <span>${Number(priceMax).toLocaleString()}+</span>
+                            </div>
+                        </div>
+
+                        {/* Availability */}
+                        <div className="pt-4" style={{ borderTop: `1px solid ${C.border}` }}>
+                            <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: C.text }}>
+                                <span>&#128230;</span> Availability
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                <span
+                                    className="px-3 py-1 rounded-full text-xs font-bold"
+                                    style={{ background: "rgba(56,189,248,0.15)", color: C.primary, border: `1px solid rgba(142,213,255,0.2)` }}
+                                >
+                                    In Stock
+                                </span>
+                                <span
+                                    className="px-3 py-1 rounded-full text-xs cursor-pointer transition-colors"
+                                    style={{ background: "rgba(48,53,57,0.2)", color: C.textMuted }}
+                                >
+                                    On Demand
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Apply / Reset buttons */}
+                    <div className="mt-6 flex gap-2">
+                        <button
+                            onClick={() => fetchProducts()}
+                            className="flex-1 py-3 rounded-lg font-bold text-sm transition-opacity hover:opacity-90 active:scale-[0.98]"
+                            style={{ background: C.btnBg, color: C.btnText }}
+                        >
+                            Apply Filters
+                        </button>
+                        <button
+                            onClick={() => {
+                                setKeyword("");
+                                setCategoryId("");
+                                setPriceMax(50000);
+                                fetchProducts("", "");
+                            }}
+                            className="flex-1 py-3 rounded-lg font-bold text-sm transition-opacity hover:opacity-90 active:scale-[0.98]"
+                            style={{ background: C.surfaceHigh, color: C.textMuted, border: `1px solid ${C.border}` }}
+                        >
+                            Reset
+                        </button>
+                    </div>
+                </aside>
+
+                {/* ── MIDDLE: Products ────────────────────────────── */}
+                <section className="col-span-12 lg:col-span-6">
+                    <div className="mb-6">
+                        <h1 className="text-2xl font-semibold" style={{ color: C.text }}>
+                            Featured Products
+                        </h1>
+                        <div className="h-1 w-16 mt-2 rounded mb-4" style={{ background: C.primary }} />
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                            className="w-full px-4 py-2.5 text-sm rounded-lg focus:outline-none"
+                            style={{ background: C.surfaceHigh, border: `1px solid ${C.border}`, color: C.text }}
+                            onFocus={(e) => (e.target.style.borderColor = C.primary)}
+                            onBlur={(e)  => (e.target.style.borderColor = C.border)}
+                        />
+                    </div>
+
+                    {loading ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                            {[...Array(3)].map((_, i) => <SkeletonCard key={i} />)}
+                        </div>
+
+                    ) : products.length === 0 ? (
+                        <div className="py-20 text-center">
+                            <p className="text-xl mb-2" style={{ color: C.textMuted }}>No products found</p>
+                            <p className="text-sm" style={{ color: C.textDim }}>Try adjusting your filters</p>
+                        </div>
+
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                            {products.map((product) => (
+                                <article
+                                    key={product.productId}
+                                    className="rounded-lg overflow-hidden flex flex-col transition-all duration-300"
+                                    style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = "rgba(142,213,255,0.4)";
+                                        e.currentTarget.style.boxShadow   = "0px 4px 20px rgba(56,189,248,0.15)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = C.border;
+                                        e.currentTarget.style.boxShadow   = "none";
+                                    }}
+                                >
+                                    {/* Image */}
+                                    <div
+                                        className="h-48 w-full relative overflow-hidden group"
+                                        style={{ background: C.bg }}
+                                    >
+                                        {product.imageUrl ? (
+                                            <img
+                                                src={product.imageUrl}
+                                                alt={product.productName}
+                                                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-4xl"
+                                                style={{ color: C.textDim }}>&#128230;</div>
+                                        )}
+                                        {/* SKU badge */}
+                                        <div
+                                            className="absolute top-2 left-2 px-2 py-1 text-[10px] font-bold rounded-sm"
+                                            style={{ background: "rgba(142,213,255,0.15)", color: C.primary, border: "1px solid rgba(142,213,255,0.2)", backdropFilter: "blur(4px)" }}
+                                        >
+                                            {product.modelNumber || product.categoryName || "PRODUCT"}
+                                        </div>
+
+                                        {/* Quick View hover overlay — desktop */}
+                                        <div className="absolute inset-0 hidden md:flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setQuickViewProduct(product); }}
+                                                className="px-4 py-2 rounded-lg text-xs font-bold"
+                                                style={{ background: "rgba(255,255,255,0.95)", color: C.btnText }}
+                                            >
+                                                Quick View
+                                            </button>
+                                        </div>
+
+                                        {/* Quick View pill — always visible on mobile */}
+                                        <div className="absolute bottom-2 left-0 right-0 flex justify-center md:hidden">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setQuickViewProduct(product); }}
+                                                className="px-3 py-1 rounded-full text-[10px] font-bold backdrop-blur-sm"
+                                                style={{ background: "rgba(0,0,0,0.6)", color: "#fff", border: "1px solid rgba(255,255,255,0.25)" }}
+                                            >
+                                                Quick View
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Info */}
+                                    <div className="p-4 flex flex-col flex-grow">
+                                        <h3 className="text-sm font-bold mb-1 leading-snug" style={{ color: C.text }}>
+                                            {product.productName}
+                                        </h3>
+                                        <p
+                                            className="text-xs mb-4 overflow-hidden"
+                                            style={{ color: C.textMuted, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
+                                        >
+                                            {product.description}
+                                        </p>
+                                        <div className="mt-auto flex flex-col gap-2">
+                                            <span className="text-base font-semibold" style={{ color: C.primary }}>
+                                                ${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            </span>
+                                            <button
+                                                disabled={product.quantity === 0 || cartBusy}
+                                                onClick={() => handleAddToCart(product.productId)}
+                                                className="w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-40"
+                                                style={{ background: C.btnBg, color: C.btnText }}
+                                            >
+                                                &#128722;&nbsp;{product.quantity === 0 ? "Out of Stock" : "Add"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                {/* ── RIGHT: Mini Cart ────────────────────────────── */}
+                <aside className="col-span-12 lg:col-span-3">
+                    <div
+                        className="rounded-lg p-4 flex flex-col lg:sticky lg:top-24 lg:max-h-[calc(100vh-112px)]"
+                        style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                    >
+                        {/* Cart header */}
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-base font-bold" style={{ color: C.text }}>Your Cart</h2>
+                            {itemCount > 0 && (
+                                <span
+                                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                                    style={{ background: "rgba(56,189,248,0.2)", color: C.primary }}
+                                >
+                                    {itemCount} {itemCount === 1 ? "ITEM" : "ITEMS"}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Items list */}
+                        <div
+                            className="flex-grow overflow-y-auto space-y-4 mb-4 pr-1"
+                            style={{ scrollbarWidth: "thin", scrollbarColor: `${C.border} ${C.bg}` }}
+                        >
+                            {!user ? (
+                                <p className="text-sm text-center py-10" style={{ color: C.textDim }}>
+                                    Login to view your cart
+                                </p>
+                            ) : cartItems.length === 0 ? (
+                                <div className="text-center py-10">
+                                    <div className="text-3xl mb-3">&#128722;</div>
+                                    <p className="text-sm mb-1" style={{ color: C.textMuted }}>Cart is empty</p>
+                                    <p className="text-xs" style={{ color: C.textDim }}>Add products to get started</p>
+                                </div>
+                            ) : (
+                                cartItems.map((item) => (
+                                    <div
+                                        key={item.productId}
+                                        className="flex gap-3 pb-4"
+                                        style={{ borderBottom: `1px solid rgba(62,72,79,0.4)` }}
+                                    >
+                                        {/* Thumbnail */}
+                                        <div
+                                            className="w-16 h-16 rounded flex-shrink-0 overflow-hidden flex items-center justify-center"
+                                            style={{ background: C.bg, border: `1px solid ${C.border}` }}
+                                        >
+                                            <span className="text-2xl" style={{ color: C.textDim }}>&#128230;</span>
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="flex-grow min-w-0">
+                                            <h4 className="text-xs font-bold truncate" style={{ color: C.text }}>
+                                                {item.productName}
+                                            </h4>
+                                            <p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: C.textMuted }}>
+                                                Qty: {item.quantity}
+                                            </p>
+                                            <div className="flex items-center justify-between mt-1">
+                                                <span className="text-sm font-bold" style={{ color: C.primary }}>
+                                                    ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                </span>
+                                                <button
+                                                    onClick={() => handleRemoveFromCart(item.productId)}
+                                                    className="transition-opacity hover:opacity-70 text-sm"
+                                                    style={{ color: C.error }}
+                                                    title="Remove"
+                                                >
+                                                    &#128465;
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        {/* Summary + checkout */}
+                        {user && cartItems.length > 0 && (
+                            <div className="pt-4 space-y-3">
+                                <div className="flex justify-between text-sm">
+                                    <span style={{ color: C.textMuted }}>Subtotal</span>
+                                    <span style={{ color: C.text }}>
+                                        ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span style={{ color: C.textMuted }}>Shipping</span>
+                                    <span className="font-bold" style={{ color: C.primary }}>FREE</span>
+                                </div>
+                                <div className="flex justify-between pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
+                                    <span className="font-bold" style={{ color: C.text }}>Total</span>
+                                    <span className="font-bold" style={{ color: C.primary }}>
+                                        ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={() => navigate("/checkout")}
+                                    className="w-full py-4 rounded-lg font-bold text-sm mt-2 hover:opacity-90 active:scale-[0.98] transition-all"
+                                    style={{ background: C.btnBg, color: C.btnText, boxShadow: "0px 4px 20px rgba(56,189,248,0.15)" }}
+                                >
+                                    Proceed to Checkout
+                                </button>
+                                <p className="text-[10px] text-center" style={{ color: "rgba(189,200,209,0.6)" }}>
+                                    Secure industrial payment gateway
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </aside>
+            </main>
+
+            {/* ══ Footer ════════════════════════════════════════════ */}
+            <footer
+                className="mt-8"
+                style={{ background: C.footer, borderTop: `1px solid ${C.border}` }}
+            >
+                <div className="flex flex-col md:flex-row justify-between items-center w-full py-8 px-4 sm:px-6 lg:px-10 mx-auto max-w-[1440px]">
+                    <div className="flex flex-col items-center md:items-start gap-1">
+                        <span className="text-sm font-bold" style={{ color: C.text }}>SolydShop</span>
+                        <p className="text-xs" style={{ color: C.textMuted }}>
+                            © 2024 SolydShop Industrial Marketplace. All rights reserved.
+                        </p>
+                    </div>
+                    <div className="flex gap-6 mt-4 md:mt-0">
+                        {["Terms", "Privacy", "Support", "Contact"].map((link) => (
+                            <a
+                                key={link}
+                                href="#"
+                                className="text-xs transition-colors hover:text-white"
+                                style={{ color: C.textMuted }}
+                            >
+                                {link}
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </footer>
+
+            {/* ══ Quick View Modal ══════════════════════════════════ */}
+            {quickViewProduct && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-10 py-6"
+                    style={{ background: "rgba(0,0,0,0.75)" }}
+                    onClick={() => setQuickViewProduct(null)}
+                >
+                    <div
+                        className="relative rounded-xl w-full max-w-xs max-h-[80vh] overflow-y-auto"
+                        style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close */}
+                        <button
+                            onClick={() => setQuickViewProduct(null)}
+                            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-opacity hover:opacity-70"
+                            style={{ background: C.surfaceHigh, color: C.textMuted }}
+                        >
+                            ✕
+                        </button>
+
+                        {/* Image */}
+                        <div className="h-40 w-full overflow-hidden rounded-t-xl" style={{ background: C.bg }}>
+                            {quickViewProduct.imageUrl ? (
+                                <img
+                                    src={quickViewProduct.imageUrl}
+                                    alt={quickViewProduct.productName}
+                                    className="w-full h-full object-contain"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-5xl" style={{ color: C.textDim }}>
+                                    &#128230;
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-4 space-y-3">
+                            {/* SKU + stock */}
+                            <div className="flex items-center justify-between">
+                                <span
+                                    className="px-2 py-1 text-[10px] font-bold rounded-sm"
+                                    style={{ background: "rgba(142,213,255,0.15)", color: C.primary, border: "1px solid rgba(142,213,255,0.2)" }}
+                                >
+                                    {quickViewProduct.modelNumber || quickViewProduct.categoryName || "PRODUCT"}
+                                </span>
+                                <span
+                                    className="text-xs font-semibold px-2 py-1 rounded-full"
+                                    style={quickViewProduct.quantity > 0
+                                        ? { background: "rgba(56,189,248,0.1)", color: C.primary }
+                                        : { background: "rgba(255,180,171,0.1)", color: C.error }
+                                    }
+                                >
+                                    {quickViewProduct.quantity > 0 ? `In Stock (${quickViewProduct.quantity})` : "Out of Stock"}
+                                </span>
+                            </div>
+
+                            {/* Name */}
+                            <h2 className="text-sm font-bold leading-snug" style={{ color: C.text }}>
+                                {quickViewProduct.productName}
+                            </h2>
+
+                            {/* Description */}
+                            <p
+                                className="text-sm leading-relaxed max-h-24 overflow-y-auto overflow-x-hidden break-all"
+                                style={{ color: C.textMuted, scrollbarWidth: "thin", scrollbarColor: `${C.border} transparent` }}
+                            >
+                                {quickViewProduct.description || "No description available."}
+                            </p>
+
+                            {/* Price + Add to Cart */}
+                            <div className="flex items-center justify-between pt-4" style={{ borderTop: `1px solid ${C.border}` }}>
+                                <span className="text-base font-bold" style={{ color: C.primary }}>
+                                    ${Number(quickViewProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                </span>
+                                <button
+                                    disabled={quickViewProduct.quantity === 0 || cartBusy}
+                                    onClick={() => { handleAddToCart(quickViewProduct.productId); setQuickViewProduct(null); }}
+                                    className="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-40"
+                                    style={{ background: C.btnBg, color: C.btnText }}
+                                >
+                                    &#128722; {quickViewProduct.quantity === 0 ? "Out of Stock" : "Add to Cart"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
-        </Dialog>
-        </>
+        </div>
     );
 };
 

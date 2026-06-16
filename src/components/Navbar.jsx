@@ -1,284 +1,248 @@
 import { useState } from "react";
-
-import { Link, useNavigate } from "react-router-dom";
-
-import {
-    useSelector,
-    useDispatch
-} from "react-redux";
-
-import {
-    logoutSuccess
-} from "../features/auth/authSlice";
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutSuccess } from "../features/auth/authSlice";
 import api from "../api/api";
-
 import { HiMenu, HiX } from "react-icons/hi";
+import { FaShoppingCart } from "react-icons/fa";
 
-import {
-    FaHome,
-    FaShoppingCart,
-    FaBoxOpen,
-    FaStore,
-    FaUserShield,
-    FaSignInAlt,
-    FaUserPlus,
-    FaSignOutAlt,
-} from "react-icons/fa";
-
-import { Avatar, Button, IconButton, Tooltip } from "@mui/material";
-
-const getRoleColor = (roles) => {
-    if (roles?.includes("ROLE_ADMIN"))  return "#d32f2f";
-    if (roles?.includes("ROLE_SELLER")) return "#ed6c02";
-    return "#1976d2";
-};
-
-const getRoleLabel = (roles) => {
-    if (roles?.includes("ROLE_ADMIN"))  return "Admin";
-    if (roles?.includes("ROLE_SELLER")) return "Seller";
-    return "User";
+// ── Design tokens ────────────────────────────────────────────
+const C = {
+    bg:          "#1B2A3D",
+    border:      "#2D4263",
+    primary:     "#8ed5ff",
+    text:        "#dee3e8",
+    textMuted:   "#bdc8d1",
+    surfaceHigh: "#243447",
+    btnBg:       "#38bdf8",
+    btnText:     "#003a57",
 };
 
 const Navbar = () => {
-
-    const navigate = useNavigate();
-
-    const dispatch = useDispatch();
-
+    const navigate   = useNavigate();
+    const location   = useLocation();
+    const dispatch   = useDispatch();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const {
-        isAuthenticated,
-        user
-    } = useSelector(
-        (state) => state.auth
-    );
+    const { isAuthenticated, user } = useSelector((s) => s.auth);
+
+    const isAdmin  = user?.roles?.includes("ROLE_ADMIN");
+    const isSeller = user?.roles?.includes("ROLE_SELLER");
+
+    const isActive = (path) => location.pathname === path;
 
     const handleLogout = async () => {
-
         try {
-
             await api.post("/auth/logout");
-
             dispatch(logoutSuccess());
-
             navigate("/login");
-
-        } catch (error) {
-
-            console.log(error);
-
-            alert("Logout failed");
+        } catch (e) {
+            console.log(e);
         }
     };
 
     const closeMenu = () => setMenuOpen(false);
 
-    const navLinkSx = {
-        color: "white",
-        textTransform: "none",
-        fontSize: "1rem",
-        "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" }
-    };
+    const initials = user?.email?.[0]?.toUpperCase() ?? "U";
 
-    const logoutSx = {
-        color: "white",
-        textTransform: "none",
-        fontSize: "1rem",
-        borderColor: "rgba(255,255,255,0.5)",
-        "&:hover": { borderColor: "white", backgroundColor: "rgba(255,255,255,0.1)" }
-    };
+    const roleColor = isAdmin ? "#ef4444" : isSeller ? "#f97316" : C.btnBg;
 
-    const mobileNavLinkSx = {
-        color: "white",
-        textTransform: "none",
-        fontSize: "1rem",
-        justifyContent: "flex-start",
-        "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" }
+    // ── Desktop link helper ──────────────────────────────────
+    const NavLink = ({ to, children }) => {
+        const active = isActive(to);
+        return (
+            <Link
+                to={to}
+                style={{
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    letterSpacing: "0.01em",
+                    color: active ? C.primary : C.textMuted,
+                    textDecoration: "none",
+                    paddingBottom: active ? "4px" : "6px",
+                    borderBottom: active ? `2px solid ${C.primary}` : "2px solid transparent",
+                    transition: "color 0.15s, border-color 0.15s",
+                    fontFamily: "Inter, sans-serif",
+                }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = C.primary; }}
+                onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = C.textMuted; }}
+            >
+                {children}
+            </Link>
+        );
     };
 
     return (
-
-        <nav className="bg-gray-950 text-white px-6 md:px-10 py-4 md:py-6">
-
-            <div className="flex justify-between items-center">
-
-                <Link to="/" className="flex items-center gap-2 text-white no-underline hover:opacity-80 transition-opacity">
-                    <FaStore className="text-2xl md:text-4xl" />
-                    <h1 className="text-3xl md:text-5xl font-bold">
-                        SolydShop
-                    </h1>
-                </Link>
-
-                {/* Desktop links */}
-                <div className="hidden md:flex items-center gap-2">
-
-                    <Button component={Link} to="/" sx={navLinkSx} startIcon={<FaHome />}>
-                        Home
-                    </Button>
-
-                    {isAuthenticated && (
-                        <Button component={Link} to="/cart" sx={navLinkSx} startIcon={<FaShoppingCart />}>
-                            Cart
-                        </Button>
-                    )}
-
-                    {isAuthenticated && (
-                        <Button component={Link} to="/orders" sx={navLinkSx} startIcon={<FaBoxOpen />}>
-                            Orders
-                        </Button>
-                    )}
-
-                    {user?.roles?.includes("ROLE_SELLER") && (
-                        <Button component={Link} to="/seller/dashboard" sx={navLinkSx} startIcon={<FaStore />}>
-                            Seller Dashboard
-                        </Button>
-                    )}
-
-                    {user?.roles?.includes("ROLE_ADMIN") && (
-                        <Button component={Link} to="/admin/dashboard" sx={navLinkSx} startIcon={<FaUserShield />}>
-                            Admin Dashboard
-                        </Button>
-                    )}
-
-                    {!isAuthenticated && (
-                        <>
-                            <Button component={Link} to="/login" sx={navLinkSx} startIcon={<FaSignInAlt />}>
-                                Login
-                            </Button>
-
-                            <Button
-                                component={Link}
-                                to="/register"
-                                variant="contained"
-                                startIcon={<FaUserPlus />}
-                                sx={{ textTransform: "none", fontSize: "1rem" }}
-                            >
-                                Register
-                            </Button>
-                        </>
-                    )}
-
-                    {isAuthenticated && (
-                        <Tooltip
-                            title={`${user?.email} · ${getRoleLabel(user?.roles)}`}
-                            arrow
-                        >
-                            <Avatar
-                                sx={{
-                                    bgcolor: getRoleColor(user?.roles),
-                                    width: 38,
-                                    height: 38,
-                                    fontSize: "1rem",
-                                    fontWeight: "bold",
-                                    cursor: "default",
-                                    ml: 1,
-                                }}
-                            >
-                                {user?.email?.[0]?.toUpperCase()}
-                            </Avatar>
-                        </Tooltip>
-                    )}
-
-                    {isAuthenticated && (
-                        <Button variant="outlined" onClick={handleLogout} sx={logoutSx} startIcon={<FaSignOutAlt />}>
-                            Logout
-                        </Button>
-                    )}
-
-                </div>
-
-                {/* Hamburger button — mobile only */}
-                <IconButton
-                    className="md:hidden"
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    aria-label="Toggle menu"
-                    sx={{ color: "white", display: { md: "none" } }}
+        <>
+            {/* ── Fixed Header ──────────────────────────────────── */}
+            <header
+                className="fixed top-0 left-0 right-0 z-50 w-full"
+                style={{ background: C.bg, borderBottom: `1px solid ${C.border}` }}
+            >
+                <div
+                    className="flex justify-between items-center w-full mx-auto h-20"
+                    style={{ maxWidth: "1440px", padding: "0 40px" }}
                 >
-                    {menuOpen ? <HiX size={28} /> : <HiMenu size={28} />}
-                </IconButton>
-
-            </div>
-
-            {/* Mobile dropdown menu */}
-            {menuOpen && (
-                <div className="flex flex-col pt-4 pb-2 border-t border-gray-700 mt-4 md:hidden">
-
-                    {isAuthenticated && (
-                        <div className="flex items-center gap-3 px-2 pb-3 mb-1 border-b border-gray-700">
-                            <Avatar
-                                sx={{
-                                    bgcolor: getRoleColor(user?.roles),
-                                    width: 40,
-                                    height: 40,
-                                    fontSize: "1.1rem",
-                                    fontWeight: "bold",
+                    {/* ── Left: Logo + Nav links ──────────────────── */}
+                    <div className="flex items-center gap-8">
+                        {/* Logo */}
+                        <Link
+                            to="/"
+                            style={{ textDecoration: "none", display: "flex", alignItems: "center" }}
+                        >
+                            <span
+                                style={{
+                                    fontSize: "24px",
+                                    fontWeight: 700,
+                                    color: C.primary,
+                                    fontFamily: "Inter, sans-serif",
+                                    letterSpacing: "-0.01em",
                                 }}
                             >
-                                {user?.email?.[0]?.toUpperCase()}
-                            </Avatar>
-                            <div>
-                                <p className="text-white text-sm font-semibold leading-tight">{user?.email}</p>
-                                <p className="text-gray-400 text-xs">{getRoleLabel(user?.roles)}</p>
-                            </div>
-                        </div>
-                    )}
+                                SolydShop
+                            </span>
+                        </Link>
 
-                    <Button component={Link} to="/" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaHome />}>
-                        Home
-                    </Button>
+                        {/* Desktop nav links */}
+                        <nav className="hidden md:flex items-center gap-6">
+                            <NavLink to="/">Home</NavLink>
 
-                    {isAuthenticated && (
-                        <Button component={Link} to="/cart" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaShoppingCart />}>
-                            Cart
-                        </Button>
-                    )}
+                            {isAuthenticated && <NavLink to="/cart">Cart</NavLink>}
+                            {isAuthenticated && <NavLink to="/orders">Orders</NavLink>}
+                            {isSeller        && <NavLink to="/seller/dashboard">Seller</NavLink>}
+                            {isAdmin         && <NavLink to="/admin/dashboard">Admin</NavLink>}
+                        </nav>
+                    </div>
 
-                    {isAuthenticated && (
-                        <Button component={Link} to="/orders" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaBoxOpen />}>
-                            Orders
-                        </Button>
-                    )}
-
-                    {user?.roles?.includes("ROLE_SELLER") && (
-                        <Button component={Link} to="/seller/dashboard" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaStore />}>
-                            Seller Dashboard
-                        </Button>
-                    )}
-
-                    {user?.roles?.includes("ROLE_ADMIN") && (
-                        <Button component={Link} to="/admin/dashboard" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaUserShield />}>
-                            Admin Dashboard
-                        </Button>
-                    )}
-
-                    {!isAuthenticated && (
-                        <>
-                            <Button component={Link} to="/login" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaSignInAlt />}>
-                                Login
-                            </Button>
-
-                            <Button component={Link} to="/register" onClick={closeMenu} sx={mobileNavLinkSx} startIcon={<FaUserPlus />}>
-                                Register
-                            </Button>
-                        </>
-                    )}
-
-                    {isAuthenticated && (
-                        <Button
-                            onClick={() => { handleLogout(); closeMenu(); }}
-                            sx={{ ...mobileNavLinkSx, color: "#f87171" }}
-                            startIcon={<FaSignOutAlt />}
+                    {/* ── Right: Search + Cart + User ─────────────── */}
+                    <div className="hidden md:flex items-center gap-4">
+                        {/* Cart icon */}
+                        <button
+                            onClick={() => navigate("/cart")}
+                            className="relative transition-colors hover:opacity-80"
+                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "4px" }}
                         >
-                            Logout
-                        </Button>
-                    )}
+                            <FaShoppingCart size={20} />
+                        </button>
 
+                        {/* Auth: avatar or login/register */}
+                        {isAuthenticated ? (
+                            <div className="flex items-center gap-3">
+                                {/* Avatar */}
+                                <div
+                                    title={`${user?.email}`}
+                                    className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold cursor-default flex-shrink-0"
+                                    style={{ background: roleColor, color: "#fff", border: `1px solid ${C.border}` }}
+                                >
+                                    {initials}
+                                </div>
+
+                                {/* Logout */}
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-sm font-medium transition-colors hover:opacity-80"
+                                    style={{ color: C.textMuted, background: "none", border: `1px solid ${C.border}`, borderRadius: "8px", padding: "6px 14px", cursor: "pointer", fontFamily: "Inter, sans-serif" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.primary)}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.border)}
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                <Link
+                                    to="/login"
+                                    style={{ fontSize: "14px", fontWeight: 500, color: C.textMuted, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
+                                    onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                                >
+                                    Login
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className="text-sm font-bold rounded-lg px-4 py-2 transition-opacity hover:opacity-90"
+                                    style={{ background: C.btnBg, color: C.btnText, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                >
+                                    Register
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ── Mobile: hamburger ───────────────────────── */}
+                    <button
+                        className="md:hidden p-2 rounded-lg transition-colors"
+                        onClick={() => setMenuOpen(!menuOpen)}
+                        style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer" }}
+                    >
+                        {menuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
+                    </button>
                 </div>
-            )}
 
-        </nav>
+                {/* ── Mobile dropdown ──────────────────────────────── */}
+                {menuOpen && (
+                    <div
+                        className="md:hidden flex flex-col px-6 pb-4 gap-1"
+                        style={{ borderTop: `1px solid ${C.border}`, background: C.bg }}
+                    >
+                        {/* User info */}
+                        {isAuthenticated && (
+                            <div className="flex items-center gap-3 py-3 mt-1" style={{ borderBottom: `1px solid ${C.border}` }}>
+                                <div
+                                    className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
+                                    style={{ background: roleColor, color: "#fff" }}
+                                >
+                                    {initials}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold" style={{ color: C.text }}>{user?.email}</p>
+                                    <p className="text-xs" style={{ color: C.textMuted }}>
+                                        {isAdmin ? "Admin" : isSeller ? "Seller" : "User"}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Mobile links */}
+                        {[
+                            { to: "/",                   label: "Home",             show: true },
+                            { to: "/cart",               label: "Cart",             show: isAuthenticated },
+                            { to: "/orders",             label: "Orders",           show: isAuthenticated },
+                            { to: "/seller/dashboard",   label: "Seller Dashboard", show: isSeller },
+                            { to: "/admin/dashboard",    label: "Admin Dashboard",  show: isAdmin },
+                        ].filter((l) => l.show).map((l) => (
+                            <Link
+                                key={l.to}
+                                to={l.to}
+                                onClick={closeMenu}
+                                className="py-2.5 text-sm font-medium transition-colors"
+                                style={{ color: isActive(l.to) ? C.primary : C.textMuted, textDecoration: "none" }}
+                            >
+                                {l.label}
+                            </Link>
+                        ))}
+
+                        {!isAuthenticated ? (
+                            <div className="flex gap-3 mt-2">
+                                <Link to="/login"    onClick={closeMenu} className="flex-1 text-center py-2 text-sm rounded-lg" style={{ border: `1px solid ${C.border}`, color: C.textMuted, textDecoration: "none" }}>Login</Link>
+                                <Link to="/register" onClick={closeMenu} className="flex-1 text-center py-2 text-sm font-bold rounded-lg" style={{ background: C.btnBg, color: C.btnText, textDecoration: "none" }}>Register</Link>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => { handleLogout(); closeMenu(); }}
+                                className="mt-2 py-2.5 text-sm text-left transition-colors"
+                                style={{ color: "#f87171", background: "none", border: "none", cursor: "pointer" }}
+                            >
+                                Logout
+                            </button>
+                        )}
+                    </div>
+                )}
+            </header>
+
+            {/* ── Spacer so content doesn't hide under fixed nav ── */}
+            <div style={{ height: "80px" }} />
+        </>
     );
 };
 

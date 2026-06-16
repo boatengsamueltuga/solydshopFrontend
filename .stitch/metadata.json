@@ -1,0 +1,42 @@
+{
+  "name": "projects/2900078776943941933",
+  "projectId": "2900078776943941933",
+  "title": "SolydShop Industrial E-Commerce",
+  "visibility": "PRIVATE",
+  "createTime": "2026-06-15T23:46:31.262075Z",
+  "updateTime": "2026-06-15T23:50:37.303942Z",
+  "projectType": "PROJECT_DESIGN",
+  "origin": "STITCH",
+  "deviceType": "DESKTOP",
+  "designTheme": {
+    "colorMode": "DARK",
+    "font": "INTER",
+    "roundness": "ROUND_FOUR",
+    "customColor": "#8ed5ff",
+    "overridePrimaryColor": "#8ed5ff",
+    "overrideSecondaryColor": "#38bdf8"
+  },
+  "screens": {
+    "homepage": {
+      "id": "e133e8f84e854fdcbea50bf2f6119c60",
+      "sourceScreen": "projects/2900078776943941933/screens/e133e8f84e854fdcbea50bf2f6119c60",
+      "x": 1024,
+      "y": 0,
+      "width": 2560,
+      "height": 2048,
+      "title": "SolydShop | Industrial Procurement"
+    },
+    "login": {
+      "id": "c4b8586416b546bd805cbb05472f9881",
+      "sourceScreen": "projects/2900078776943941933/screens/c4b8586416b546bd805cbb05472f9881",
+      "x": 0,
+      "y": 0,
+      "width": 2560,
+      "height": 2048,
+      "title": "Login | SolydShop Industrial Procurement"
+    }
+  },
+  "metadata": {
+    "userRole": "OWNER"
+  }
+}
