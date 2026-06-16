@@ -61,7 +61,7 @@ const HomePage = () => {
     const [categories,       setCategories]       = useState([]);
     const [cart,             setCart]             = useState(null);
     const [cartBusy,         setCartBusy]         = useState(false);
-    const [priceMax,         setPriceMax]         = useState(50000);
+    const [priceMax,         setPriceMax]         = useState(100000);
     const [quickViewProduct, setQuickViewProduct] = useState(null);
     const [filtersOpen,      setFiltersOpen]      = useState(false);
     const [productError,     setProductError]     = useState(null);
@@ -79,13 +79,14 @@ const HomePage = () => {
         }
     };
 
-    const fetchProducts = async (kw = keyword, catId = categoryId) => {
+    const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax) => {
         dispatch(fetchProductsStart());
         setProductError(null);
         try {
             let url = "/public/products?";
-            if (kw.trim()) url += `keyword=${kw}&`;
-            if (catId)     url += `categoryId=${catId}`;
+            if (kw.trim())    url += `keyword=${kw}&`;
+            if (catId)        url += `categoryId=${catId}&`;
+            if (max < 100000) url += `maxPrice=${max}&`;
             const res = await api.get(url);
             dispatch(fetchProductsSuccess(res.data.content));
         } catch (e) {
@@ -113,7 +114,7 @@ const HomePage = () => {
     useEffect(() => {
         const t = setTimeout(() => fetchProducts(), 400);
         return () => clearTimeout(t);
-    }, [keyword, categoryId]);
+    }, [keyword, categoryId, priceMax]);
 
     // ── Quick View focus management ───────────────────────────
     useEffect(() => {
@@ -194,8 +195,8 @@ const HomePage = () => {
     const handleReset = () => {
         setKeyword("");
         setCategoryId("");
-        setPriceMax(50000);
-        fetchProducts("", "");
+        setPriceMax(100000);
+        fetchProducts("", "", 100000);
     };
 
     const cartItems = cart?.items ?? [];
@@ -300,7 +301,7 @@ const HomePage = () => {
                                 min={0}
                                 max={100000}
                                 value={priceMax}
-                                onChange={(e) => setPriceMax(e.target.value)}
+                                onChange={(e) => setPriceMax(Number(e.target.value))}
                                 aria-valuetext={`Up to $${Number(priceMax).toLocaleString()}`}
                                 className="w-full h-1 rounded-lg appearance-none cursor-pointer"
                                 style={{ accentColor: C.btnBg, background: "#39485a" }}
