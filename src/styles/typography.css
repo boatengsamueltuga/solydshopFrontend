@@ -1,0 +1,62 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SolydShop Base Typography
+   Consumes font-family tokens defined in tokens.css.
+   NOTE: Google Fonts (Space Grotesk, IBM Plex Sans, IBM Plex Mono) must be
+   loaded in index.html (P1.0) for these to render. Until then they fall back
+   to system fonts via the var() stacks in tokens.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* ── Text selection ──────────────────────────────────────────────────────── */
+::selection {
+  background-color: var(--accent-subtle);
+  color: var(--text);
+}
+
+/* ── Scrollbar — webkit only (Chrome, Edge, Safari) ─────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-mid);
+  border-radius: var(--r-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
