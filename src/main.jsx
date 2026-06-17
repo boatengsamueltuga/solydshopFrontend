@@ -6,6 +6,9 @@ import { BrowserRouter } from 'react-router-dom'
 
 import { Provider } from 'react-redux'
 
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+
 import { Toaster } from 'react-hot-toast'
 
 import App from './App'
@@ -13,6 +16,7 @@ import App from './App'
 import './index.css'
 
 import { store } from './app/store'
+import { solydTheme } from './app/theme'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 
@@ -22,23 +26,29 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
       <BrowserRouter>
 
-        {/* Global toast notifications */}
-        <Toaster
-          position="top-right"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 2000,
-            style: {
-              background: '#111827',
-              color: '#ffffff',
-              borderRadius: '10px',
-              padding: '16px',
-              fontSize: '16px'
-            }
-          }}
-        />
+        <ThemeProvider theme={solydTheme}>
 
-        <App />
+          <CssBaseline />
+
+          {/* Global toast notifications */}
+          <Toaster
+            position="top-right"
+            reverseOrder={false}
+            toastOptions={{
+              duration: 2000,
+              style: {
+                background: '#111827',
+                color: '#ffffff',
+                borderRadius: '10px',
+                padding: '16px',
+                fontSize: '16px'
+              }
+            }}
+          />
+
+          <App />
+
+        </ThemeProvider>
 
       </BrowserRouter>
 
