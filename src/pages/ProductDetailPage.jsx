@@ -162,6 +162,11 @@ export default function ProductDetailPage() {
                 @media (max-width: 767px) {
                     .pdp-grid { grid-template-columns: 1fr; gap: var(--space-6); }
                     .pdp-image-panel { position: static !important; }
+                    .pdp-image-inner {
+                        aspect-ratio: unset !important;
+                        height: clamp(200px, 56vw, 260px) !important;
+                        padding: var(--space-4) !important;
+                    }
                 }
 
                 /* ── Button hover states ─────────────── */
@@ -300,6 +305,7 @@ export default function ProductDetailPage() {
                     }}
                 >
                     <div
+                        className="pdp-image-inner"
                         style={{
                             aspectRatio: '4 / 3',
                             display: 'flex',
@@ -314,8 +320,8 @@ export default function ProductDetailPage() {
                                 src={product.imageUrl}
                                 alt={product.productName}
                                 style={{
-                                    maxWidth: '100%',
-                                    maxHeight: '100%',
+                                    width: '100%',
+                                    height: '100%',
                                     objectFit: 'contain',
                                     display: 'block',
                                 }}
