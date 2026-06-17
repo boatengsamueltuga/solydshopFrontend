@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
 import { HiAdjustments, HiSearch, HiX } from "react-icons/hi";
@@ -498,8 +498,15 @@ const HomePage = () => {
 
                                     {/* Info */}
                                     <div className="p-3 flex flex-col flex-grow">
-                                        <h3 className="text-xs font-bold mb-1 leading-snug line-clamp-2" style={{ color: C.text }}>
-                                            {product.productName}
+                                        <h3 className="text-xs font-bold mb-1 leading-snug line-clamp-2">
+                                            <Link
+                                                to={`/products/${product.productId}`}
+                                                style={{ color: C.text, textDecoration: "none" }}
+                                                onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
+                                                onMouseLeave={(e) => (e.currentTarget.style.color = C.text)}
+                                            >
+                                                {product.productName}
+                                            </Link>
                                         </h3>
                                         <p className="text-[11px] mb-3 line-clamp-2" style={{ color: C.textMuted }}>
                                             {product.description}
@@ -795,6 +802,16 @@ const HomePage = () => {
                                     {quickViewProduct.quantity === 0 ? "Out of Stock" : "Add to Cart"}
                                 </button>
                             </div>
+
+                            {/* View Full Details link */}
+                            <Link
+                                to={`/products/${quickViewProduct.productId}`}
+                                onClick={closeQuickView}
+                                className="block text-center text-xs font-bold py-2 rounded transition-opacity hover:opacity-80 motion-reduce:transition-none"
+                                style={{ color: C.primary, border: `1px solid ${C.border}`, textDecoration: "none", lineHeight: "2.5", minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}
+                            >
+                                View Full Details →
+                            </Link>
                         </div>
                     </div>
                 </div>

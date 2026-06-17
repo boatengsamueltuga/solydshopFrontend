@@ -33,6 +33,7 @@ import AdminCategoriesPage from "./pages/AdminCategoriesPage";
 // Added AdminOrdesPage import
 import AdminOrdersPage from "./pages/AdminOrdersPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -178,6 +179,16 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                {/* Product Detail Route */}
+                <Route
+                    path="/products/:id"
+                    element={
+                        <ProtectedRoute>
+                            <ProductDetailPage />
+                        </ProtectedRoute>
+                    }
+                />
+
                 <Route
                     path="/login"
                     element={<LoginPage />}
