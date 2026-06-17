@@ -1,95 +1,133 @@
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import Drawer from '@mui/material/Drawer';
 import AppLayout from './AppLayout';
+import AppSidebar from '../navigation/AppSidebar';
+import TopBar from '../navigation/TopBar';
+
+const NAVBAR_HEIGHT = 80;
 
 /**
- * AdminLayout — for all /admin/* pages.
- *
- * Structure:
- *   AppLayout (dark bg, min-h-screen)
- *     <div> (flex row, full height)
- *       <aside>   ← sidebar slot; populated in P1.6 with <AppSidebar />
- *         {sidebar}
- *       </aside>
- *       <div> (flex column, fills remaining width)
- *         <div>   ← topbar slot; populated in P1.6 with <TopBar />
- *           {topbar}
- *         </div>
- *         <main>  ← scrollable page content
- *           {children}
- *         </main>
- *       </div>
- *     </div>
+ * AdminLayout — full-page admin shell with persistent sidebar and topbar.
  *
  * Props:
- *   sidebar  — optional React node; renders as the left sidebar.
- *              When undefined no sidebar column is rendered and the content
- *              takes full width (safe default until P1.6).
- *   topbar   — optional React node; renders as the top bar above content.
- *              When undefined no topbar is rendered.
- *   children — page content
+ *   title    — string; page title shown in the TopBar.
+ *   children — page content rendered in the scrollable main area.
+ *
+ * Structure (desktop):
+ *   AppLayout (dark bg)
+ *     ├── <aside>  — fixed left sidebar (240px), starts below the global Navbar
+ *     └── <main>   — content column (margin-left: 240px)
+ *                     ├── TopBar (56px, sticky)
+ *                     └── scrollable page area
+ *
+ * Mobile (≤ 767px):
+ *   Sidebar becomes a full-height MUI Drawer triggered by TopBar hamburger.
+ *   Drawer auto-closes on route change.
  */
-const AdminLayout = ({ sidebar, topbar, children }) => {
+const AdminLayout = ({ title = 'Admin', children }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   return (
     <AppLayout>
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
 
-        {/* Sidebar slot — filled by <AppSidebar variant="admin" /> in P1.6 */}
-        {sidebar && (
-          <aside
-            style={{
-              width:           'var(--sidebar-width)',
-              flexShrink:      0,
-              backgroundColor: 'var(--surface)',
-              borderRight:     '1px solid var(--border)',
-              position:        'sticky',
-              top:             0,
-              height:          '100vh',
-              overflowY:       'auto',
-            }}
-          >
-            {sidebar}
-          </aside>
-        )}
+      {/* ── Desktop sidebar ── */}
+      <aside
+        style={{
+          position:        'fixed',
+          top:             `${NAVBAR_HEIGHT}px`,
+          left:            0,
+          bottom:          0,
+          width:           'var(--sidebar-width)',
+          zIndex:          'var(--z-sticky)',
+          overflowY:       'auto',
+          overflowX:       'hidden',
+          backgroundColor: 'var(--surface)',
+          borderRight:     '1px solid var(--border)',
+        }}
+        className="admin-sidebar-desktop"
+      >
+        <AppSidebar variant="admin" />
+      </aside>
 
-        {/* Right column: topbar + scrollable content */}
+      {/* ── Mobile sidebar (MUI Drawer) ── */}
+      <Drawer
+        anchor="left"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        PaperProps={{
+          sx: {
+            top:             `${NAVBAR_HEIGHT}px`,
+            height:          `calc(100vh - ${NAVBAR_HEIGHT}px)`,
+            backgroundImage: 'none',
+            backgroundColor: 'var(--surface)',
+            borderRight:     '1px solid var(--border)',
+            width:           'var(--sidebar-width)',
+          },
+        }}
+        slotProps={{
+          backdrop: {
+            sx: { top: `${NAVBAR_HEIGHT}px` },
+          },
+        }}
+        className="admin-sidebar-mobile"
+      >
+        <AppSidebar variant="admin" />
+      </Drawer>
+
+      {/* ── Main content column ── */}
+      <div
+        className="admin-main-col"
+        style={{
+          marginLeft:    'var(--sidebar-width)',
+          display:       'flex',
+          flexDirection: 'column',
+          minHeight:     `calc(100vh - ${NAVBAR_HEIGHT}px)`,
+        }}
+      >
+        {/* TopBar */}
         <div
           style={{
-            flex:           1,
-            display:        'flex',
-            flexDirection:  'column',
-            minWidth:       0,   /* prevent flex overflow */
-            overflow:       'hidden',
+            position:        'sticky',
+            top:             0,
+            zIndex:          'var(--z-sticky)',
+            flexShrink:      0,
           }}
         >
-          {/* TopBar slot — filled by <TopBar /> in P1.6 */}
-          {topbar && (
-            <div
-              style={{
-                height:          'var(--topbar-height)',
-                flexShrink:      0,
-                backgroundColor: 'var(--surface)',
-                borderBottom:    '1px solid var(--border)',
-                position:        'sticky',
-                top:             0,
-                zIndex:          'var(--z-sticky)',
-              }}
-            >
-              {topbar}
-            </div>
-          )}
-
-          {/* Scrollable page content */}
-          <main
-            style={{
-              flex:       1,
-              overflowY:  'auto',
-              padding:    'var(--space-6)',
-            }}
-          >
-            {children}
-          </main>
+          <TopBar
+            title={title}
+            onMenuClick={() => setMobileOpen(true)}
+          />
         </div>
 
+        {/* Page content */}
+        <main
+          style={{
+            flex:       1,
+            background: 'var(--bg)',
+            padding:    'var(--space-6)',
+            overflowX:  'hidden',
+          }}
+        >
+          {children}
+        </main>
       </div>
+
+      <style>{`
+        @media (max-width: 767px) {
+          .admin-sidebar-desktop { display: none !important; }
+          .admin-main-col { margin-left: 0 !important; }
+        }
+        @media (min-width: 768px) {
+          .admin-sidebar-mobile { display: none !important; }
+        }
+      `}</style>
+
     </AppLayout>
   );
 };

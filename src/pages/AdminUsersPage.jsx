@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -6,52 +6,76 @@ import {
     Box,
     Button,
     Chip,
-    Dialog as MuiDialog,
-    DialogContent,
-    DialogActions,
     Divider,
     FormControl,
     IconButton,
     InputLabel,
     MenuItem,
     Select,
+    Stack,
+    Tooltip,
     Typography,
 } from "@mui/material";
 
-import CloseIcon        from "@mui/icons-material/Close";
-import VisibilityIcon   from "@mui/icons-material/Visibility";
-import DeleteIcon       from "@mui/icons-material/Delete";
+import VisibilityIcon     from "@mui/icons-material/Visibility";
+import DeleteIcon         from "@mui/icons-material/Delete";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
-import api from "../api/api";
-import Loader from "../components/Loader";
-import toast from "react-hot-toast";
-import confirmToast from "../utils/confirmToast";
+import api           from "../api/api";
+import toast         from "react-hot-toast";
+import confirmToast  from "../utils/confirmToast";
+import AdminLayout   from "../components/layouts/AdminLayout";
+import SheetPanel    from "../components/common/SheetPanel";
 
-const ROLE_COLORS = {
-    ROLE_ADMIN:  "error",
-    ROLE_SELLER: "warning",
-    ROLE_USER:   "primary",
+/* ── Constants ── */
+const ROLE_TABS = ["ALL", "USERS", "SELLERS", "ADMINS"];
+
+const ROLE_STYLE = {
+    ROLE_ADMIN:  { color: "var(--error)",   bg: "var(--error-subtle)"   },
+    ROLE_SELLER: { color: "var(--warning)", bg: "var(--warning-subtle)" },
+    ROLE_USER:   { color: "var(--info)",    bg: "var(--info-subtle)"    },
 };
 
+const RoleBadge = ({ role }) => {
+    const s = ROLE_STYLE[role] ?? { color: "var(--text-3)", bg: "var(--surface-mid)" };
+    return (
+        <span style={{
+            display:       "inline-block",
+            padding:       "1px 7px",
+            borderRadius:  "var(--r-sm)",
+            background:    s.bg,
+            color:         s.color,
+            fontSize:      "11px",
+            fontWeight:    600,
+            fontFamily:    "var(--font-mono)",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+        }}>
+            {role.replace("ROLE_", "")}
+        </span>
+    );
+};
+
+/* ── AdminUsersPage ── */
 const AdminUsersPage = () => {
 
     const [users,        setUsers]        = useState([]);
     const [loading,      setLoading]      = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isSheetOpen,  setIsSheetOpen]  = useState(false);
     const [newRole,      setNewRole]      = useState("");
+    const [activeTab,    setActiveTab]    = useState("ALL");
 
     const [isMobile,  setIsMobile]  = useState(window.innerWidth < 600);
     const [isCompact, setIsCompact] = useState(window.innerWidth < 1100);
 
     useEffect(() => {
-        const handleResize = () => {
+        const h = () => {
             setIsMobile(window.innerWidth < 600);
             setIsCompact(window.innerWidth < 1100);
         };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        window.addEventListener("resize", h);
+        return () => window.removeEventListener("resize", h);
     }, []);
 
     /*
@@ -62,10 +86,10 @@ const AdminUsersPage = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await api.get("/admin/users");
-            setUsers(response.data);
-        } catch (error) {
-            console.log(error);
+            const res = await api.get("/admin/users");
+            setUsers(res.data);
+        } catch (err) {
+            console.log(err);
             toast.error("Failed to load users");
         } finally {
             setLoading(false);
@@ -78,6 +102,28 @@ const AdminUsersPage = () => {
 
     /*
     |----------------------------------------------------------
+    | Filtered rows + tab counts
+    |----------------------------------------------------------
+    */
+
+    const tabCounts = useMemo(() => ({
+        ALL:     users.length,
+        USERS:   users.filter(u => u.roles?.includes("ROLE_USER") && !u.roles?.includes("ROLE_ADMIN") && !u.roles?.includes("ROLE_SELLER")).length,
+        SELLERS: users.filter(u => u.roles?.includes("ROLE_SELLER")).length,
+        ADMINS:  users.filter(u => u.roles?.includes("ROLE_ADMIN")).length,
+    }), [users]);
+
+    const filteredUsers = useMemo(() => {
+        switch (activeTab) {
+            case "USERS":   return users.filter(u => u.roles?.includes("ROLE_USER") && !u.roles?.includes("ROLE_ADMIN") && !u.roles?.includes("ROLE_SELLER"));
+            case "SELLERS": return users.filter(u => u.roles?.includes("ROLE_SELLER"));
+            case "ADMINS":  return users.filter(u => u.roles?.includes("ROLE_ADMIN"));
+            default:        return users;
+        }
+    }, [users, activeTab]);
+
+    /*
+    |----------------------------------------------------------
     | Handlers
     |----------------------------------------------------------
     */
@@ -85,7 +131,7 @@ const AdminUsersPage = () => {
     const handleViewUser = (user) => {
         setSelectedUser(user);
         setNewRole(user.roles?.[0] ?? "ROLE_USER");
-        setIsDialogOpen(true);
+        setIsSheetOpen(true);
     };
 
     const handleUpdateRole = async () => {
@@ -93,9 +139,9 @@ const AdminUsersPage = () => {
             await api.put(`/admin/users/${selectedUser.userId}/role?role=${newRole}`);
             toast.success("Role updated successfully");
             fetchUsers();
-            setIsDialogOpen(false);
-        } catch (error) {
-            console.log(error);
+            setIsSheetOpen(false);
+        } catch (err) {
+            console.log(err);
             toast.error("Failed to update role");
         }
     };
@@ -106,8 +152,9 @@ const AdminUsersPage = () => {
                 await api.delete(`/admin/users/${userId}`);
                 toast.success("User deleted successfully");
                 fetchUsers();
-            } catch (error) {
-                console.log(error);
+                setIsSheetOpen(false);
+            } catch (err) {
+                console.log(err);
                 toast.error("Failed to delete user");
             }
         });
@@ -115,103 +162,81 @@ const AdminUsersPage = () => {
 
     /*
     |----------------------------------------------------------
-    | DataGrid Columns
+    | DataGrid columns
     |----------------------------------------------------------
     */
 
     const columns = [
-
         {
             field: "userId",
             headerName: "ID",
             width: isMobile ? 55 : 70,
+            renderCell: (params) => (
+                <span style={{ color: "var(--text-3)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>
+                    {params.row.userId}
+                </span>
+            ),
         },
-
         {
             field: "name",
             headerName: "Name",
-            minWidth: isMobile ? 110 : 150,
+            minWidth: isMobile ? 120 : 160,
             flex: 1,
             renderCell: (params) => (
-                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4 }}>
+                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4, color: "var(--text)", fontSize: "13px" }}>
                     {params.row.name}
                 </span>
             ),
         },
-
         ...(!isCompact ? [{
             field: "email",
             headerName: "Email",
             minWidth: 180,
             flex: 1.2,
+            renderCell: (params) => (
+                <span style={{ color: "var(--text-2)", fontSize: "13px" }}>{params.row.email}</span>
+            ),
         }] : []),
-
         ...(!isMobile ? [{
             field: "roles",
             headerName: "Roles",
-            width: 160,
+            width: 180,
             renderCell: (params) => (
                 <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", py: 0.5 }}>
-                    {params.row.roles?.map((role) => (
-                        <Chip
-                            key={role}
-                            label={role.replace("ROLE_", "")}
-                            color={ROLE_COLORS[role] || "default"}
-                            size="small"
-                            variant="filled"
-                        />
-                    ))}
+                    {params.row.roles?.map(role => <RoleBadge key={role} role={role} />)}
                 </Box>
             ),
         }] : []),
-
         {
             field: "actions",
             headerName: "Actions",
-            width: isMobile ? 90 : 180,
+            width: isMobile ? 80 : 120,
             renderCell: (params) => (
-                <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        startIcon={<VisibilityIcon />}
-                        onClick={() => handleViewUser(params.row)}
-                        sx={{ fontSize: isMobile ? "10px" : "12px" }}
-                    >
-                        View
-                    </Button>
-                    {!isMobile && (
-                        <Button
-                            variant="contained"
-                            color="error"
+                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ height: "100%" }}>
+                    <Tooltip title="View user" arrow>
+                        <IconButton
                             size="small"
-                            startIcon={<DeleteIcon />}
-                            onClick={() => handleDeleteUser(params.row.userId)}
-                            sx={{ fontSize: "12px" }}
+                            onClick={() => handleViewUser(params.row)}
+                            sx={{ color: "var(--accent)", "&:hover": { background: "var(--accent-subtle)" } }}
                         >
-                            Delete
-                        </Button>
+                            <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    {!isMobile && (
+                        <Tooltip title="Delete user" arrow>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleDeleteUser(params.row.userId)}
+                                sx={{ color: "var(--error)", "&:hover": { background: "var(--error-subtle)" } }}
+                            >
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
                     )}
-                </Box>
+                </Stack>
             ),
         },
     ];
-
-    /*
-    |----------------------------------------------------------
-    | Loading
-    |----------------------------------------------------------
-    */
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex flex-col justify-center items-center">
-                <Loader />
-                <p className="text-2xl font-semibold mt-4">Loading users...</p>
-            </div>
-        );
-    }
 
     /*
     |----------------------------------------------------------
@@ -220,179 +245,189 @@ const AdminUsersPage = () => {
     */
 
     return (
+        <AdminLayout title="Users">
 
-        <div className="p-4 md:p-10 bg-gray-100 min-h-screen w-full overflow-x-hidden">
-
-            <div className="mb-6 md:mb-10">
-                <h1 className="text-3xl md:text-5xl font-bold">User Management</h1>
-                <p className="text-base text-gray-500 mt-2">{users.length} registered user{users.length !== 1 ? "s" : ""}</p>
+            {/* ── Role tabs ── */}
+            <div style={{
+                display:      "flex",
+                gap:          "4px",
+                background:   "var(--surface-mid)",
+                border:       "1px solid var(--border)",
+                borderRadius: "var(--r-md)",
+                padding:      "4px",
+                marginBottom: "var(--space-4)",
+                overflowX:    "auto",
+                flexWrap:     "nowrap",
+            }}>
+                {ROLE_TABS.map(tab => {
+                    const isActive = activeTab === tab;
+                    return (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            style={{
+                                padding:      "6px 12px",
+                                borderRadius: "var(--r-sm)",
+                                border:       "none",
+                                background:   isActive ? "var(--surface-high)" : "transparent",
+                                color:        isActive ? "var(--text)" : "var(--text-3)",
+                                fontFamily:   "var(--font-body)",
+                                fontSize:     "12px",
+                                fontWeight:   isActive ? 600 : 400,
+                                cursor:       "pointer",
+                                whiteSpace:   "nowrap",
+                                borderBottom: isActive ? "2px solid var(--accent)" : "2px solid transparent",
+                                transition:   "all var(--duration-fast)",
+                                display:      "flex",
+                                alignItems:   "center",
+                                gap:          "6px",
+                                flexShrink:   0,
+                            }}
+                        >
+                            {tab}
+                            <span style={{
+                                fontSize:     "10px",
+                                padding:      "1px 5px",
+                                borderRadius: "var(--r-pill)",
+                                background:   isActive ? "var(--accent-subtle)" : "var(--surface-hover)",
+                                color:        isActive ? "var(--accent)" : "var(--text-4)",
+                                fontFamily:   "var(--font-mono)",
+                                fontWeight:   700,
+                            }}>
+                                {tabCounts[tab] ?? 0}
+                            </span>
+                        </button>
+                    );
+                })}
             </div>
 
-            <div
-                className="bg-white rounded-xl shadow min-w-0"
-                style={{ height: isMobile ? 450 : 600, width: "100%" }}
-            >
+            {/* ── DataGrid ── */}
+            <div style={{
+                background:   "var(--surface-mid)",
+                border:       "1px solid var(--border)",
+                borderRadius: "var(--r-md)",
+                overflow:     "hidden",
+            }}>
                 <DataGrid
-                    rows={users}
+                    rows={filteredUsers}
                     columns={columns}
                     getRowId={(row) => row.userId}
                     getRowHeight={() => "auto"}
                     disableRowSelectionOnClick
-                    pageSizeOptions={[5, 10, 25]}
+                    loading={loading}
+                    pageSizeOptions={[10, 25, 50]}
                     initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                    sx={{
-                        border: "none",
-                        "& .MuiDataGrid-columnHeaderTitle": {
-                            fontWeight: "bold",
-                            fontSize: isMobile ? "12px" : "14px",
-                        },
-                        "& .MuiDataGrid-cell": {
-                            fontSize: isMobile ? "12px" : "14px",
-                            padding: isMobile ? "4px 6px" : "8px 10px",
-                        },
-                    }}
+                    style={{ height: isMobile ? 450 : 600, width: "100%", border: "none" }}
                 />
             </div>
 
-            {/* ── User Detail Dialog ── */}
-            <MuiDialog
-                open={isDialogOpen}
-                onClose={() => setIsDialogOpen(false)}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{ sx: { borderRadius: 3 } }}
-            >
-                {selectedUser && (
-                    <>
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                px: 3,
-                                py: 2,
-                                borderBottom: "2px solid",
-                                borderColor: "secondary.main",
-                                bgcolor: "#f5f0ff",
-                            }}
+            {/* ── User Detail SheetPanel ── */}
+            <SheetPanel
+                open={isSheetOpen}
+                onClose={() => setIsSheetOpen(false)}
+                title={`User #${selectedUser?.userId}`}
+                subtitle={selectedUser?.email}
+                footer={
+                    <Stack direction="row" justifyContent="space-between" gap={1} flexWrap="wrap">
+                        <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            onClick={() => handleDeleteUser(selectedUser?.userId)}
+                            sx={{ textTransform: "none", fontWeight: 700 }}
                         >
-                            <Typography variant="h6" fontWeight="bold" color="secondary.main">
-                                User #{selectedUser.userId}
-                            </Typography>
-                            <IconButton size="small" onClick={() => setIsDialogOpen(false)}>
-                                <CloseIcon fontSize="small" />
-                            </IconButton>
-                        </Box>
-
-                        <DialogContent sx={{ pt: 3 }}>
-                            <Box
-                                sx={{
-                                    bgcolor: "#f5f0ff",
-                                    border: "1px solid",
-                                    borderColor: "secondary.light",
-                                    borderLeft: "4px solid",
-                                    borderLeftColor: "secondary.main",
-                                    borderRadius: 2,
-                                    p: 2,
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: 1,
-                                }}
-                            >
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-                                    <Box>
-                                        <Typography variant="caption" color="secondary.main" fontWeight={700} textTransform="uppercase" letterSpacing={1}>User</Typography>
-                                        <Typography variant="subtitle1" fontWeight="bold" fontSize="1.05rem">{selectedUser.name}</Typography>
-                                    </Box>
-                                    <Box sx={{ display: "flex", gap: 0.5 }}>
-                                        {selectedUser.roles?.map((role) => (
-                                            <Chip
-                                                key={role}
-                                                label={role.replace("ROLE_", "")}
-                                                color={ROLE_COLORS[role] || "default"}
-                                                size="small"
-                                                sx={{ fontWeight: 700 }}
-                                            />
-                                        ))}
-                                    </Box>
-                                </Box>
-
-                                <Divider />
-
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    <Typography variant="body2" fontWeight={700} sx={{ minWidth: 55 }}>Email:</Typography>
-                                    <Typography variant="body2" color="secondary.dark" fontWeight={500}>{selectedUser.email}</Typography>
-                                </Box>
-                            </Box>
-
-                            <Divider sx={{ my: 2 }} />
-
-                            <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
-                                Assign Role
-                            </Typography>
-
-                            <FormControl fullWidth size="small">
-                                <InputLabel sx={{ fontWeight: "bold" }}>Role</InputLabel>
-                                <Select
-                                    label="Role"
-                                    value={newRole}
-                                    onChange={(e) => setNewRole(e.target.value)}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            style: { maxHeight: 240, overflow: "auto" },
-                                        },
-                                        sx: {
-                                            "& .MuiMenuItem-root.Mui-selected": {
-                                                backgroundColor: "#1976d2 !important",
-                                                color: "#fff !important",
-                                            },
-                                            "& .MuiMenuItem-root.Mui-selected:hover": {
-                                                backgroundColor: "#1565c0 !important",
-                                            },
-                                        },
-                                    }}
-                                >
-                                    <MenuItem value="ROLE_USER">User</MenuItem>
-                                    <MenuItem value="ROLE_SELLER">Seller</MenuItem>
-                                    <MenuItem value="ROLE_ADMIN">Admin</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </DialogContent>
-
-                        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-                            <Button
-                                onClick={() => setIsDialogOpen(false)}
-                                variant="outlined"
-                                color="inherit"
-                                startIcon={<CloseIcon />}
-                            >
+                            Delete User
+                        </Button>
+                        <Stack direction="row" gap={1}>
+                            <Button onClick={() => setIsSheetOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
                                 Close
-                            </Button>
-                            <Button
-                                onClick={() => {
-                                    setIsDialogOpen(false);
-                                    handleDeleteUser(selectedUser.userId);
-                                }}
-                                variant="contained"
-                                color="error"
-                                startIcon={<DeleteIcon />}
-                            >
-                                Delete
                             </Button>
                             <Button
                                 onClick={handleUpdateRole}
                                 variant="contained"
-                                color="secondary"
+                                color="primary"
                                 startIcon={<ManageAccountsIcon />}
+                                sx={{ textTransform: "none", fontWeight: 700 }}
                             >
                                 Update Role
                             </Button>
-                        </DialogActions>
-                    </>
-                )}
-            </MuiDialog>
+                        </Stack>
+                    </Stack>
+                }
+            >
+                {selectedUser && (
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
 
-        </div>
+                        {/* User info card */}
+                        <Box sx={{
+                            background:   "var(--surface-high)",
+                            border:       "1px solid var(--border)",
+                            borderLeft:   "3px solid var(--accent)",
+                            borderRadius: "var(--r-md)",
+                            p:            2,
+                        }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: "var(--text-3)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>User</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "var(--text)", mt: 0.25 }}>
+                                        {selectedUser.name}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+                                    {selectedUser.roles?.map(role => <RoleBadge key={role} role={role} />)}
+                                </Box>
+                            </Box>
+
+                            <Divider sx={{ mb: 1.5 }} />
+
+                            <Box sx={{ display: "flex", gap: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 700, color: "var(--text)", minWidth: 55 }}>Email</Typography>
+                                <Typography variant="body2" sx={{ color: "var(--accent)" }}>{selectedUser.email}</Typography>
+                            </Box>
+                        </Box>
+
+                        <Divider />
+
+                        {/* Role assignment */}
+                        <Box>
+                            <Typography variant="caption" sx={{ color: "var(--text-3)", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600, display: "block", mb: 1.5 }}>
+                                Assign Role
+                            </Typography>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Role</InputLabel>
+                                <Select
+                                    label="Role"
+                                    value={newRole}
+                                    onChange={(e) => setNewRole(e.target.value)}
+                                    MenuProps={{ PaperProps: { style: { maxHeight: 200 } } }}
+                                >
+                                    <MenuItem value="ROLE_USER">
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                                            <RoleBadge role="ROLE_USER" />
+                                            <Typography variant="body2" sx={{ color: "var(--text-2)" }}>Standard customer account</Typography>
+                                        </Box>
+                                    </MenuItem>
+                                    <MenuItem value="ROLE_SELLER">
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                                            <RoleBadge role="ROLE_SELLER" />
+                                            <Typography variant="body2" sx={{ color: "var(--text-2)" }}>Can manage products</Typography>
+                                        </Box>
+                                    </MenuItem>
+                                    <MenuItem value="ROLE_ADMIN">
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                                            <RoleBadge role="ROLE_ADMIN" />
+                                            <Typography variant="body2" sx={{ color: "var(--text-2)" }}>Full platform access</Typography>
+                                        </Box>
+                                    </MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+
+                    </Box>
+                )}
+            </SheetPanel>
+
+        </AdminLayout>
     );
 };
 
