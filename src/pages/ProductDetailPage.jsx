@@ -161,6 +161,7 @@ export default function ProductDetailPage() {
                 }
                 @media (max-width: 767px) {
                     .pdp-grid { grid-template-columns: 1fr; gap: var(--space-6); }
+                    .pdp-image-panel { position: static !important; }
                 }
 
                 /* ── Button hover states ─────────────── */
@@ -288,6 +289,7 @@ export default function ProductDetailPage() {
 
                 {/* ── Left: image panel ─────────────────────────── */}
                 <div
+                    className="pdp-image-panel"
                     style={{
                         background: 'var(--surface)',
                         border: '1px solid var(--border)',
