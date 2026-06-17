@@ -1,0 +1,689 @@
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import api from '../api/api';
+
+/* ── XSRF helper (mirrors the pattern used in HomePage.jsx) ─── */
+const getXsrfToken = () =>
+    document.cookie
+        .split(';')
+        .find(c => c.trim().startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? '';
+
+/* ── Loading skeleton ──────────────────────────────────────────── */
+function Skeleton({ style }) {
+    return (
+        <div
+            style={{
+                background: 'var(--surface-mid)',
+                borderRadius: 'var(--r-md)',
+                animation: 'solyd-pulse 1.6s ease-in-out infinite',
+                ...style,
+            }}
+        />
+    );
+}
+
+/* ── Stock badge colors ────────────────────────────────────────── */
+function stockColor(qty) {
+    if (qty <= 0)  return 'var(--error)';
+    if (qty <= 5)  return 'var(--warning)';
+    return 'var(--success)';
+}
+function stockLabel(qty) {
+    if (qty <= 0)  return 'OUT OF STOCK';
+    if (qty <= 5)  return `LOW STOCK · ${qty} units`;
+    return `IN STOCK · ${qty} units`;
+}
+
+/* ── Spec row ──────────────────────────────────────────────────── */
+function SpecRow({ label, value, mono, last }) {
+    return (
+        <div
+            style={{
+                display: 'grid',
+                gridTemplateColumns: '140px 1fr',
+                borderBottom: last ? 'none' : '1px solid var(--border-subtle)',
+            }}
+        >
+            <div
+                style={{
+                    padding: '9px 14px',
+                    fontSize: 'var(--text-xs)',
+                    color: 'var(--text-3)',
+                    background: 'var(--surface)',
+                    borderRight: '1px solid var(--border-subtle)',
+                }}
+            >
+                {label}
+            </div>
+            <div
+                style={{
+                    padding: '9px 14px',
+                    fontSize: 'var(--text-sm)',
+                    color: mono ? 'var(--accent)' : 'var(--text)',
+                    fontFamily: mono ? 'var(--font-mono)' : 'var(--font-body)',
+                    fontWeight: mono ? 500 : 400,
+                    letterSpacing: mono ? '0.01em' : 'normal',
+                }}
+            >
+                {value}
+            </div>
+        </div>
+    );
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ProductDetailPage
+   ════════════════════════════════════════════════════════════════ */
+export default function ProductDetailPage() {
+    const { id } = useParams();
+    const { isAuthenticated, user } = useSelector(s => s.auth);
+
+    const [product,      setProduct]      = useState(null);
+    const [loading,      setLoading]      = useState(true);
+    const [fetchError,   setFetchError]   = useState(null);
+    const [qty,          setQty]          = useState(1);
+    const [addingToCart, setAddingToCart] = useState(false);
+
+    /* ── Fetch product ───────────────────────────────────────── */
+    useEffect(() => {
+        setLoading(true);
+        setFetchError(null);
+        setQty(1);
+
+        api.get(`/public/products/${id}`)
+            .then(res => setProduct(res.data))
+            .catch(() => setFetchError('Product not found or no longer available.'))
+            .finally(() => setLoading(false));
+    }, [id]);
+
+    /* ── Add to cart ─────────────────────────────────────────── */
+    const handleAddToCart = async () => {
+        if (!isAuthenticated) {
+            toast.error('Please log in to add items to your cart.');
+            return;
+        }
+        if (qty < 1 || qty > (product?.quantity ?? 0)) return;
+
+        setAddingToCart(true);
+        try {
+            await api.post(
+                `/cart/${user.userId}/items`,
+                { productId: product.productId, quantity: qty },
+                { headers: { 'X-XSRF-TOKEN': getXsrfToken() } },
+            );
+            toast.success(`${product.productName} added to cart.`);
+        } catch {
+            toast.error('Failed to add to cart. Please try again.');
+        } finally {
+            setAddingToCart(false);
+        }
+    };
+
+    /* ── Shared page shell ───────────────────────────────────── */
+    const shell = (children) => (
+        <div
+            style={{
+                background: 'var(--bg)',
+                minHeight: '100vh',
+                paddingTop: 'var(--topbar-height)',
+                color: 'var(--text)',
+                fontFamily: 'var(--font-body)',
+            }}
+        >
+            <div
+                style={{
+                    maxWidth: 'var(--content-max)',
+                    margin: '0 auto',
+                    padding: 'var(--space-6) var(--space-5) var(--space-20)',
+                }}
+            >
+                {children}
+            </div>
+
+            <style>{`
+                @keyframes solyd-pulse {
+                    0%, 100% { opacity: 1; }
+                    50%       { opacity: 0.45; }
+                }
+
+                /* ── Responsive grid ─────────────────── */
+                .pdp-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+                    gap: var(--space-12);
+                    align-items: start;
+                }
+                @media (max-width: 1023px) {
+                    .pdp-grid { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+                }
+                @media (max-width: 767px) {
+                    .pdp-grid { grid-template-columns: 1fr; gap: var(--space-6); }
+                }
+
+                /* ── Button hover states ─────────────── */
+                .pdp-btn-primary:hover:not(:disabled) {
+                    background: var(--accent-hi) !important;
+                }
+                .pdp-btn-ghost:hover {
+                    border-color: var(--accent) !important;
+                    color: var(--accent) !important;
+                }
+                .pdp-qty-btn:hover:not(:disabled) {
+                    background: var(--surface-hover) !important;
+                }
+                .pdp-back-link:hover {
+                    color: var(--accent) !important;
+                }
+            `}</style>
+        </div>
+    );
+
+    /* ── Loading state ───────────────────────────────────────── */
+    if (loading) {
+        return shell(
+            <>
+                <Skeleton style={{ height: 16, width: 240, marginBottom: 'var(--space-6)' }} />
+                <div className="pdp-grid">
+                    <Skeleton style={{ aspectRatio: '4/3' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+                        <Skeleton style={{ height: 36, width: '80%' }} />
+                        <Skeleton style={{ height: 16, width: '40%' }} />
+                        <Skeleton style={{ height: 120 }} />
+                        <Skeleton style={{ height: 96 }} />
+                        <Skeleton style={{ height: 48 }} />
+                        <Skeleton style={{ height: 48 }} />
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    /* ── Error state ─────────────────────────────────────────── */
+    if (fetchError || !product) {
+        return shell(
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: 320,
+                    gap: 'var(--space-4)',
+                    textAlign: 'center',
+                }}
+            >
+                <p style={{ color: 'var(--error)', fontSize: 'var(--text-base)' }}>
+                    {fetchError ?? 'Product not found.'}
+                </p>
+                <Link
+                    to="/"
+                    className="pdp-back-link"
+                    style={{
+                        color: 'var(--text-2)',
+                        fontSize: 'var(--text-sm)',
+                        textDecoration: 'none',
+                        transition: 'color var(--duration-fast)',
+                    }}
+                >
+                    ← Back to Catalog
+                </Link>
+            </div>
+        );
+    }
+
+    const inStock  = product.quantity > 0;
+    const maxQty   = product.quantity;
+
+    /* ── Spec rows: only show fields that have data ───────────── */
+    const specRows = [
+        product.partNumber  && { label: 'Part Number',  value: product.partNumber,  mono: true  },
+        product.modelNumber && { label: 'Model Number', value: product.modelNumber, mono: true  },
+        product.categoryName && { label: 'Category',   value: product.categoryName, mono: false },
+    ].filter(Boolean);
+
+    /* ── Rendered page ───────────────────────────────────────── */
+    return shell(
+        <>
+            {/* Breadcrumb */}
+            <nav
+                aria-label="breadcrumb"
+                style={{
+                    marginBottom: 'var(--space-6)',
+                    fontSize: 'var(--text-xs)',
+                    color: 'var(--text-3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    flexWrap: 'wrap',
+                }}
+            >
+                <Link
+                    to="/"
+                    style={{ color: 'var(--text-3)', textDecoration: 'none' }}
+                >
+                    Catalog
+                </Link>
+
+                {product.categoryName && (
+                    <>
+                        <span aria-hidden="true">›</span>
+                        <span style={{ color: 'var(--text-3)' }}>{product.categoryName}</span>
+                    </>
+                )}
+
+                <span aria-hidden="true">›</span>
+                <span
+                    style={{ color: 'var(--text-2)' }}
+                    aria-current="page"
+                >
+                    {product.productName}
+                </span>
+            </nav>
+
+            {/* Two-column grid */}
+            <div className="pdp-grid">
+
+                {/* ── Left: image panel ─────────────────────────── */}
+                <div
+                    style={{
+                        background: 'var(--surface)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--r-md)',
+                        overflow: 'hidden',
+                        position: 'sticky',
+                        top: 'calc(var(--topbar-height) + var(--space-4))',
+                    }}
+                >
+                    <div
+                        style={{
+                            aspectRatio: '4 / 3',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 'var(--space-8)',
+                            background: 'var(--surface)',
+                        }}
+                    >
+                        {product.imageUrl ? (
+                            <img
+                                src={product.imageUrl}
+                                alt={product.productName}
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    objectFit: 'contain',
+                                    display: 'block',
+                                }}
+                            />
+                        ) : (
+                            <div
+                                style={{
+                                    color: 'var(--text-3)',
+                                    fontSize: 'var(--text-sm)',
+                                    textAlign: 'center',
+                                    userSelect: 'none',
+                                }}
+                            >
+                                No image available
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* ── Right: specs panel ───────────────────────── */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+
+                    {/* Product name + category */}
+                    <div>
+                        <h1
+                            style={{
+                                fontFamily: 'var(--font-display)',
+                                fontWeight: 700,
+                                fontSize: 'clamp(1.25rem, 2.5vw, var(--text-3xl))',
+                                color: 'var(--text)',
+                                lineHeight: 1.15,
+                                margin: '0 0 var(--space-2)',
+                                letterSpacing: '-0.01em',
+                            }}
+                        >
+                            {product.productName}
+                        </h1>
+
+                        {product.categoryName && (
+                            <p
+                                style={{
+                                    color: 'var(--text-3)',
+                                    fontSize: 'var(--text-sm)',
+                                    margin: 0,
+                                    fontFamily: 'var(--font-body)',
+                                }}
+                            >
+                                {product.categoryName}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Price + availability box */}
+                    <div
+                        style={{
+                            background: 'var(--surface-mid)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--r-md)',
+                            padding: 'var(--space-5) var(--space-6)',
+                        }}
+                    >
+                        {/* Price row */}
+                        <div style={{ marginBottom: 'var(--space-4)' }}>
+                            <div
+                                style={{
+                                    fontSize: 'var(--text-2xs)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    color: 'var(--text-3)',
+                                    marginBottom: 'var(--space-2)',
+                                    fontFamily: 'var(--font-body)',
+                                }}
+                            >
+                                UNIT PRICE
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)' }}>
+                                <span
+                                    style={{
+                                        fontFamily: 'var(--font-mono)',
+                                        fontWeight: 600,
+                                        fontSize: 'clamp(1.5rem, 3vw, var(--text-4xl))',
+                                        color: 'var(--accent)',
+                                        letterSpacing: '-0.02em',
+                                        lineHeight: 1,
+                                    }}
+                                >
+                                    ${Number(product.price).toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}
+                                </span>
+                                <span
+                                    style={{
+                                        color: 'var(--text-3)',
+                                        fontSize: 'var(--text-xs)',
+                                        fontFamily: 'var(--font-body)',
+                                    }}
+                                >
+                                    USD · per unit
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div style={{ height: 1, background: 'var(--border-subtle)', margin: '0 0 var(--space-4)' }} />
+
+                        {/* Availability row */}
+                        <div>
+                            <div
+                                style={{
+                                    fontSize: 'var(--text-2xs)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    color: 'var(--text-3)',
+                                    marginBottom: 'var(--space-2)',
+                                    fontFamily: 'var(--font-body)',
+                                }}
+                            >
+                                AVAILABILITY
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                <div
+                                    aria-hidden="true"
+                                    style={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: '50%',
+                                        background: stockColor(product.quantity),
+                                        flexShrink: 0,
+                                    }}
+                                />
+                                <span
+                                    style={{
+                                        fontFamily: 'var(--font-mono)',
+                                        fontSize: 'var(--text-sm)',
+                                        color: stockColor(product.quantity),
+                                        fontWeight: 500,
+                                        letterSpacing: '0.02em',
+                                    }}
+                                >
+                                    {stockLabel(product.quantity)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Specifications table */}
+                    {specRows.length > 0 && (
+                        <div>
+                            <div
+                                style={{
+                                    fontSize: 'var(--text-2xs)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    color: 'var(--text-3)',
+                                    marginBottom: 'var(--space-3)',
+                                    fontFamily: 'var(--font-body)',
+                                }}
+                            >
+                                SPECIFICATIONS
+                            </div>
+                            <div
+                                style={{
+                                    border: '1px solid var(--border-subtle)',
+                                    borderRadius: 'var(--r-md)',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                {specRows.map((row, i) => (
+                                    <SpecRow
+                                        key={row.label}
+                                        label={row.label}
+                                        value={row.value}
+                                        mono={row.mono}
+                                        last={i === specRows.length - 1}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Quantity selector */}
+                    {inStock && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                            <span
+                                style={{
+                                    fontSize: 'var(--text-2xs)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    color: 'var(--text-3)',
+                                    fontFamily: 'var(--font-body)',
+                                    minWidth: 28,
+                                }}
+                            >
+                                QTY
+                            </span>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'stretch',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 'var(--r-md)',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <button
+                                    className="pdp-qty-btn"
+                                    onClick={() => setQty(q => Math.max(1, q - 1))}
+                                    disabled={qty <= 1}
+                                    aria-label="Decrease quantity"
+                                    style={{
+                                        width: 40,
+                                        height: 40,
+                                        background: 'var(--surface-high)',
+                                        border: 'none',
+                                        borderRight: '1px solid var(--border)',
+                                        color: qty <= 1 ? 'var(--text-3)' : 'var(--text)',
+                                        cursor: qty <= 1 ? 'default' : 'pointer',
+                                        fontSize: 18,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'background var(--duration-fast)',
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    −
+                                </button>
+
+                                <div
+                                    aria-live="polite"
+                                    aria-label={`Quantity: ${qty}`}
+                                    style={{
+                                        width: 56,
+                                        height: 40,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontFamily: 'var(--font-mono)',
+                                        fontWeight: 500,
+                                        fontSize: 'var(--text-base)',
+                                        color: 'var(--text)',
+                                        background: 'var(--surface)',
+                                        userSelect: 'none',
+                                    }}
+                                >
+                                    {qty}
+                                </div>
+
+                                <button
+                                    className="pdp-qty-btn"
+                                    onClick={() => setQty(q => Math.min(maxQty, q + 1))}
+                                    disabled={qty >= maxQty}
+                                    aria-label="Increase quantity"
+                                    style={{
+                                        width: 40,
+                                        height: 40,
+                                        background: 'var(--surface-high)',
+                                        border: 'none',
+                                        borderLeft: '1px solid var(--border)',
+                                        color: qty >= maxQty ? 'var(--text-3)' : 'var(--text)',
+                                        cursor: qty >= maxQty ? 'default' : 'pointer',
+                                        fontSize: 18,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'background var(--duration-fast)',
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    +
+                                </button>
+                            </div>
+
+                            <span
+                                style={{
+                                    fontSize: 'var(--text-xs)',
+                                    color: 'var(--text-3)',
+                                    fontFamily: 'var(--font-mono)',
+                                }}
+                            >
+                                {maxQty} available
+                            </span>
+                        </div>
+                    )}
+
+                    {/* CTA buttons */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        <button
+                            className="pdp-btn-primary"
+                            onClick={handleAddToCart}
+                            disabled={!inStock || addingToCart}
+                            style={{
+                                background: inStock ? 'var(--accent)' : 'var(--surface-high)',
+                                color: inStock ? 'var(--bg)' : 'var(--text-3)',
+                                border: 'none',
+                                borderRadius: 'var(--r-md)',
+                                padding: 'var(--space-4) var(--space-6)',
+                                fontFamily: 'var(--font-body)',
+                                fontWeight: 600,
+                                fontSize: 'var(--text-base)',
+                                cursor: inStock && !addingToCart ? 'pointer' : 'default',
+                                transition: 'background var(--duration-fast)',
+                                letterSpacing: '0.01em',
+                                width: '100%',
+                            }}
+                        >
+                            {addingToCart ? 'Adding…' : inStock ? '● Add to Cart' : 'Out of Stock'}
+                        </button>
+
+                        <button
+                            className="pdp-btn-ghost"
+                            style={{
+                                background: 'transparent',
+                                color: 'var(--text-2)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--r-md)',
+                                padding: 'calc(var(--space-4) - 1px) var(--space-6)',
+                                fontFamily: 'var(--font-body)',
+                                fontWeight: 500,
+                                fontSize: 'var(--text-base)',
+                                cursor: 'pointer',
+                                transition: 'border-color var(--duration-fast), color var(--duration-fast)',
+                                letterSpacing: '0.01em',
+                                width: '100%',
+                            }}
+                        >
+                            Request Quote
+                        </button>
+                    </div>
+
+                    {/* Description */}
+                    {product.description && (
+                        <div
+                            style={{
+                                borderTop: '1px solid var(--border-subtle)',
+                                paddingTop: 'var(--space-5)',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: 'var(--text-2xs)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                    color: 'var(--text-3)',
+                                    marginBottom: 'var(--space-3)',
+                                    fontFamily: 'var(--font-body)',
+                                }}
+                            >
+                                DESCRIPTION
+                            </div>
+                            <p
+                                style={{
+                                    color: 'var(--text-2)',
+                                    fontSize: 'var(--text-base)',
+                                    lineHeight: 1.65,
+                                    margin: 0,
+                                    fontFamily: 'var(--font-body)',
+                                }}
+                            >
+                                {product.description}
+                            </p>
+                        </div>
+                    )}
+
+                </div>
+                {/* end right panel */}
+
+            </div>
+            {/* end grid */}
+        </>
+    );
+}
