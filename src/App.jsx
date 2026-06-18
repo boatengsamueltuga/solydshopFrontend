@@ -24,6 +24,7 @@ import OrdersPage from "./pages/OrdersPage";
 // Added SellerDashboardPage import
 import SellerDashboardPage from "./pages/SellerDashboardPage";
 import SellerProductFormPage from "./pages/SellerProductFormPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 // Added AdminDashboardPage import
 import AdminDashboardPage from "./pages/AdminDashboardPage";
@@ -226,6 +227,9 @@ function App() {
                     path="/reset-password"
                     element={<ResetPasswordPage />}
                 />
+
+                {/* 404 catch-all */}
+                <Route path="*" element={<NotFoundPage />} />
 
             </Routes>
 

@@ -12,6 +12,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { Toaster } from 'react-hot-toast'
 
 import App from './App'
+import ErrorBoundary from './components/ErrorBoundary'
 
 import './index.css'
 
@@ -46,7 +47,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             }}
           />
 
-          <App />
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
 
         </ThemeProvider>
 
