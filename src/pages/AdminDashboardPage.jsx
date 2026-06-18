@@ -7,6 +7,7 @@ import {
     HiClipboardList,
     HiUsers,
     HiArrowRight,
+    HiCurrencyDollar,
 } from "react-icons/hi";
 
 import api from "../api/api";
@@ -156,6 +157,9 @@ const AdminDashboardPage = () => {
         .sort((a, b) => b.orderId - a.orderId)
         .slice(0, 5);
 
+    const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+    const revenueDisplay = "$" + totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 });
+
     return (
         <AdminLayout title="Dashboard">
 
@@ -166,10 +170,11 @@ const AdminDashboardPage = () => {
                 gap:                 "var(--space-4)",
                 marginBottom:        "var(--space-8)",
             }}>
-                <StatCard label="Products"   value={products.length}   Icon={HiCube}          loading={loading} />
-                <StatCard label="Categories" value={categories.length} Icon={HiTag}           loading={loading} />
-                <StatCard label="Orders"     value={orders.length}     Icon={HiClipboardList} loading={loading} />
-                <StatCard label="Users"      value={users.length}      Icon={HiUsers}         loading={loading} />
+                <StatCard label="Products"   value={products.length}   Icon={HiCube}            loading={loading} />
+                <StatCard label="Categories" value={categories.length} Icon={HiTag}             loading={loading} />
+                <StatCard label="Orders"     value={orders.length}     Icon={HiClipboardList}   loading={loading} />
+                <StatCard label="Users"      value={users.length}      Icon={HiUsers}           loading={loading} />
+                <StatCard label="Total Revenue" value={revenueDisplay} Icon={HiCurrencyDollar}  loading={loading} />
             </div>
 
             {/* ── Quick Actions ── */}

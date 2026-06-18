@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import toast from "react-hot-toast";
 import { Step, StepLabel, Stepper } from "@mui/material";
-import { HiShoppingBag, HiCube } from "react-icons/hi";
+import { HiShoppingBag, HiCube, HiRefresh } from "react-icons/hi";
+
+const getXsrfToken = () =>
+    document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
 
 const STATUS_STYLE = {
     PENDING:    { color: "var(--warning)",  bg: "var(--warning-subtle)",  border: "var(--warning)" },
@@ -43,9 +47,10 @@ const StatusBadge = ({ status }) => {
 
 const OrdersPage = () => {
 
-    const [orders,  setOrders]  = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error,   setError]   = useState("");
+    const [orders,     setOrders]     = useState([]);
+    const [loading,    setLoading]    = useState(true);
+    const [error,      setError]      = useState("");
+    const [reordering, setReordering] = useState(new Set());
 
     const { user } = useSelector((state) => state.auth);
     const navigate = useNavigate();
@@ -80,6 +85,28 @@ const OrdersPage = () => {
     );
 
     const totalSpent = orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+
+    const handleReorder = async (order) => {
+        if (!user?.userId) return;
+        setReordering(prev => new Set([...prev, order.orderId]));
+        try {
+            const xsrf = getXsrfToken();
+            await Promise.all(order.items.map(item =>
+                api.post(
+                    `/cart/${user.userId}/items`,
+                    { productId: item.productId, quantity: item.quantity },
+                    { headers: { "X-XSRF-TOKEN": xsrf } }
+                )
+            ));
+            toast.success("Items added to cart");
+            navigate("/cart");
+        } catch (e) {
+            console.log(e);
+            toast.error("Reorder failed — some items may no longer be available.");
+        } finally {
+            setReordering(prev => { const s = new Set(prev); s.delete(order.orderId); return s; });
+        }
+    };
 
     return (
         <div style={{ background: "var(--bg)", minHeight: "100vh", color: "var(--text)", fontFamily: "var(--font-body)" }}>
@@ -274,12 +301,39 @@ const OrdersPage = () => {
                                             ))}
                                         </div>
 
-                                        {/* Order total footer */}
-                                        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-3)", borderTop: "1px dashed var(--border)", display: "flex", justifyContent: "flex-end", alignItems: "baseline", gap: "var(--space-3)" }}>
-                                            <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>Order Total</span>
-                                            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--accent)" }}>
-                                                ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                                            </span>
+                                        {/* Order total footer + Reorder */}
+                                        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-3)", borderTop: "1px dashed var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                                            <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-3)" }}>
+                                                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>Order Total</span>
+                                                <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--accent)" }}>
+                                                    ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={() => handleReorder(order)}
+                                                disabled={reordering.has(order.orderId)}
+                                                style={{
+                                                    display:       "flex",
+                                                    alignItems:    "center",
+                                                    gap:           "var(--space-2)",
+                                                    padding:       "var(--space-2) var(--space-4)",
+                                                    background:    "transparent",
+                                                    border:        "1px solid var(--border)",
+                                                    borderRadius:  "var(--r-sm)",
+                                                    color:         reordering.has(order.orderId) ? "var(--text-4)" : "var(--text-2)",
+                                                    fontFamily:    "var(--font-body)",
+                                                    fontSize:      "var(--text-sm)",
+                                                    fontWeight:    600,
+                                                    cursor:        reordering.has(order.orderId) ? "not-allowed" : "pointer",
+                                                    transition:    "border-color var(--duration-fast), color var(--duration-fast)",
+                                                    flexShrink:    0,
+                                                }}
+                                                onMouseEnter={e => { if (!reordering.has(order.orderId)) { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; } }}
+                                                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                                            >
+                                                <HiRefresh style={{ fontSize: "14px" }} />
+                                                {reordering.has(order.orderId) ? "Adding…" : "Reorder"}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

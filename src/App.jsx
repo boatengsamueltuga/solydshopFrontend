@@ -25,6 +25,8 @@ import OrdersPage from "./pages/OrdersPage";
 import SellerDashboardPage from "./pages/SellerDashboardPage";
 import SellerProductFormPage from "./pages/SellerProductFormPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import UserAccountPage from "./pages/UserAccountPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 
 // Added AdminDashboardPage import
 import AdminDashboardPage from "./pages/AdminDashboardPage";
@@ -226,6 +228,26 @@ function App() {
                 <Route
                     path="/reset-password"
                     element={<ResetPasswordPage />}
+                />
+
+                {/* User account */}
+                <Route
+                    path="/account"
+                    element={
+                        <ProtectedRoute>
+                            <UserAccountPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Order confirmation */}
+                <Route
+                    path="/order-confirmation"
+                    element={
+                        <ProtectedRoute>
+                            <OrderConfirmationPage />
+                        </ProtectedRoute>
+                    }
                 />
 
                 {/* 404 catch-all */}

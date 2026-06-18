@@ -43,6 +43,8 @@ const HomePage = () => {
     const [quickViewProduct, setQuickViewProduct] = useState(null);
     const [filtersOpen,      setFiltersOpen]      = useState(false);
     const [productError,     setProductError]     = useState(null);
+    const [pageNumber,       setPageNumber]       = useState(0);
+    const [totalPages,       setTotalPages]       = useState(1);
 
     const modalRef            = useRef(null);
     const quickViewTriggerRef = useRef(null);
@@ -55,16 +57,17 @@ const HomePage = () => {
         } catch (e) { console.log(e); }
     };
 
-    const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax) => {
+    const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax, page = pageNumber) => {
         dispatch(fetchProductsStart());
         setProductError(null);
         try {
-            let url = "/public/products?";
-            if (kw.trim())    url += `keyword=${kw}&`;
+            let url = `/public/products?pageNumber=${page}&pageSize=12&`;
+            if (kw.trim())    url += `keyword=${encodeURIComponent(kw)}&`;
             if (catId)        url += `categoryId=${catId}&`;
             if (max < 100000) url += `maxPrice=${max}&`;
             const res = await api.get(url);
             dispatch(fetchProductsSuccess(res.data.content));
+            setTotalPages(res.data.totalPages ?? 1);
         } catch (e) {
             dispatch(fetchProductsFailure(e.message));
             setProductError("Failed to load products. Check your connection and try again.");
@@ -86,7 +89,8 @@ const HomePage = () => {
     }, []);
 
     useEffect(() => {
-        const t = setTimeout(() => fetchProducts(), 400);
+        setPageNumber(0);
+        const t = setTimeout(() => fetchProducts(keyword, categoryId, priceMax, 0), 400);
         return () => clearTimeout(t);
     }, [keyword, categoryId, priceMax]);
 
@@ -164,7 +168,14 @@ const HomePage = () => {
         setKeyword("");
         setCategoryId("");
         setPriceMax(100000);
-        fetchProducts("", "", 100000);
+        setPageNumber(0);
+        fetchProducts("", "", 100000, 0);
+    };
+
+    const handlePageChange = (newPage) => {
+        setPageNumber(newPage);
+        fetchProducts(keyword, categoryId, priceMax, newPage);
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const cartItems = cart?.items ?? [];
@@ -312,7 +323,7 @@ const HomePage = () => {
                         style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}
                     >
                         <button
-                            onClick={() => fetchProducts()}
+                            onClick={() => { setPageNumber(0); fetchProducts(keyword, categoryId, priceMax, 0); }}
                             className="flex-1 py-2.5 rounded font-bold text-xs transition-colors hover:opacity-90 min-h-[44px]"
                             style={{ background: "var(--accent)", color: "var(--bg)" }}
                         >
@@ -383,6 +394,7 @@ const HomePage = () => {
                             <p className="text-sm" style={{ color: "var(--text-3)" }}>Try adjusting your filters</p>
                         </div>
                     ) : (
+                        <>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {products.map((product) => (
                                 <article
@@ -514,6 +526,58 @@ const HomePage = () => {
                                 </article>
                             ))}
                         </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-3)", marginTop: "var(--space-6)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--border)" }}>
+                                <button
+                                    onClick={() => handlePageChange(pageNumber - 1)}
+                                    disabled={pageNumber === 0 || loading}
+                                    style={{
+                                        padding:      "var(--space-2) var(--space-4)",
+                                        background:   "var(--surface-mid)",
+                                        border:       "1px solid var(--border)",
+                                        borderRadius: "var(--r-sm)",
+                                        color:        pageNumber === 0 ? "var(--text-4)" : "var(--text-2)",
+                                        fontFamily:   "var(--font-body)",
+                                        fontSize:     "var(--text-sm)",
+                                        fontWeight:   600,
+                                        cursor:       pageNumber === 0 ? "not-allowed" : "pointer",
+                                        transition:   "border-color var(--duration-fast)",
+                                    }}
+                                    onMouseEnter={e => { if (pageNumber > 0) e.currentTarget.style.borderColor = "var(--accent)"; }}
+                                    onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+                                >
+                                    ← Prev
+                                </button>
+
+                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", color: "var(--text-3)" }}>
+                                    {pageNumber + 1} / {totalPages}
+                                </span>
+
+                                <button
+                                    onClick={() => handlePageChange(pageNumber + 1)}
+                                    disabled={pageNumber >= totalPages - 1 || loading}
+                                    style={{
+                                        padding:      "var(--space-2) var(--space-4)",
+                                        background:   "var(--surface-mid)",
+                                        border:       "1px solid var(--border)",
+                                        borderRadius: "var(--r-sm)",
+                                        color:        pageNumber >= totalPages - 1 ? "var(--text-4)" : "var(--text-2)",
+                                        fontFamily:   "var(--font-body)",
+                                        fontSize:     "var(--text-sm)",
+                                        fontWeight:   600,
+                                        cursor:       pageNumber >= totalPages - 1 ? "not-allowed" : "pointer",
+                                        transition:   "border-color var(--duration-fast)",
+                                    }}
+                                    onMouseEnter={e => { if (pageNumber < totalPages - 1) e.currentTarget.style.borderColor = "var(--accent)"; }}
+                                    onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+                                >
+                                    Next →
+                                </button>
+                            </div>
+                        )}
+                        </>
                     )}
                 </section>
 
