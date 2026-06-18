@@ -186,8 +186,7 @@ export default function ProductDetailPage() {
                     .pdp-image-panel { position: static !important; }
                     .pdp-image-inner {
                         aspect-ratio: unset !important;
-                        height: clamp(200px, 56vw, 260px) !important;
-                        padding: var(--space-4) !important;
+                        height: clamp(220px, 56vw, 320px) !important;
                     }
                 }
 
@@ -379,22 +378,28 @@ export default function ProductDetailPage() {
                     <div
                         className="pdp-image-inner"
                         style={{
+                            position:    'relative',
                             aspectRatio: '4 / 3',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 'var(--space-8)',
-                            background: 'var(--surface)',
+                            background:  'var(--surface)',
+                            overflow:    'hidden',
                         }}
                     >
                         {selectedImg ? (
                             <img
                                 src={selectedImg}
                                 alt={product.productName}
-                                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                                style={{
+                                    position:   'absolute',
+                                    inset:      0,
+                                    width:      '100%',
+                                    height:     '100%',
+                                    objectFit:  'contain',
+                                    padding:    'var(--space-8)',
+                                    boxSizing:  'border-box',
+                                }}
                             />
                         ) : (
-                            <div style={{ color: 'var(--text-3)', fontSize: 'var(--text-sm)', textAlign: 'center', userSelect: 'none' }}>
+                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)', fontSize: 'var(--text-sm)', userSelect: 'none' }}>
                                 No image available
                             </div>
                         )}

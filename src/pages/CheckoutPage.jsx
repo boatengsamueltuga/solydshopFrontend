@@ -324,6 +324,15 @@ const CheckoutPage = () => {
     const [step,            setStep]            = useState("address");
     const [shippingAddress, setShippingAddress] = useState("");
 
+    /* Hide any Stripe-injected floating elements when leaving checkout */
+    useEffect(() => {
+        return () => {
+            document.querySelectorAll(
+                '[id*="stripe"],[class*="StripeLink"],[data-stripe-modal]'
+            ).forEach(el => { el.style.display = "none"; });
+        };
+    }, []);
+
     useEffect(() => {
         if (!user?.userId) return;
         api.get(`/cart/${user.userId}`)
@@ -354,6 +363,7 @@ const CheckoutPage = () => {
         amount:             Math.round(totalPrice * 100),
         currency:           "usd",
         paymentMethodTypes: ["card"],
+        wallets:            { applePay: "never", googlePay: "never" },
         appearance: {
             theme: "night",
             variables: {
