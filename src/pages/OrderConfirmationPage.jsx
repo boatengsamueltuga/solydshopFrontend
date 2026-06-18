@@ -138,7 +138,7 @@ const OrderConfirmationPage = () => {
                                 }
                             />
                             {order.shippingAddress && (
-                                <Row label="Ship to" value={<span style={{ color: "var(--text-2)" }}>{order.shippingAddress}</span>} />
+                                <Row label="Ship to" value={<span style={{ color: "var(--text-2)", whiteSpace: "pre-line", display: "block" }}>{order.shippingAddress}</span>} />
                             )}
                         </div>
 
