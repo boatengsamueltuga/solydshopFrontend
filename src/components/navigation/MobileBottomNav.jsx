@@ -75,10 +75,10 @@ const MobileBottomNav = () => {
                     zIndex:     "var(--z-sticky)",
                 }}
             >
-                <NavTab icon={HiHome}        label="Home"    active={path === "/"}        onClick={() => navigate("/")}       />
+                <NavTab icon={HiHome}         label="Home"    active={path === "/"}         onClick={() => navigate("/")}        />
                 <NavTab icon={FaShoppingCart} label="Cart"    active={path === "/cart"}    onClick={() => navigate("/cart")}   />
                 <NavTab icon={HiClipboardList} label="Orders" active={path === "/orders"}  onClick={() => navigate("/orders")} />
-                <NavTab icon={HiUser}        label="Account"  active={false}              onClick={handleLogout}              />
+                <NavTab icon={HiUser}         label="Account" active={path === "/account"} onClick={() => navigate("/account")} />
             </nav>
             <style>{`
                 .mobile-bottom-nav { display: none !important; }
