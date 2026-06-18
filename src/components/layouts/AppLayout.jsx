@@ -7,6 +7,7 @@
 const AppLayout = ({ children }) => {
   return (
     <div
+      className="app-root-body"
       style={{
         minHeight:       '100vh',
         backgroundColor: 'var(--bg)',

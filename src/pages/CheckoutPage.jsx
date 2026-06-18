@@ -10,30 +10,63 @@ import {
     useElements,
 } from "@stripe/react-stripe-js";
 
-import api from "../api/api";
-import Loader from "../components/Loader";
+import api  from "../api/api";
 import toast from "react-hot-toast";
 
-import {
-    Avatar,
-    Box,
-    Button,
-    CircularProgress,
-    Container,
-    Divider,
-    Paper,
-    Stack,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Button, Stack, TextField } from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { CircularProgress } from "@mui/material";
+import { HiArrowLeft, HiCheckCircle, HiCube } from "react-icons/hi";
 
-import LockOutlinedIcon    from "@mui/icons-material/LockOutlined";
-import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
-import ArrowBackIcon       from "@mui/icons-material/ArrowBack";
+/* ── Progress step indicator ── */
+const StepIndicator = ({ step }) => {
+    const steps = ["Shipping", "Payment"];
+    return (
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", padding: "var(--space-4) var(--space-6)", background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
+            {steps.map((label, i) => {
+                const idx    = i + 1;
+                const active = idx === step;
+                const done   = idx < step;
+                return (
+                    <div key={label} style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                        <div style={{
+                            width:          "24px",
+                            height:         "24px",
+                            borderRadius:   "50%",
+                            border:         `2px solid ${active || done ? "var(--accent)" : "var(--border)"}`,
+                            background:     done ? "var(--accent)" : active ? "var(--accent-subtle)" : "transparent",
+                            color:          done ? "var(--bg)" : active ? "var(--accent)" : "var(--text-4)",
+                            display:        "flex",
+                            alignItems:     "center",
+                            justifyContent: "center",
+                            fontSize:       "11px",
+                            fontFamily:     "var(--font-mono)",
+                            fontWeight:     700,
+                            flexShrink:     0,
+                        }}>
+                            {done ? <HiCheckCircle style={{ fontSize: 14 }} /> : idx}
+                        </div>
+                        <span style={{
+                            fontSize:   "13px",
+                            fontFamily: "var(--font-body)",
+                            fontWeight: active ? 600 : 400,
+                            color:      active ? "var(--text)" : done ? "var(--accent)" : "var(--text-4)",
+                        }}>
+                            {label}
+                        </span>
+                        {i < steps.length - 1 && (
+                            <div style={{ width: "32px", height: "1px", background: "var(--border-mid)", margin: "0 var(--space-2)" }} />
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
 /*
 |----------------------------------------------------------
-| Inner form — must be rendered inside <Elements>
+| Inner payment form — rendered inside <Elements>
 |----------------------------------------------------------
 */
 const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) => {
@@ -45,10 +78,7 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
     const [paymentError, setPaymentError] = useState("");
 
     const getXsrfToken = () =>
-        document.cookie
-            .split("; ")
-            .find(row => row.startsWith("XSRF-TOKEN="))
-            ?.split("=")[1];
+        document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -105,67 +135,95 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
         <form onSubmit={handleSubmit}>
 
             {/* Shipping address summary */}
-            <Box
-                sx={{
-                    bgcolor: "grey.50",
-                    border: "1px solid",
-                    borderColor: "divider",
-                    borderRadius: 2,
-                    p: 2,
-                    mb: 3,
-                }}
-            >
-                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                    <Box>
-                        <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
+            <div style={{
+                background:    "var(--surface-high)",
+                border:        "1px solid var(--border)",
+                borderLeft:    "3px solid var(--accent)",
+                borderRadius:  "var(--r-md)",
+                padding:       "var(--space-4)",
+                marginBottom:  "var(--space-5)",
+            }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "var(--space-3)" }}>
+                    <div>
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", margin: "0 0 var(--space-1)" }}>
                             Ships to
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: "pre-line" }}>
+                        </p>
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-2)", margin: 0, whiteSpace: "pre-line", lineHeight: 1.6 }}>
                             {shippingAddress}
-                        </Typography>
-                    </Box>
-                    <Button
-                        size="small"
+                        </p>
+                    </div>
+                    <button
+                        type="button"
                         onClick={onEditAddress}
-                        sx={{ ml: 2, textTransform: "none", flexShrink: 0, fontWeight: 600 }}
+                        style={{ background: "none", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", color: "var(--accent)", fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 600, cursor: "pointer", padding: "4px 10px", flexShrink: 0, transition: "border-color var(--duration-fast)" }}
+                        onMouseEnter={(e) => e.currentTarget.style.borderColor = "var(--accent)"}
+                        onMouseLeave={(e) => e.currentTarget.style.borderColor = "var(--border)"}
                     >
                         Edit
-                    </Button>
-                </Stack>
-            </Box>
+                    </button>
+                </div>
+            </div>
 
-            <Box sx={{ mb: 3 }}>
+            <div style={{ marginBottom: "var(--space-5)" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", marginBottom: "var(--space-3)" }}>
+                    Payment Details
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-4)" }}>
+                    <LockOutlinedIcon sx={{ fontSize: 13, color: "var(--text-3)" }} />
+                    <span style={{ fontSize: "12px", color: "var(--text-3)", fontFamily: "var(--font-body)" }}>Secured by Stripe</span>
+                </div>
                 <PaymentElement />
-            </Box>
+            </div>
 
             {paymentError && (
-                <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+                <p style={{ color: "var(--error)", fontSize: "13px", marginBottom: "var(--space-3)", fontFamily: "var(--font-body)" }}>
                     {paymentError}
-                </Typography>
+                </p>
             )}
 
-            <Button
-                type="submit"
-                variant="contained"
-                color="success"
-                fullWidth
-                size="large"
-                disabled={!stripe || paying}
-                startIcon={paying
-                    ? <CircularProgress size={18} color="inherit" />
-                    : <LockOutlinedIcon />
-                }
-                sx={{
-                    py: 1.5,
-                    fontWeight: 700,
-                    fontSize: "1rem",
-                    textTransform: "none",
-                    borderRadius: 2,
-                }}
-            >
-                {paying ? "Processing..." : `Pay $${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
-            </Button>
-
+            <div style={{ paddingTop: "var(--space-4)", borderTop: "1px solid var(--border)", marginBottom: "var(--space-4)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "var(--space-4)" }}>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)" }}>
+                        Order Total
+                    </span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "22px", color: "var(--text)" }}>
+                        ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </span>
+                </div>
+                <button
+                    type="submit"
+                    disabled={!stripe || paying}
+                    style={{
+                        width:         "100%",
+                        padding:       "var(--space-4)",
+                        background:    !stripe || paying ? "var(--border)" : "var(--accent)",
+                        color:         "var(--bg)",
+                        border:        "none",
+                        borderRadius:  "var(--r-md)",
+                        fontFamily:    "var(--font-body)",
+                        fontWeight:    700,
+                        fontSize:      "14px",
+                        cursor:        !stripe || paying ? "not-allowed" : "pointer",
+                        display:       "flex",
+                        alignItems:    "center",
+                        justifyContent:"center",
+                        gap:           "var(--space-2)",
+                        letterSpacing: "0.02em",
+                    }}
+                >
+                    {paying ? (
+                        <>
+                            <CircularProgress size={14} sx={{ color: "var(--bg)" }} />
+                            Processing…
+                        </>
+                    ) : (
+                        <>
+                            <LockOutlinedIcon sx={{ fontSize: 14 }} />
+                            Pay ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })} →
+                        </>
+                    )}
+                </button>
+            </div>
         </form>
     );
 };
@@ -176,31 +234,22 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
 |----------------------------------------------------------
 */
 const AddressForm = ({ onContinue }) => {
-    const [companyName,  setCompanyName]  = useState("");
-    const [contactName,  setContactName]  = useState("");
-    const [address1,     setAddress1]     = useState("");
-    const [address2,     setAddress2]     = useState("");
-    const [city,         setCity]         = useState("");
-    const [state,        setState]        = useState("");
-    const [zip,          setZip]          = useState("");
-    const [country,      setCountry]      = useState("");
-    const [phone,        setPhone]        = useState("");
+    const [companyName, setCompanyName] = useState("");
+    const [contactName, setContactName] = useState("");
+    const [address1,    setAddress1]    = useState("");
+    const [address2,    setAddress2]    = useState("");
+    const [city,        setCity]        = useState("");
+    const [state,       setState]       = useState("");
+    const [zip,         setZip]         = useState("");
+    const [country,     setCountry]     = useState("");
+    const [phone,       setPhone]       = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        if (
-            !contactName.trim() ||
-            !address1.trim()    ||
-            !city.trim()        ||
-            !state.trim()       ||
-            !zip.trim()         ||
-            !country.trim()
-        ) {
+        if (!contactName.trim() || !address1.trim() || !city.trim() || !state.trim() || !zip.trim() || !country.trim()) {
             toast.error("Please fill in all required fields");
             return;
         }
-
         const lines = [];
         if (companyName.trim()) lines.push(companyName.trim());
         lines.push(contactName.trim());
@@ -209,117 +258,56 @@ const AddressForm = ({ onContinue }) => {
         lines.push(`${city.trim()}, ${state.trim()} ${zip.trim()}`);
         lines.push(country.trim());
         if (phone.trim()) lines.push(`Phone: ${phone.trim()}`);
-        const formatted = lines.join("\n");
-
-        onContinue(formatted);
+        onContinue(lines.join("\n"));
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                Shipping Address
-            </Typography>
-
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", marginBottom: "var(--space-4)" }}>
+                Shipping Details
+            </p>
             <Stack spacing={2}>
-                <TextField
-                    label="Company Name"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    fullWidth
-                    size="small"
-                />
-                <TextField
-                    label="Contact Name"
-                    value={contactName}
-                    onChange={(e) => setContactName(e.target.value)}
-                    fullWidth
-                    size="small"
-                    required
-                />
-                <TextField
-                    label="Address Line 1"
-                    value={address1}
-                    onChange={(e) => setAddress1(e.target.value)}
-                    fullWidth
-                    size="small"
-                    required
-                />
-                <TextField
-                    label="Address Line 2"
-                    value={address2}
-                    onChange={(e) => setAddress2(e.target.value)}
-                    fullWidth
-                    size="small"
-                />
+                <TextField label="Company Name"        value={companyName} onChange={(e) => setCompanyName(e.target.value)} fullWidth size="small" />
+                <TextField label="Contact Name *"      value={contactName} onChange={(e) => setContactName(e.target.value)} fullWidth size="small" required />
+                <TextField label="Address Line 1 *"    value={address1}    onChange={(e) => setAddress1(e.target.value)}    fullWidth size="small" required />
+                <TextField label="Address Line 2"      value={address2}    onChange={(e) => setAddress2(e.target.value)}    fullWidth size="small" />
                 <Stack direction="row" spacing={2}>
-                    <TextField
-                        label="City"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        fullWidth
-                        size="small"
-                        required
-                    />
-                    <TextField
-                        label="State / Province"
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        fullWidth
-                        size="small"
-                        required
-                    />
+                    <TextField label="City *"           value={city}        onChange={(e) => setCity(e.target.value)}        fullWidth size="small" required />
+                    <TextField label="State / Province *" value={state}     onChange={(e) => setState(e.target.value)}       fullWidth size="small" required />
                 </Stack>
                 <Stack direction="row" spacing={2}>
-                    <TextField
-                        label="ZIP / Postal Code"
-                        value={zip}
-                        onChange={(e) => setZip(e.target.value)}
-                        fullWidth
-                        size="small"
-                        required
-                    />
-                    <TextField
-                        label="Country"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        fullWidth
-                        size="small"
-                        required
-                    />
+                    <TextField label="ZIP / Postal Code *" value={zip}     onChange={(e) => setZip(e.target.value)}         fullWidth size="small" required />
+                    <TextField label="Country *"        value={country}     onChange={(e) => setCountry(e.target.value)}     fullWidth size="small" required />
                 </Stack>
-                <TextField
-                    label="Phone (optional)"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    fullWidth
-                    size="small"
-                />
+                <TextField label="Phone (optional)"    value={phone}       onChange={(e) => setPhone(e.target.value)}       fullWidth size="small" />
             </Stack>
 
-            <Button
+            <button
                 type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                size="large"
-                sx={{
-                    mt: 3,
-                    py: 1.5,
-                    fontWeight: 700,
-                    fontSize: "1rem",
-                    textTransform: "none",
-                    borderRadius: 2,
+                style={{
+                    width:         "100%",
+                    padding:       "var(--space-4)",
+                    background:    "var(--accent)",
+                    color:         "var(--bg)",
+                    border:        "none",
+                    borderRadius:  "var(--r-md)",
+                    fontFamily:    "var(--font-body)",
+                    fontWeight:    700,
+                    fontSize:      "14px",
+                    cursor:        "pointer",
+                    marginTop:     "var(--space-5)",
+                    letterSpacing: "0.02em",
                 }}
             >
                 Continue to Payment →
-            </Button>
+            </button>
         </form>
     );
 };
 
 /*
 |----------------------------------------------------------
-| Page wrapper — fetches cart total, then renders Elements
+| Page wrapper
 |----------------------------------------------------------
 */
 const CheckoutPage = () => {
@@ -331,153 +319,195 @@ const CheckoutPage = () => {
         []
     );
 
-    const [totalPrice,      setTotalPrice]      = useState(null);
+    const [cart,            setCart]            = useState(null);
     const [loading,         setLoading]         = useState(true);
-    const [step,            setStep]            = useState("address");   // "address" | "payment"
+    const [step,            setStep]            = useState("address");
     const [shippingAddress, setShippingAddress] = useState("");
 
     useEffect(() => {
         if (!user?.userId) return;
         api.get(`/cart/${user.userId}`)
-            .then(res => setTotalPrice(Number(res.data.totalPrice ?? 0)))
+            .then(res => setCart(res.data))
             .catch(() => toast.error("Could not load cart"))
             .finally(() => setLoading(false));
     }, [user]);
 
-    if (loading) {
-        return (
-            <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2, bgcolor: "grey.50" }}>
-                <Loader />
-                <Typography variant="h6" color="text.secondary">Preparing checkout...</Typography>
-            </Box>
-        );
-    }
+    if (loading) return (
+        <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "var(--space-3)" }}>
+            <div className="solyd-spinner" />
+            <p style={{ color: "var(--text-3)", fontFamily: "var(--font-body)", fontSize: "14px" }}>Preparing checkout…</p>
+            <style>{`@keyframes solyd-spin { to { transform: rotate(360deg); } } .solyd-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: solyd-spin 0.8s linear infinite; }`}</style>
+        </div>
+    );
 
-    if (!totalPrice || totalPrice === 0) {
-        return (
-            <Box sx={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", bgcolor: "grey.50" }}>
-                <Typography variant="h6" color="text.secondary">Your cart is empty.</Typography>
-            </Box>
-        );
-    }
+    const totalPrice = Number(cart?.totalPrice ?? 0);
+    const cartItems  = cart?.items ?? [];
+
+    if (!totalPrice || totalPrice === 0) return (
+        <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <p style={{ color: "var(--text-3)", fontFamily: "var(--font-body)" }}>Your cart is empty.</p>
+        </div>
+    );
 
     const elementsOptions = {
         mode:               "payment",
         amount:             Math.round(totalPrice * 100),
         currency:           "usd",
         paymentMethodTypes: ["card"],
+        appearance: {
+            theme: "night",
+            variables: {
+                colorPrimary:    "#c87940",
+                colorBackground: "#3d3225",
+                colorText:       "#f0ede8",
+                colorDanger:     "#8b2020",
+                fontFamily:      "'IBM Plex Sans', system-ui, sans-serif",
+                borderRadius:    "4px",
+            },
+        },
     };
 
-    const handleAddressContinue = (formatted) => {
-        setShippingAddress(formatted);
-        setStep("payment");
-    };
-
-    const handleEditAddress = () => {
-        setStep("address");
-    };
+    const stepNum = step === "address" ? 1 : 2;
 
     return (
-        <Box sx={{ bgcolor: "grey.50", minHeight: "100vh" }}>
+        <div style={{ background: "var(--bg)", minHeight: "100vh", color: "var(--text)", fontFamily: "var(--font-body)" }}>
 
-            {/* Banner */}
-            <Box
-                sx={{
-                    background: "linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%)",
-                    color: "white",
-                    px: { xs: 3, sm: 5, md: 8 },
-                    py: { xs: 4, md: 6 },
-                }}
-            >
-                <Stack direction="row" alignItems="center" spacing={2}>
-                    <Avatar sx={{ bgcolor: "rgba(255,255,255,0.15)", width: 56, height: 56 }}>
-                        <PaymentOutlinedIcon sx={{ fontSize: 30 }} />
-                    </Avatar>
-                    <Box>
-                        <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: "1.6rem", md: "2.2rem" } }}>
-                            Checkout
-                        </Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.75, mt: 0.25 }}>
-                            Complete your purchase securely with Stripe
-                        </Typography>
-                    </Box>
-                </Stack>
-            </Box>
+            {/* ── Page Header ── */}
+            <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "var(--space-6) var(--space-8)" }}>
+                <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-3xl)", color: "var(--text)", margin: 0, letterSpacing: "-0.01em" }}>
+                    CHECKOUT
+                </h1>
+            </div>
 
-            <Container maxWidth="sm" sx={{ py: { xs: 3, md: 5 } }}>
+            {/* ── Step Indicator ── */}
+            <StepIndicator step={stepNum} />
 
-                {/* Back to cart */}
-                <Button
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate("/cart")}
-                    sx={{ mb: 3, textTransform: "none", color: "text.secondary", fontWeight: 600 }}
+            {/* ── Content ── */}
+            <div style={{ maxWidth: "960px", margin: "0 auto", padding: "var(--space-6)" }}>
+
+                {/* Back link */}
+                <button
+                    onClick={() => step === "payment" ? setStep("address") : navigate("/cart")}
+                    style={{
+                        background:  "none",
+                        border:      "none",
+                        cursor:      "pointer",
+                        color:       "var(--text-3)",
+                        fontFamily:  "var(--font-body)",
+                        fontSize:    "13px",
+                        display:     "flex",
+                        alignItems:  "center",
+                        gap:         "var(--space-2)",
+                        padding:     0,
+                        marginBottom:"var(--space-5)",
+                        transition:  "color var(--duration-fast)",
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = "var(--accent)"}
+                    onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-3)"}
                 >
-                    Back to Cart
-                </Button>
+                    <HiArrowLeft style={{ fontSize: 14 }} />
+                    {step === "payment" ? "Back to Shipping" : "Back to Cart"}
+                </button>
 
-                <Paper elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+                {/* ── Two-column layout ── */}
+                <div className="checkout-grid" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "var(--space-6)" }}>
 
-                    {/* Accent bar */}
-                    <Box sx={{ height: 4, bgcolor: "success.main" }} />
+                    {/* ── Form column ── */}
+                    <div>
+                        <div style={{
+                            background:   "var(--surface-mid)",
+                            border:       "1px solid var(--border)",
+                            borderRadius: "var(--r-md)",
+                            padding:      "var(--space-6)",
+                        }}>
+                            {step === "address" && (
+                                <AddressForm onContinue={(formatted) => { setShippingAddress(formatted); setStep("payment"); }} />
+                            )}
 
-                    <Box sx={{ p: 3 }}>
-
-                        {/* Order total summary */}
-                        <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                            Order Summary
-                        </Typography>
-
-                        <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                            <Typography variant="body2" color="text.secondary">Subtotal</Typography>
-                            <Typography variant="body2" fontWeight={600}>
-                                ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                            </Typography>
-                        </Stack>
-
-                        <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
-                            <Typography variant="body2" color="text.secondary">Shipping</Typography>
-                            <Typography variant="body2" fontWeight={600} color="success.main">Free</Typography>
-                        </Stack>
-
-                        <Divider sx={{ mb: 2 }} />
-
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-                            <Typography variant="subtitle1" fontWeight="bold">Total</Typography>
-                            <Typography variant="h5" fontWeight="bold" color="success.main">
-                                ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                            </Typography>
-                        </Stack>
-
-                        <Divider sx={{ mb: 3 }} />
-
-                        {/* Step 1: Address form */}
-                        {step === "address" && (
-                            <AddressForm onContinue={handleAddressContinue} />
-                        )}
-
-                        {/* Step 2: Stripe payment form */}
-                        {step === "payment" && (
-                            <>
-                                <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                                    Payment Details
-                                </Typography>
-
+                            {step === "payment" && (
                                 <Elements stripe={stripePromise} options={elementsOptions}>
                                     <CheckoutForm
                                         totalPrice={totalPrice}
                                         userId={user.userId}
                                         shippingAddress={shippingAddress}
-                                        onEditAddress={handleEditAddress}
+                                        onEditAddress={() => setStep("address")}
                                     />
                                 </Elements>
-                            </>
-                        )}
+                            )}
+                        </div>
+                    </div>
 
-                    </Box>
-                </Paper>
+                    {/* ── Order Summary column ── */}
+                    <div className="checkout-summary" style={{ alignSelf: "start" }}>
+                        <div style={{
+                            background:   "var(--surface-mid)",
+                            border:       "1px solid var(--border)",
+                            borderRadius: "var(--r-md)",
+                            overflow:     "hidden",
+                        }}>
+                            <div style={{ padding: "var(--space-4) var(--space-5)", borderBottom: "1px solid var(--border)" }}>
+                                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", margin: 0 }}>
+                                    Your Order
+                                </p>
+                            </div>
 
-            </Container>
-        </Box>
+                            <div style={{ padding: "var(--space-4) var(--space-5)" }}>
+                                {cartItems.map((item, i) => (
+                                    <div
+                                        key={item.productId ?? i}
+                                        style={{
+                                            display:       "flex",
+                                            alignItems:    "center",
+                                            gap:           "var(--space-3)",
+                                            padding:       "var(--space-3) 0",
+                                            borderBottom:  i < cartItems.length - 1 ? "1px solid var(--border-subtle)" : "none",
+                                        }}
+                                    >
+                                        <div style={{ width: "36px", height: "36px", background: "var(--surface-high)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            {item.imageUrl ? (
+                                                <img src={item.imageUrl} alt={item.productName} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                                            ) : (
+                                                <HiCube style={{ fontSize: "16px", color: "var(--text-4)" }} />
+                                            )}
+                                        </div>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                                {item.productName}
+                                            </p>
+                                            <p style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-3)", margin: 0 }}>
+                                                Qty: {item.quantity}
+                                            </p>
+                                        </div>
+                                        <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 600, color: "var(--text)", flexShrink: 0 }}>
+                                            ${(Number(item.price) * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div style={{ padding: "var(--space-4) var(--space-5)", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                                <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)" }}>
+                                    Total
+                                </span>
+                                <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "18px", color: "var(--text)" }}>
+                                    ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <style>{`
+                @keyframes solyd-spin { to { transform: rotate(360deg); } }
+                .solyd-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: solyd-spin 0.8s linear infinite; }
+                @media (min-width: 768px) {
+                    .checkout-grid { grid-template-columns: 3fr 2fr !important; }
+                    .checkout-summary { position: sticky; top: 24px; }
+                }
+            `}</style>
+        </div>
     );
 };
 

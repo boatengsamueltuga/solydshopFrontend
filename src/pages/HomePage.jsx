@@ -11,44 +11,22 @@ import {
     fetchProductsFailure,
 } from "../features/product/productSlice";
 
-// ── Design tokens ────────────────────────────────────────────
-const C = {
-    bg:          "#0D1B2A",
-    surface:     "#1B2A3D",
-    surfaceHigh: "#243447",
-    border:      "#2D4263",
-    text:        "#dee3e8",
-    textMuted:   "#bdc8d1",
-    textDim:     "#87929a",
-    primary:     "#8ed5ff",
-    btnBg:       "#38bdf8",
-    btnText:     "#003a57",
-    error:       "#ffb4ab",
-    footer:      "#091522",
-};
-
 const getXsrfToken = () =>
-    document.cookie
-        .split("; ")
-        .find((r) => r.startsWith("XSRF-TOKEN="))
-        ?.split("=")[1];
+    document.cookie.split("; ").find((r) => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
 
-// ── Skeleton card ────────────────────────────────────────────
+/* ── Skeleton card ── */
 const SkeletonCard = () => (
-    <div
-        className="rounded overflow-hidden animate-pulse"
-        style={{ background: C.surface, border: `1px solid ${C.border}` }}
-    >
-        <div className="h-32 w-full" style={{ background: C.surfaceHigh }} />
+    <div className="rounded overflow-hidden animate-pulse" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+        <div className="h-32 w-full" style={{ background: "var(--surface-high)" }} />
         <div className="p-3 space-y-2">
-            <div className="h-2.5 rounded w-4/5" style={{ background: C.surfaceHigh }} />
-            <div className="h-2.5 rounded w-3/5" style={{ background: C.surfaceHigh }} />
-            <div className="h-7 rounded mt-3" style={{ background: C.surfaceHigh }} />
+            <div className="h-2.5 rounded w-4/5" style={{ background: "var(--surface-high)" }} />
+            <div className="h-2.5 rounded w-3/5" style={{ background: "var(--surface-high)" }} />
+            <div className="h-7 rounded mt-3" style={{ background: "var(--surface-high)" }} />
         </div>
     </div>
 );
 
-// ── Main component ───────────────────────────────────────────
+/* ── Main component ── */
 const HomePage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -69,14 +47,12 @@ const HomePage = () => {
     const modalRef            = useRef(null);
     const quickViewTriggerRef = useRef(null);
 
-    // ── Fetchers ─────────────────────────────────────────────
+    /* ── Fetchers ── */
     const fetchCategories = async () => {
         try {
             const res = await api.get("/public/categories?pageSize=1000");
             setCategories(res.data.content);
-        } catch (e) {
-            console.log(e);
-        }
+        } catch (e) { console.log(e); }
     };
 
     const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax) => {
@@ -100,9 +76,7 @@ const HomePage = () => {
         try {
             const res = await api.get(`/cart/${user.userId}`);
             setCart(res.data);
-        } catch (e) {
-            console.log(e);
-        }
+        } catch (e) { console.log(e); }
     };
 
     useEffect(() => {
@@ -116,7 +90,7 @@ const HomePage = () => {
         return () => clearTimeout(t);
     }, [keyword, categoryId, priceMax]);
 
-    // ── Quick View focus management ───────────────────────────
+    /* ── Quick View focus management ── */
     useEffect(() => {
         if (!quickViewProduct || !modalRef.current) return;
         const focusable = modalRef.current.querySelectorAll(
@@ -149,12 +123,12 @@ const HomePage = () => {
             if (e.shiftKey) {
                 if (document.activeElement === first) { e.preventDefault(); last.focus(); }
             } else {
-                if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+                if (document.activeElement === last) { e.preventDefault(); first.focus(); }
             }
         }
     };
 
-    // ── Cart actions ──────────────────────────────────────────
+    /* ── Cart actions ── */
     const handleAddToCart = async (productId) => {
         if (!user) { toast.error("Please login to add items to cart"); return; }
         setCartBusy(true);
@@ -166,11 +140,8 @@ const HomePage = () => {
             );
             toast.success("Added to cart");
             await fetchCart();
-        } catch (e) {
-            console.log(e);
-        } finally {
-            setCartBusy(false);
-        }
+        } catch (e) { console.log(e); }
+        finally { setCartBusy(false); }
     };
 
     const handleRemoveFromCart = async (productId) => {
@@ -182,11 +153,8 @@ const HomePage = () => {
                 { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
             await fetchCart();
-        } catch (e) {
-            console.log(e);
-        } finally {
-            setCartBusy(false);
-        }
+        } catch (e) { console.log(e); }
+        finally { setCartBusy(false); }
     };
 
     const handleCategoryToggle = (id) =>
@@ -203,66 +171,66 @@ const HomePage = () => {
     const cartTotal = Number(cart?.totalPrice ?? 0);
     const itemCount = cartItems.reduce((s, i) => s + i.quantity, 0);
 
-    // ── Render ────────────────────────────────────────────────
+    /* ── Render ── */
     return (
         <div
             className="min-h-screen flex flex-col"
-            style={{ background: C.bg, color: C.text, fontFamily: "Inter, sans-serif" }}
+            style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}
         >
-            {/* ══ Three-column main ══════════════════════════════════ */}
+            {/* ══ Three-column main ══ */}
             <main className="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-12 gap-6 py-6">
 
-                {/* ── Mobile filter toggle ────────────────────────── */}
+                {/* ── Mobile filter toggle ── */}
                 <div className="col-span-12 lg:hidden">
                     <button
                         onClick={() => setFiltersOpen((o) => !o)}
                         aria-expanded={filtersOpen}
                         aria-controls="filters-aside"
                         className="w-full py-3 rounded font-bold text-sm flex items-center justify-center gap-2 transition-colors hover:opacity-90 min-h-[44px]"
-                        style={{ background: C.surfaceHigh, border: `1px solid ${C.border}`, color: C.text }}
+                        style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)" }}
                     >
                         <HiSearch aria-hidden="true" size={16} />
                         {filtersOpen ? "Hide Filters" : "Show Filters"}
                     </button>
                 </div>
 
-                {/* ── LEFT: Filters card ──────────────────────────── */}
+                {/* ── LEFT: Filters ── */}
                 <aside
                     id="filters-aside"
                     className={`${filtersOpen ? "flex" : "hidden"} lg:flex flex-col col-span-12 lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-112px)] rounded overflow-hidden`}
-                    style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                    style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
                 >
                     {/* Card header */}
                     <div
                         className="flex items-center gap-2 px-4 py-3 flex-shrink-0"
-                        style={{ background: C.surfaceHigh, borderBottom: `1px solid ${C.border}` }}
+                        style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}
                     >
-                        <HiAdjustments aria-hidden="true" size={16} style={{ color: C.textDim }} />
-                        <h2 className="text-sm font-bold" style={{ color: C.text }}>Filters</h2>
+                        <HiAdjustments aria-hidden="true" size={16} style={{ color: "var(--text-3)" }} />
+                        <h2 className="text-sm font-bold" style={{ color: "var(--text)" }}>Filters</h2>
                     </div>
 
                     {/* Scrollable body */}
                     <div
                         className="flex-grow overflow-y-auto p-4 space-y-5"
-                        style={{ scrollbarWidth: "thin", scrollbarColor: `${C.border} ${C.bg}` }}
+                        style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) var(--bg)" }}
                     >
                         {/* Categories */}
                         <div>
-                            <p className="text-xs font-semibold mb-2" style={{ color: C.textDim }}>
+                            <p className="text-xs font-semibold mb-2" style={{ color: "var(--text-3)" }}>
                                 Category
                             </p>
                             <div className="space-y-0.5">
                                 <label
                                     className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer transition-colors"
-                                    style={{ color: categoryId === "" ? C.primary : C.textMuted }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(48,53,57,0.4)")}
+                                    style={{ color: categoryId === "" ? "var(--accent)" : "var(--text-2)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
                                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                 >
                                     <input
                                         type="checkbox"
                                         checked={categoryId === ""}
                                         onChange={() => setCategoryId("")}
-                                        style={{ accentColor: C.btnBg }}
+                                        style={{ accentColor: "var(--accent)" }}
                                     />
                                     All Categories
                                 </label>
@@ -270,15 +238,15 @@ const HomePage = () => {
                                     <label
                                         key={cat.categoryId}
                                         className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer transition-colors"
-                                        style={{ color: categoryId === String(cat.categoryId) ? C.primary : C.textMuted }}
-                                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(48,53,57,0.4)")}
+                                        style={{ color: categoryId === String(cat.categoryId) ? "var(--accent)" : "var(--text-2)" }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
                                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                     >
                                         <input
                                             type="checkbox"
                                             checked={categoryId === String(cat.categoryId)}
                                             onChange={() => handleCategoryToggle(cat.categoryId)}
-                                            style={{ accentColor: C.btnBg }}
+                                            style={{ accentColor: "var(--accent)" }}
                                         />
                                         {cat.categoryName}
                                     </label>
@@ -287,11 +255,11 @@ const HomePage = () => {
                         </div>
 
                         {/* Price Range */}
-                        <div className="pt-4" style={{ borderTop: `1px solid ${C.border}` }}>
+                        <div className="pt-4" style={{ borderTop: "1px solid var(--border)" }}>
                             <label
                                 htmlFor="price-range"
                                 className="block text-xs font-semibold mb-3"
-                                style={{ color: C.textDim }}
+                                style={{ color: "var(--text-3)" }}
                             >
                                 Price range (USD)
                             </label>
@@ -304,17 +272,17 @@ const HomePage = () => {
                                 onChange={(e) => setPriceMax(Number(e.target.value))}
                                 aria-valuetext={`Up to $${Number(priceMax).toLocaleString()}`}
                                 className="w-full h-1 rounded-lg appearance-none cursor-pointer"
-                                style={{ accentColor: C.btnBg, background: "#39485a" }}
+                                style={{ accentColor: "var(--accent)", background: "var(--border-mid)" }}
                             />
-                            <div className="flex justify-between mt-2 text-[10px]" style={{ color: C.textMuted }}>
+                            <div className="flex justify-between mt-2 text-[10px]" style={{ color: "var(--text-2)" }}>
                                 <span>$0</span>
-                                <span>${Number(priceMax).toLocaleString()}+</span>
+                                <span style={{ fontFamily: "var(--font-mono)" }}>${Number(priceMax).toLocaleString()}+</span>
                             </div>
                         </div>
 
-                        {/* Availability — coming soon, not yet wired */}
-                        <div className="pt-4" style={{ borderTop: `1px solid ${C.border}` }}>
-                            <p className="text-xs font-semibold mb-3" style={{ color: C.textDim }}>
+                        {/* Availability */}
+                        <div className="pt-4" style={{ borderTop: "1px solid var(--border)" }}>
+                            <p className="text-xs font-semibold mb-3" style={{ color: "var(--text-3)" }}>
                                 Availability
                             </p>
                             <div className="flex flex-wrap gap-2">
@@ -322,7 +290,7 @@ const HomePage = () => {
                                     disabled
                                     aria-disabled="true"
                                     className="px-2 py-1 rounded-sm text-[10px] font-bold opacity-40 cursor-not-allowed"
-                                    style={{ background: "rgba(15,58,43,0.9)", color: "#86efac", border: "1px solid #166534" }}
+                                    style={{ background: "var(--success-subtle)", color: "var(--success)", border: "1px solid var(--success)" }}
                                 >
                                     In Stock
                                 </button>
@@ -330,7 +298,7 @@ const HomePage = () => {
                                     disabled
                                     aria-disabled="true"
                                     className="px-2 py-1 rounded-sm text-[10px] font-bold opacity-40 cursor-not-allowed"
-                                    style={{ background: C.surfaceHigh, color: C.textMuted, border: `1px solid ${C.border}` }}
+                                    style={{ background: "var(--surface-high)", color: "var(--text-2)", border: "1px solid var(--border)" }}
                                 >
                                     On Demand
                                 </button>
@@ -338,60 +306,58 @@ const HomePage = () => {
                         </div>
                     </div>
 
-                    {/* Pinned footer — Apply / Reset */}
+                    {/* Footer — Apply / Reset */}
                     <div
                         className="flex gap-2 p-4 flex-shrink-0"
-                        style={{ borderTop: `1px solid ${C.border}`, background: "rgba(9,21,34,0.6)" }}
+                        style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}
                     >
                         <button
                             onClick={() => fetchProducts()}
                             className="flex-1 py-2.5 rounded font-bold text-xs transition-colors hover:opacity-90 min-h-[44px]"
-                            style={{ background: C.btnBg, color: C.btnText }}
+                            style={{ background: "var(--accent)", color: "var(--bg)" }}
                         >
                             Apply Filters
                         </button>
                         <button
                             onClick={handleReset}
                             className="px-4 py-2.5 rounded font-bold text-xs transition-colors hover:opacity-80 min-h-[44px]"
-                            style={{ border: `1px solid ${C.border}`, color: C.primary, background: "transparent" }}
+                            style={{ border: "1px solid var(--border)", color: "var(--accent)", background: "transparent" }}
                         >
                             Reset
                         </button>
                     </div>
                 </aside>
 
-                {/* ── CENTER: Products ─────────────────────────────── */}
+                {/* ── CENTER: Products ── */}
                 <section className="col-span-12 lg:col-span-6 flex flex-col">
                     {/* Section header */}
-                    <div className="mb-4 pb-3" style={{ borderBottom: `1px solid ${C.border}` }}>
-                        <h1 className="text-xl font-semibold inline-block relative" style={{ color: C.text }}>
-                            Featured Products
+                    <div className="mb-4 pb-3" style={{ borderBottom: "1px solid var(--border)" }}>
+                        <h1 className="text-xl font-semibold inline-block relative" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>
+                            Featured Parts
                             <span
                                 className="absolute bottom-[-13px] left-0 w-1/2 h-[3px] rounded-t"
-                                style={{ background: C.primary }}
+                                style={{ background: "var(--accent)" }}
                             />
                         </h1>
                     </div>
 
                     {/* Search */}
                     <div className="mb-4">
-                        <label htmlFor="product-search" className="sr-only">
-                            Search products or part numbers
-                        </label>
+                        <label htmlFor="product-search" className="sr-only">Search parts by name, model, or number</label>
                         <input
                             id="product-search"
                             type="text"
-                            placeholder="Search products or part numbers..."
+                            placeholder="Search by part name, model, or number..."
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
                             className="w-full px-4 py-2 text-sm rounded focus:outline-none"
-                            style={{ background: C.surfaceHigh, border: `1px solid ${C.border}`, color: C.text }}
-                            onFocus={(e) => (e.target.style.borderColor = C.primary)}
-                            onBlur={(e)  => (e.target.style.borderColor = C.border)}
+                            style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)", fontFamily: "var(--font-body)" }}
+                            onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
+                            onBlur={(e)  => (e.target.style.borderColor = "var(--border)")}
                         />
                     </div>
 
-                    {/* Screen-reader product count announcement */}
+                    {/* Screen-reader count */}
                     <div aria-live="polite" aria-atomic="true" className="sr-only">
                         {!loading && !productError && `${products.length} products`}
                     </div>
@@ -402,19 +368,19 @@ const HomePage = () => {
                         </div>
                     ) : productError ? (
                         <div className="py-20 text-center">
-                            <p className="text-base mb-4" style={{ color: C.error }}>{productError}</p>
+                            <p className="text-base mb-4" style={{ color: "var(--error)" }}>{productError}</p>
                             <button
                                 onClick={() => fetchProducts()}
                                 className="px-5 py-2 rounded text-sm font-bold transition-opacity hover:opacity-90 min-h-[44px]"
-                                style={{ background: C.btnBg, color: C.btnText }}
+                                style={{ background: "var(--accent)", color: "var(--bg)" }}
                             >
                                 Try again
                             </button>
                         </div>
                     ) : products.length === 0 ? (
                         <div className="py-20 text-center">
-                            <p className="text-lg mb-2" style={{ color: C.textMuted }}>No products found</p>
-                            <p className="text-sm" style={{ color: C.textDim }}>Try adjusting your filters</p>
+                            <p className="text-lg mb-2" style={{ color: "var(--text-2)" }}>No products found</p>
+                            <p className="text-sm" style={{ color: "var(--text-3)" }}>Try adjusting your filters</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -422,14 +388,14 @@ const HomePage = () => {
                                 <article
                                     key={product.productId}
                                     className="rounded overflow-hidden flex flex-col transition-colors duration-200"
-                                    style={{ background: C.surface, border: `1px solid ${C.border}` }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.primary; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.border; }}
+                                    style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
                                 >
-                                    {/* Image */}
+                                    {/* Product image */}
                                     <div
                                         className="h-32 w-full relative overflow-hidden group"
-                                        style={{ background: C.bg, borderBottom: `1px solid ${C.border}` }}
+                                        style={{ background: "var(--bg)", borderBottom: "1px solid var(--border)" }}
                                     >
                                         {product.imageUrl ? (
                                             <img
@@ -441,33 +407,33 @@ const HomePage = () => {
                                         ) : (
                                             <div
                                                 className="w-full h-full flex items-center justify-center text-3xl"
-                                                style={{ color: C.textDim }}
+                                                style={{ color: "var(--text-4)" }}
                                                 aria-hidden="true"
                                             >
                                                 &#128230;
                                             </div>
                                         )}
 
-                                        {/* SKU badge — top left */}
+                                        {/* Model badge — top left */}
                                         <div
                                             className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-bold rounded-sm z-10"
-                                            style={{ background: C.surface, color: C.text, border: `1px solid ${C.border}` }}
+                                            style={{ background: "var(--surface-mid)", color: "var(--text-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)" }}
                                         >
-                                            {product.modelNumber || product.categoryName || "PRODUCT"}
+                                            {product.modelNumber || product.categoryName || "PART"}
                                         </div>
 
                                         {/* Stock badge — top right */}
                                         {product.quantity > 0 ? (
                                             <div
                                                 className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded-sm z-10"
-                                                style={{ background: "rgba(15,58,43,0.9)", color: "#86efac", border: "1px solid #166534" }}
+                                                style={{ background: "var(--success-subtle)", color: "var(--success)", border: "1px solid var(--success)" }}
                                             >
                                                 IN STOCK
                                             </div>
                                         ) : (
                                             <div
                                                 className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded-sm z-10"
-                                                style={{ background: "rgba(100,0,0,0.85)", color: C.error, border: "1px solid #93000a" }}
+                                                style={{ background: "var(--error-subtle)", color: "var(--error)", border: "1px solid var(--error)" }}
                                             >
                                                 OUT
                                             </div>
@@ -478,7 +444,7 @@ const HomePage = () => {
                                             <button
                                                 onClick={(e) => openQuickView(e, product)}
                                                 className="flex items-center gap-1.5 px-4 py-2 rounded text-xs font-bold min-h-[44px]"
-                                                style={{ background: "rgba(255,255,255,0.95)", color: C.btnText, border: `1px solid ${C.border}` }}
+                                                style={{ background: "rgba(255,255,255,0.95)", color: "var(--bg)", border: "1px solid var(--border)" }}
                                             >
                                                 Quick View
                                             </button>
@@ -498,25 +464,39 @@ const HomePage = () => {
 
                                     {/* Info */}
                                     <div className="p-3 flex flex-col flex-grow">
-                                        <h3 className="text-xs font-bold mb-1 leading-snug line-clamp-2">
+                                        <h3 className="text-xs font-bold mb-1 leading-snug line-clamp-2" style={{ fontFamily: "var(--font-display)" }}>
                                             <Link
                                                 to={`/products/${product.productId}`}
-                                                style={{ color: C.text, textDecoration: "none" }}
-                                                onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
-                                                onMouseLeave={(e) => (e.currentTarget.style.color = C.text)}
+                                                style={{ color: "var(--text)", textDecoration: "none" }}
+                                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+                                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text)")}
                                             >
                                                 {product.productName}
                                             </Link>
                                         </h3>
-                                        <p className="text-[11px] mb-3 line-clamp-2" style={{ color: C.textMuted }}>
+
+                                        <p className="text-[11px] mb-2 line-clamp-2" style={{ color: "var(--text-2)" }}>
                                             {product.description}
                                         </p>
-                                        <div className="mt-auto flex flex-col gap-2 pt-2" style={{ borderTop: `1px solid rgba(62,72,79,0.4)` }}>
+
+                                        {/* Part number */}
+                                        {product.partNumber && (
+                                            <div className="mb-2">
+                                                <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>
+                                                    Part No.
+                                                </span>
+                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--accent)", fontWeight: 500 }}>
+                                                    {product.partNumber}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div className="mt-auto flex flex-col gap-2 pt-2" style={{ borderTop: "1px solid var(--border-subtle)" }}>
                                             <div>
-                                                <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: C.textDim }}>
+                                                <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>
                                                     Unit Price
                                                 </span>
-                                                <span className="text-sm font-bold" style={{ color: C.primary }}>
+                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>
                                                     ${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                                 </span>
                                             </div>
@@ -524,7 +504,7 @@ const HomePage = () => {
                                                 disabled={product.quantity === 0 || cartBusy}
                                                 onClick={() => handleAddToCart(product.productId)}
                                                 className="w-full py-2 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity motion-reduce:transition-none disabled:opacity-40 min-h-[44px]"
-                                                style={{ background: C.btnBg, color: C.btnText }}
+                                                style={{ background: "var(--accent)", color: "var(--bg)", fontFamily: "var(--font-body)" }}
                                             >
                                                 <FaShoppingCart aria-hidden="true" size={12} />
                                                 {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
@@ -537,25 +517,25 @@ const HomePage = () => {
                     )}
                 </section>
 
-                {/* ── RIGHT: Mini Cart card ────────────────────────── */}
+                {/* ── RIGHT: Mini Cart ── */}
                 <aside className="col-span-12 lg:col-span-3">
                     <div
                         className="rounded overflow-hidden flex flex-col lg:sticky lg:top-24 lg:max-h-[calc(100vh-112px)]"
-                        style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
                     >
                         {/* Cart header */}
                         <div
                             className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-                            style={{ background: C.surfaceHigh, borderBottom: `1px solid ${C.border}` }}
+                            style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}
                         >
                             <div className="flex items-center gap-2">
-                                <FaShoppingCart aria-hidden="true" size={14} style={{ color: C.textDim }} />
-                                <h2 className="text-sm font-bold" style={{ color: C.text }}>Your Cart</h2>
+                                <FaShoppingCart aria-hidden="true" size={14} style={{ color: "var(--text-3)" }} />
+                                <h2 className="text-sm font-bold" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>Your Cart</h2>
                             </div>
                             {itemCount > 0 && (
                                 <span
                                     className="text-[10px] font-bold px-2 py-0.5 rounded"
-                                    style={{ background: "rgba(142,213,255,0.2)", color: C.primary }}
+                                    style={{ background: "var(--accent-subtle)", color: "var(--accent)", fontFamily: "var(--font-mono)" }}
                                     aria-live="polite"
                                 >
                                     {itemCount} {itemCount === 1 ? "ITEM" : "ITEMS"}
@@ -566,50 +546,46 @@ const HomePage = () => {
                         {/* Items list */}
                         <div
                             className="flex-grow overflow-y-auto p-3 space-y-3"
-                            style={{ scrollbarWidth: "thin", scrollbarColor: `${C.border} ${C.bg}` }}
+                            style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) var(--bg)" }}
                         >
                             {!user ? (
-                                <p className="text-sm text-center py-10" style={{ color: C.textDim }}>
+                                <p className="text-sm text-center py-10" style={{ color: "var(--text-3)" }}>
                                     Login to view your cart
                                 </p>
                             ) : cartItems.length === 0 ? (
                                 <div className="text-center py-10">
-                                    <FaShoppingCart aria-hidden="true" size={28} className="mx-auto mb-3" style={{ color: C.textDim }} />
-                                    <p className="text-sm mb-1" style={{ color: C.textMuted }}>Cart is empty</p>
-                                    <p className="text-xs" style={{ color: C.textDim }}>Add products to get started</p>
+                                    <FaShoppingCart aria-hidden="true" size={28} className="mx-auto mb-3" style={{ color: "var(--text-4)" }} />
+                                    <p className="text-sm mb-1" style={{ color: "var(--text-2)" }}>Cart is empty</p>
+                                    <p className="text-xs" style={{ color: "var(--text-3)" }}>Add products to get started</p>
                                 </div>
                             ) : (
                                 cartItems.map((item) => (
                                     <div
                                         key={item.productId}
                                         className="flex gap-2 p-2 rounded relative"
-                                        style={{ background: C.bg, border: `1px solid ${C.border}` }}
+                                        style={{ background: "var(--bg)", border: "1px solid var(--border)" }}
                                     >
                                         {/* Thumbnail */}
                                         <div
                                             className="w-12 h-12 rounded flex-shrink-0 overflow-hidden flex items-center justify-center"
-                                            style={{ background: C.surfaceHigh, border: `1px solid ${C.border}` }}
+                                            style={{ background: "var(--surface-high)", border: "1px solid var(--border)" }}
                                         >
                                             {item.imageUrl ? (
-                                                <img
-                                                    src={item.imageUrl}
-                                                    alt={item.productName}
-                                                    className="w-full h-full object-contain"
-                                                />
+                                                <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-contain" />
                                             ) : (
-                                                <span aria-hidden="true" className="text-xl" style={{ color: C.textDim }}>&#128230;</span>
+                                                <span aria-hidden="true" className="text-xl" style={{ color: "var(--text-4)" }}>&#128230;</span>
                                             )}
                                         </div>
 
                                         {/* Details */}
                                         <div className="flex-grow min-w-0 pr-8">
-                                            <h4 className="text-[11px] font-bold truncate" style={{ color: C.text }}>
+                                            <h4 className="text-[11px] font-bold truncate" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>
                                                 {item.productName}
                                             </h4>
-                                            <p className="text-[10px] mt-0.5" style={{ color: C.textMuted }}>
+                                            <p className="text-[10px] mt-0.5" style={{ color: "var(--text-2)" }}>
                                                 Qty: {item.quantity}
                                             </p>
-                                            <span className="text-xs font-bold" style={{ color: C.primary }}>
+                                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--accent)" }}>
                                                 ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                             </span>
                                         </div>
@@ -619,7 +595,7 @@ const HomePage = () => {
                                             onClick={() => handleRemoveFromCart(item.productId)}
                                             aria-label={`Remove ${item.productName} from cart`}
                                             className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center rounded transition-opacity hover:opacity-70"
-                                            style={{ color: C.textDim, background: "none", border: "none", cursor: "pointer" }}
+                                            style={{ color: "var(--text-3)", background: "none", border: "none", cursor: "pointer" }}
                                         >
                                             <HiX aria-hidden="true" size={12} />
                                         </button>
@@ -632,28 +608,28 @@ const HomePage = () => {
                         {user && cartItems.length > 0 && (
                             <div
                                 className="p-4 space-y-2.5 flex-shrink-0"
-                                style={{ borderTop: `1px solid ${C.border}`, background: C.surfaceHigh }}
+                                style={{ borderTop: "1px solid var(--border)", background: "var(--surface-high)" }}
                             >
                                 <div className="flex justify-between text-xs">
-                                    <span style={{ color: C.textMuted }}>Subtotal</span>
-                                    <span style={{ color: C.text }}>
+                                    <span style={{ color: "var(--text-2)" }}>Subtotal</span>
+                                    <span style={{ fontFamily: "var(--font-mono)", color: "var(--text)", fontWeight: 600 }}>
                                         ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span style={{ color: C.textMuted }}>Est. Shipping (Freight)</span>
-                                    <span style={{ color: C.textMuted }}>TBD</span>
+                                    <span style={{ color: "var(--text-3)" }}>Est. Shipping (Freight)</span>
+                                    <span style={{ color: "var(--text-3)" }}>TBD</span>
                                 </div>
-                                <div className="flex justify-between pt-2.5" style={{ borderTop: `1px solid ${C.border}` }}>
-                                    <span className="text-sm font-bold" style={{ color: C.text }}>Total</span>
-                                    <span className="text-sm font-bold" style={{ color: C.primary }}>
+                                <div className="flex justify-between pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
+                                    <span className="text-sm font-bold" style={{ color: "var(--text)", fontFamily: "var(--font-body)" }}>Total</span>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--accent)" }}>
                                         ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
                                 <button
                                     onClick={() => navigate("/checkout")}
                                     className="w-full py-3 rounded font-bold text-xs mt-1 hover:opacity-90 transition-opacity motion-reduce:transition-none flex items-center justify-center gap-1.5 min-h-[44px]"
-                                    style={{ background: C.btnBg, color: C.btnText }}
+                                    style={{ background: "var(--accent)", color: "var(--bg)", fontFamily: "var(--font-body)" }}
                                 >
                                     Proceed to Checkout →
                                 </button>
@@ -663,27 +639,12 @@ const HomePage = () => {
                 </aside>
             </main>
 
-            {/* ══ Mobile floating cart badge ═════════════════════════ */}
-            {user && itemCount > 0 && (
-                <div className="fixed bottom-6 right-4 z-40 lg:hidden">
-                    <button
-                        onClick={() => navigate("/cart")}
-                        aria-label={`Cart: ${itemCount} ${itemCount === 1 ? "item" : "items"}`}
-                        className="flex items-center gap-2 px-4 py-3 rounded-full shadow-lg min-h-[44px]"
-                        style={{ background: C.btnBg, color: C.btnText }}
-                    >
-                        <FaShoppingCart aria-hidden="true" size={18} />
-                        <span className="font-bold text-sm">{itemCount}</span>
-                    </button>
-                </div>
-            )}
-
-            {/* ══ Footer ════════════════════════════════════════════ */}
-            <footer style={{ background: C.footer, borderTop: `1px solid ${C.border}` }}>
+            {/* ══ Footer ══ */}
+            <footer style={{ background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-[1440px] mx-auto py-6 px-4 sm:px-6 lg:px-10">
                     <div>
-                        <span className="text-sm font-bold" style={{ color: C.primary }}>SolydShop</span>
-                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>
+                        <span className="text-sm font-bold" style={{ color: "var(--accent)", fontFamily: "var(--font-display)" }}>SolydShop</span>
+                        <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
                             © 2024 SolydShop Industrial Procurement. All rights reserved.
                         </p>
                     </div>
@@ -693,9 +654,9 @@ const HomePage = () => {
                                 key={link}
                                 href="#"
                                 className="text-xs transition-colors"
-                                style={{ color: C.textMuted }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                                style={{ color: "var(--text-3)" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
                             >
                                 {link}
                             </a>
@@ -704,7 +665,7 @@ const HomePage = () => {
                 </div>
             </footer>
 
-            {/* ══ Quick View Modal ══════════════════════════════════ */}
+            {/* ══ Quick View Modal ══ */}
             {quickViewProduct && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-10 py-6"
@@ -717,7 +678,7 @@ const HomePage = () => {
                         aria-modal="true"
                         aria-labelledby="qv-title"
                         className="relative rounded w-full max-w-xs max-h-[80vh] overflow-y-auto"
-                        style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
                         onClick={(e) => e.stopPropagation()}
                         onKeyDown={handleModalKeyDown}
                     >
@@ -726,25 +687,17 @@ const HomePage = () => {
                             onClick={closeQuickView}
                             aria-label="Close Quick View"
                             className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center rounded transition-opacity hover:opacity-70"
-                            style={{ background: C.surfaceHigh, color: C.textMuted, border: `1px solid ${C.border}` }}
+                            style={{ background: "var(--surface-high)", color: "var(--text-2)", border: "1px solid var(--border)" }}
                         >
                             <HiX aria-hidden="true" size={12} />
                         </button>
 
                         {/* Image */}
-                        <div className="h-36 w-full overflow-hidden rounded-t" style={{ background: C.bg }}>
+                        <div className="h-36 w-full overflow-hidden rounded-t" style={{ background: "var(--bg)" }}>
                             {quickViewProduct.imageUrl ? (
-                                <img
-                                    src={quickViewProduct.imageUrl}
-                                    alt={quickViewProduct.productName}
-                                    className="w-full h-full object-contain"
-                                />
+                                <img src={quickViewProduct.imageUrl} alt={quickViewProduct.productName} className="w-full h-full object-contain" />
                             ) : (
-                                <div
-                                    className="w-full h-full flex items-center justify-center text-4xl"
-                                    style={{ color: C.textDim }}
-                                    aria-hidden="true"
-                                >
+                                <div className="w-full h-full flex items-center justify-center text-4xl" style={{ color: "var(--text-4)" }} aria-hidden="true">
                                     &#128230;
                                 </div>
                             )}
@@ -752,19 +705,19 @@ const HomePage = () => {
 
                         {/* Content */}
                         <div className="p-4 space-y-3">
-                            {/* SKU + stock */}
+                            {/* Model + stock badges */}
                             <div className="flex items-center justify-between">
                                 <span
                                     className="px-2 py-0.5 text-[10px] font-bold rounded-sm"
-                                    style={{ background: C.surface, color: C.text, border: `1px solid ${C.border}` }}
+                                    style={{ background: "var(--surface-mid)", color: "var(--text-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)" }}
                                 >
                                     {quickViewProduct.modelNumber || quickViewProduct.categoryName || "PRODUCT"}
                                 </span>
                                 <span
                                     className="text-[10px] font-bold px-2 py-0.5 rounded-sm"
                                     style={quickViewProduct.quantity > 0
-                                        ? { background: "rgba(15,58,43,0.9)", color: "#86efac", border: "1px solid #166534" }
-                                        : { background: "rgba(100,0,0,0.85)", color: C.error, border: "1px solid #93000a" }
+                                        ? { background: "var(--success-subtle)", color: "var(--success)", border: "1px solid var(--success)" }
+                                        : { background: "var(--error-subtle)", color: "var(--error)", border: "1px solid var(--error)" }
                                     }
                                 >
                                     {quickViewProduct.quantity > 0 ? `In Stock (${quickViewProduct.quantity})` : "Out of Stock"}
@@ -772,23 +725,33 @@ const HomePage = () => {
                             </div>
 
                             {/* Name */}
-                            <h2 id="qv-title" className="text-sm font-bold leading-snug" style={{ color: C.text }}>
+                            <h2 id="qv-title" className="text-sm font-bold leading-snug" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>
                                 {quickViewProduct.productName}
                             </h2>
+
+                            {/* Part number */}
+                            {quickViewProduct.partNumber && (
+                                <div>
+                                    <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>Part No.</span>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--accent)", fontWeight: 500 }}>
+                                        {quickViewProduct.partNumber}
+                                    </span>
+                                </div>
+                            )}
 
                             {/* Description */}
                             <p
                                 className="text-sm leading-relaxed max-h-24 overflow-y-auto overflow-x-hidden break-all"
-                                style={{ color: C.textMuted, scrollbarWidth: "thin", scrollbarColor: `${C.border} transparent` }}
+                                style={{ color: "var(--text-2)", scrollbarWidth: "thin", scrollbarColor: "var(--border) transparent" }}
                             >
                                 {quickViewProduct.description || "No description available."}
                             </p>
 
                             {/* Price + Add */}
-                            <div className="flex items-center justify-between pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
+                            <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid var(--border)" }}>
                                 <div>
-                                    <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: C.textDim }}>Unit Price</span>
-                                    <span className="text-base font-bold" style={{ color: C.primary }}>
+                                    <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>Unit Price</span>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                                         ${Number(quickViewProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
@@ -796,19 +759,19 @@ const HomePage = () => {
                                     disabled={quickViewProduct.quantity === 0 || cartBusy}
                                     onClick={() => { handleAddToCart(quickViewProduct.productId); closeQuickView(); }}
                                     className="px-4 py-2 rounded text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity motion-reduce:transition-none disabled:opacity-40 min-h-[44px]"
-                                    style={{ background: C.btnBg, color: C.btnText }}
+                                    style={{ background: "var(--accent)", color: "var(--bg)", fontFamily: "var(--font-body)" }}
                                 >
                                     <FaShoppingCart aria-hidden="true" size={12} />
                                     {quickViewProduct.quantity === 0 ? "Out of Stock" : "Add to Cart"}
                                 </button>
                             </div>
 
-                            {/* View Full Details link */}
+                            {/* View Full Details */}
                             <Link
                                 to={`/products/${quickViewProduct.productId}`}
                                 onClick={closeQuickView}
                                 className="block text-center text-xs font-bold py-2 rounded transition-opacity hover:opacity-80 motion-reduce:transition-none"
-                                style={{ color: C.primary, border: `1px solid ${C.border}`, textDecoration: "none", lineHeight: "2.5", minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}
+                                style={{ color: "var(--accent)", border: "1px solid var(--border)", textDecoration: "none", lineHeight: "2.5", minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}
                             >
                                 View Full Details →
                             </Link>

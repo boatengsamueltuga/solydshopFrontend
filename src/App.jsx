@@ -23,6 +23,7 @@ import OrdersPage from "./pages/OrdersPage";
 
 // Added SellerDashboardPage import
 import SellerDashboardPage from "./pages/SellerDashboardPage";
+import SellerProductFormPage from "./pages/SellerProductFormPage";
 
 // Added AdminDashboardPage import
 import AdminDashboardPage from "./pages/AdminDashboardPage";
@@ -36,6 +37,7 @@ import AdminUsersPage from "./pages/AdminUsersPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import MobileBottomNav from "./components/navigation/MobileBottomNav";
 
 import {
     restoreUser,
@@ -134,6 +136,22 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/seller/products/new"
+                    element={
+                        <ProtectedRoute allowedRoles={["ROLE_SELLER"]}>
+                            <SellerProductFormPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/seller/products/:id/edit"
+                    element={
+                        <ProtectedRoute allowedRoles={["ROLE_SELLER"]}>
+                            <SellerProductFormPage />
+                        </ProtectedRoute>
+                    }
+                />
 
                 {/* Added Admin Dashboard Route */}
                 <Route
@@ -210,6 +228,8 @@ function App() {
                 />
 
             </Routes>
+
+            <MobileBottomNav />
 
         </div>
     );

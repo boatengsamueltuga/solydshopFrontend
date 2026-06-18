@@ -9,6 +9,7 @@ import {
   HiUsers,
   HiChartBar,
   HiLogout,
+  HiPlusCircle,
 } from 'react-icons/hi';
 
 import api from '../../api/api';
@@ -43,7 +44,8 @@ const SELLER_GROUPS = [
   {
     label: 'MY STORE',
     links: [
-      { to: '/seller/dashboard', label: 'Dashboard',  Icon: HiChartBar },
+      { to: '/seller/dashboard',    label: 'Dashboard',   Icon: HiChartBar },
+      { to: '/seller/products/new', label: 'Add Product', Icon: HiPlusCircle },
     ],
   },
 ];

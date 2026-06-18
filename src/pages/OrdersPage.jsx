@@ -1,44 +1,17 @@
 import { useEffect, useState } from "react";
-
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import api from "../api/api";
+import { Step, StepLabel, Stepper } from "@mui/material";
+import { HiShoppingBag, HiCube } from "react-icons/hi";
 
-import Loader from "../components/Loader";
-
-import {
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Container,
-    Divider,
-    Paper,
-    Stack,
-    Step,
-    StepLabel,
-    Stepper,
-    Typography,
-} from "@mui/material";
-
-import ShoppingBagOutlinedIcon   from "@mui/icons-material/ShoppingBagOutlined";
-import ReceiptLongOutlinedIcon   from "@mui/icons-material/ReceiptLongOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import CheckCircleOutlinedIcon   from "@mui/icons-material/CheckCircleOutlined";
-import CancelOutlinedIcon        from "@mui/icons-material/CancelOutlined";
-import InventoryOutlinedIcon     from "@mui/icons-material/InventoryOutlined";
-import StorefrontOutlinedIcon    from "@mui/icons-material/StorefrontOutlined";
-
-const STATUS_COLORS = {
-    PENDING:    "warning",
-    CONFIRMED:  "info",
-    PROCESSING: "info",
-    SHIPPED:    "primary",
-    DELIVERED:  "success",
-    CANCELLED:  "error",
+const STATUS_STYLE = {
+    PENDING:    { color: "var(--warning)",  bg: "var(--warning-subtle)",  border: "var(--warning)" },
+    CONFIRMED:  { color: "var(--info)",     bg: "var(--info-subtle)",     border: "var(--info)"    },
+    PROCESSING: { color: "var(--info)",     bg: "var(--info-subtle)",     border: "var(--info)"    },
+    SHIPPED:    { color: "var(--accent)",   bg: "var(--accent-subtle)",   border: "var(--accent)"  },
+    DELIVERED:  { color: "var(--success)",  bg: "var(--success-subtle)",  border: "var(--success)" },
+    CANCELLED:  { color: "var(--error)",    bg: "var(--error-subtle)",    border: "var(--error)"   },
 };
 
 const ORDER_STEPS = ["Order Placed", "Processing", "Shipped", "Delivered"];
@@ -48,13 +21,24 @@ const getActiveStep = (status) => {
     return map[status] ?? 0;
 };
 
-const ACCENT_COLORS = {
-    DELIVERED:  "#2e7d32",
-    CANCELLED:  "#c62828",
-    SHIPPED:    "#1565c0",
-    PROCESSING: "#0277bd",
-    CONFIRMED:  "#01579b",
-    PENDING:    "#e65100",
+const StatusBadge = ({ status }) => {
+    const s = STATUS_STYLE[status] ?? { color: "var(--text-3)", bg: "var(--surface-mid)", border: "var(--border)" };
+    return (
+        <span style={{
+            display:       "inline-block",
+            padding:       "2px 8px",
+            borderRadius:  "var(--r-sm)",
+            background:    s.bg,
+            color:         s.color,
+            fontSize:      "11px",
+            fontWeight:    600,
+            fontFamily:    "var(--font-mono)",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+        }}>
+            {status}
+        </span>
+    );
 };
 
 const OrdersPage = () => {
@@ -67,434 +51,249 @@ const OrdersPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-
         const fetchOrders = async () => {
-
             try {
-
-                const response = await api.get(`/order/${user.userId}`);
-
-                setOrders(response.data);
-
-            } catch (error) {
-
-                console.log(error);
-
+                const res = await api.get(`/order/${user.userId}`);
+                setOrders(res.data);
+            } catch (e) {
+                console.log(e);
                 setError("Unable to load orders. Please try again.");
-
             } finally {
-
                 setLoading(false);
             }
         };
-
         if (user?.userId) fetchOrders();
-
     }, [user]);
 
-    /*
-    |----------------------------------------------------------
-    | Loading / Error
-    |----------------------------------------------------------
-    */
+    if (loading) return (
+        <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "var(--space-3)" }}>
+            <div className="solyd-spinner" />
+            <p style={{ color: "var(--text-3)", fontFamily: "var(--font-body)", fontSize: "14px" }}>Loading orders…</p>
+            <style>{`@keyframes solyd-spin { to { transform: rotate(360deg); } } .solyd-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: solyd-spin 0.8s linear infinite; }`}</style>
+        </div>
+    );
 
-    if (loading) {
-        return (
-            <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 2, bgcolor: "grey.50" }}>
-                <Loader />
-                <Typography variant="h6" color="text.secondary">Loading your orders...</Typography>
-            </Box>
-        );
-    }
-
-    if (error) {
-        return (
-            <Box sx={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", bgcolor: "grey.50" }}>
-                <Typography variant="h6" color="error">{error}</Typography>
-            </Box>
-        );
-    }
-
-    /*
-    |----------------------------------------------------------
-    | Derived
-    |----------------------------------------------------------
-    */
+    if (error) return (
+        <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <p style={{ color: "var(--error)", fontFamily: "var(--font-body)", fontSize: "14px" }}>{error}</p>
+        </div>
+    );
 
     const totalSpent = orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
 
-    /*
-    |----------------------------------------------------------
-    | Render
-    |----------------------------------------------------------
-    */
-
     return (
+        <div style={{ background: "var(--bg)", minHeight: "100vh", color: "var(--text)", fontFamily: "var(--font-body)" }}>
 
-        <Box sx={{ bgcolor: "grey.50", minHeight: "100vh" }}>
-
-            {/* ── Page Banner ── */}
-            <Box
-                sx={{
-                    background: "linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%)",
-                    color: "white",
-                    px: { xs: 3, sm: 5, md: 8 },
-                    py: { xs: 4, md: 6 },
-                }}
-            >
-                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: orders.length > 0 ? 3 : 0 }}>
-                    <Avatar sx={{ bgcolor: "rgba(255,255,255,0.15)", width: 56, height: 56 }}>
-                        <ShoppingBagOutlinedIcon sx={{ fontSize: 30 }} />
-                    </Avatar>
-                    <Box>
-                        <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: "1.6rem", md: "2.2rem" } }}>
-                            My Orders
-                        </Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.75, mt: 0.25 }}>
-                            Track and manage your purchases
-                        </Typography>
-                    </Box>
-                </Stack>
-
+            {/* ── Page Header ── */}
+            <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "var(--space-6) var(--space-8)" }}>
+                <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-3xl)", color: "var(--text)", margin: 0, letterSpacing: "-0.01em" }}>
+                    MY ORDERS
+                </h1>
                 {orders.length > 0 && (
-                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                px: 3,
-                                py: 1.75,
-                                bgcolor: "rgba(255,255,255,0.12)",
-                                border: "1px solid rgba(255,255,255,0.2)",
-                                borderRadius: 2,
-                                color: "white",
-                                minWidth: 140,
-                            }}
-                        >
-                            <Typography variant="caption" sx={{ opacity: 0.75, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 600 }}>
-                                Total Orders
-                            </Typography>
-                            <Typography variant="h5" fontWeight="bold">{orders.length}</Typography>
-                        </Paper>
-
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                px: 3,
-                                py: 1.75,
-                                bgcolor: "rgba(255,255,255,0.12)",
-                                border: "1px solid rgba(255,255,255,0.2)",
-                                borderRadius: 2,
-                                color: "white",
-                                minWidth: 180,
-                            }}
-                        >
-                            <Typography variant="caption" sx={{ opacity: 0.75, textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 600 }}>
-                                Total Spent
-                            </Typography>
-                            <Typography variant="h5" fontWeight="bold">
-                                ${totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                            </Typography>
-                        </Paper>
-
-                    </Stack>
+                    <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", color: "var(--text-3)", marginTop: "var(--space-1)" }}>
+                        {orders.length} order{orders.length !== 1 ? "s" : ""} · ${totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2 })} total
+                    </p>
                 )}
-            </Box>
+            </div>
 
             {/* ── Content ── */}
-            <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
+            <div style={{ maxWidth: "var(--content-max)", margin: "0 auto", padding: "var(--space-6)" }}>
 
                 {/* ── Empty State ── */}
                 {orders.length === 0 ? (
-
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            borderRadius: 3,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            py: 10,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            textAlign: "center",
-                            bgcolor: "white",
-                        }}
-                    >
-                        <Avatar sx={{ width: 88, height: 88, bgcolor: "#e8eaf6", mb: 3 }}>
-                            <ShoppingBagOutlinedIcon sx={{ fontSize: 44, color: "primary.main" }} />
-                        </Avatar>
-
-                        <Typography variant="h5" fontWeight="bold" color="text.primary" gutterBottom>
+                    <div style={{
+                        textAlign:    "center",
+                        padding:      "var(--space-24) var(--space-6)",
+                        background:   "var(--surface-mid)",
+                        border:       "1px solid var(--border)",
+                        borderRadius: "var(--r-lg)",
+                    }}>
+                        <HiShoppingBag style={{ fontSize: "48px", color: "var(--text-4)", marginBottom: "var(--space-4)" }} />
+                        <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-xl)", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
                             No orders yet
-                        </Typography>
-
-                        <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 320, lineHeight: 1.7 }}>
-                            Looks like you haven't placed any orders yet. Start shopping to see your orders here.
-                        </Typography>
-
-                        <Button
-                            variant="contained"
-                            size="large"
-                            startIcon={<StorefrontOutlinedIcon />}
+                        </h2>
+                        <p style={{ color: "var(--text-3)", fontSize: "14px", marginBottom: "var(--space-6)" }}>
+                            Browse the catalog and place your first order.
+                        </p>
+                        <button
                             onClick={() => navigate("/")}
-                            sx={{
-                                borderRadius: 2,
-                                px: 4,
-                                py: 1.25,
-                                textTransform: "none",
-                                fontWeight: 700,
-                                fontSize: "1rem",
-                            }}
+                            style={{ padding: "var(--space-3) var(--space-6)", background: "var(--accent)", color: "var(--bg)", border: "none", borderRadius: "var(--r-md)", fontFamily: "var(--font-body)", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}
                         >
-                            Start Shopping
-                        </Button>
-                    </Paper>
+                            Browse Catalog
+                        </button>
+                    </div>
 
                 ) : (
 
-                    <Stack spacing={3}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
 
-                        {orders.map((order) => (
-
-                            <Card
-                                key={order.orderId}
-                                elevation={0}
-                                sx={{
-                                    borderRadius: 3,
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                    overflow: "hidden",
-                                    bgcolor: "white",
-                                    transition: "box-shadow 0.2s ease",
-                                    "&:hover": { boxShadow: "0 6px 24px rgba(0,0,0,0.08)" },
-                                }}
-                            >
-
-                                {/* ── Status Accent Bar ── */}
-                                <Box sx={{ height: 4, bgcolor: ACCENT_COLORS[order.status] || "grey.400" }} />
-
-                                {/* ── Order Header ── */}
-                                <Box
-                                    sx={{
-                                        px: { xs: 2.5, md: 4 },
-                                        py: { xs: 2, md: 2.5 },
-                                        bgcolor: "grey.50",
-                                        borderBottom: "1px solid",
-                                        borderColor: "divider",
-                                        display: "flex",
-                                        flexDirection: { xs: "column", sm: "row" },
-                                        justifyContent: "space-between",
-                                        alignItems: { sm: "center" },
-                                        gap: 2,
+                        {orders.map((order) => {
+                            const s = STATUS_STYLE[order.status] ?? STATUS_STYLE.PENDING;
+                            return (
+                                <div
+                                    key={order.orderId}
+                                    style={{
+                                        background:   "var(--surface-mid)",
+                                        border:       "1px solid var(--border)",
+                                        borderLeft:   `4px solid ${s.border}`,
+                                        borderRadius: "var(--r-lg)",
+                                        overflow:     "hidden",
+                                        transition:   "border-color var(--duration-fast)",
                                     }}
                                 >
-
-                                    <Stack direction="row" alignItems="center" spacing={2}>
-
-                                        <Avatar sx={{ bgcolor: "primary.main", width: 48, height: 48 }}>
-                                            <ReceiptLongOutlinedIcon sx={{ fontSize: 22 }} />
-                                        </Avatar>
-
-                                        <Box>
-                                            <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1}>
+                                    {/* ── Order header ── */}
+                                    <div style={{
+                                        padding:       "var(--space-4) var(--space-5)",
+                                        borderBottom:  "1px solid var(--border)",
+                                        display:       "flex",
+                                        flexDirection: "row",
+                                        flexWrap:      "wrap",
+                                        justifyContent:"space-between",
+                                        alignItems:    "center",
+                                        gap:           "var(--space-3)",
+                                        background:    "var(--surface-high)",
+                                    }}>
+                                        <div>
+                                            <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", margin: "0 0 2px" }}>
                                                 Order
-                                            </Typography>
-                                            <Typography variant="h6" fontWeight="bold" color="text.primary">
+                                            </p>
+                                            <p style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--text)", margin: 0 }}>
                                                 #{order.orderId}
-                                            </Typography>
+                                            </p>
                                             {order.createdAt && (
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                                                </Typography>
+                                                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--text-3)", margin: "2px 0 0" }}>
+                                                    {new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                                                </p>
                                             )}
-                                        </Box>
+                                        </div>
 
-                                    </Stack>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                                            <StatusBadge status={order.status} />
+                                            <div style={{ textAlign: "right" }}>
+                                                <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", margin: "0 0 2px" }}>
+                                                    Order Total
+                                                </p>
+                                                <p style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "18px", color: "var(--text)", margin: 0 }}>
+                                                    ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                    <Stack direction="row" alignItems="center" spacing={2.5} flexWrap="wrap">
-
-                                        <Chip
-                                            label={order.status}
-                                            color={STATUS_COLORS[order.status] || "default"}
-                                            size="medium"
-                                            sx={{ fontWeight: 700, px: 0.5, fontSize: "0.8rem" }}
-                                        />
-
-                                        <Box sx={{ textAlign: "right" }}>
-                                            <Typography variant="caption" color="text.disabled" fontWeight={600} textTransform="uppercase" letterSpacing={1} display="block">
-                                                Order Total
-                                            </Typography>
-                                            <Typography variant="h6" fontWeight="bold" color="success.main">
-                                                ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                                            </Typography>
-                                        </Box>
-
-                                    </Stack>
-
-                                </Box>
-
-                                {/* ── Status Stepper ── */}
-                                {order.status !== "CANCELLED" ? (
-                                    <Box
-                                        sx={{
-                                            px: { xs: 2, md: 5 },
-                                            py: 2.5,
-                                            borderBottom: "1px solid",
-                                            borderColor: "divider",
-                                            bgcolor: "white",
-                                        }}
-                                    >
-                                        <Stepper activeStep={getActiveStep(order.status)} alternativeLabel>
-                                            {ORDER_STEPS.map((label) => (
-                                                <Step key={label}>
-                                                    <StepLabel
-                                                        sx={{
-                                                            "& .MuiStepLabel-label": {
-                                                                fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                                                                fontWeight: 600,
-                                                            },
-                                                        }}
-                                                    >
-                                                        {label}
-                                                    </StepLabel>
-                                                </Step>
-                                            ))}
-                                        </Stepper>
-                                    </Box>
-                                ) : (
-                                    <Box
-                                        sx={{
-                                            px: { xs: 2.5, md: 4 },
-                                            py: 1.5,
-                                            bgcolor: "#fff5f5",
-                                            borderBottom: "1px solid #fecaca",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: 1,
-                                        }}
-                                    >
-                                        <CancelOutlinedIcon sx={{ color: "error.main", fontSize: 18 }} />
-                                        <Typography variant="body2" color="error.main" fontWeight={600}>
-                                            This order was cancelled.
-                                        </Typography>
-                                    </Box>
-                                )}
-
-                                {/* ── Order Items ── */}
-                                <CardContent sx={{ px: { xs: 2.5, md: 4 }, pt: 2.5, pb: "20px !important" }}>
-
-                                    <Typography
-                                        variant="overline"
-                                        color="text.disabled"
-                                        fontWeight={700}
-                                        letterSpacing={1.5}
-                                    >
-                                        {order.items.length} Item{order.items.length !== 1 ? "s" : ""}
-                                    </Typography>
-
-                                    <Stack divider={<Divider />} sx={{ mt: 1 }}>
-
-                                        {order.items.map((item) => (
-
-                                            <Box
-                                                key={item.productId}
-                                                sx={{
-                                                    display: "flex",
-                                                    justifyContent: "space-between",
-                                                    alignItems: "center",
-                                                    gap: 2,
-                                                    py: 1.75,
-                                                }}
-                                            >
-
-                                                <Stack direction="row" alignItems="center" spacing={1.75}>
-
-                                                    <Avatar
-                                                        variant="rounded"
-                                                        sx={{
-                                                            width: 44,
-                                                            height: 44,
-                                                            bgcolor: "grey.100",
-                                                            color: "text.secondary",
-                                                            flexShrink: 0,
-                                                        }}
-                                                    >
-                                                        <InventoryOutlinedIcon fontSize="small" />
-                                                    </Avatar>
-
-                                                    <Box>
-                                                        <Typography
-                                                            variant="body1"
-                                                            fontWeight={700}
+                                    {/* ── Stepper (non-cancelled) ── */}
+                                    {order.status !== "CANCELLED" ? (
+                                        <div style={{ padding: "var(--space-5) var(--space-5) var(--space-4)", borderBottom: "1px solid var(--border)", background: "var(--surface-mid)" }}>
+                                            <Stepper activeStep={getActiveStep(order.status)} alternativeLabel>
+                                                {ORDER_STEPS.map((label) => (
+                                                    <Step key={label}>
+                                                        <StepLabel
                                                             sx={{
-                                                                background: "linear-gradient(135deg, #1a237e 0%, #3949ab 100%)",
-                                                                WebkitBackgroundClip: "text",
-                                                                WebkitTextFillColor: "transparent",
-                                                                backgroundClip: "text",
-                                                                letterSpacing: 0.2,
-                                                                fontSize: "0.95rem",
+                                                                "& .MuiStepLabel-label": {
+                                                                    fontSize:   { xs: "0.65rem", sm: "0.75rem" },
+                                                                    fontWeight: 600,
+                                                                    color:      "var(--text-3) !important",
+                                                                    "&.Mui-active":    { color: "var(--accent) !important" },
+                                                                    "&.Mui-completed": { color: "var(--success) !important" },
+                                                                },
+                                                                "& .MuiStepIcon-root": {
+                                                                    color: "var(--border-mid)",
+                                                                    "&.Mui-active":    { color: "var(--accent)" },
+                                                                    "&.Mui-completed": { color: "var(--success)" },
+                                                                },
                                                             }}
                                                         >
-                                                            {item.productName}
-                                                        </Typography>
-                                                        <Typography variant="caption" color="text.secondary">
-                                                            Qty: {item.quantity}&nbsp;&nbsp;·&nbsp;&nbsp;
-                                                            ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })} each
-                                                        </Typography>
-                                                    </Box>
+                                                            {label}
+                                                        </StepLabel>
+                                                    </Step>
+                                                ))}
+                                            </Stepper>
+                                        </div>
+                                    ) : (
+                                        <div style={{ padding: "var(--space-3) var(--space-5)", background: "var(--error-subtle)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                                            <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--error)", fontWeight: 600 }}>
+                                                This order was cancelled.
+                                            </span>
+                                        </div>
+                                    )}
 
-                                                </Stack>
+                                    {/* ── Order items ── */}
+                                    <div style={{ padding: "var(--space-4) var(--space-5)" }}>
+                                        <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", margin: "0 0 var(--space-3)" }}>
+                                            {order.items.length} Item{order.items.length !== 1 ? "s" : ""}
+                                        </p>
 
-                                                <Typography
-                                                    variant="subtitle1"
-                                                    fontWeight="bold"
-                                                    color="success.dark"
-                                                    sx={{ whiteSpace: "nowrap" }}
+                                        <div style={{ display: "flex", flexDirection: "column" }}>
+                                            {order.items.map((item, i) => (
+                                                <div
+                                                    key={item.productId ?? i}
+                                                    style={{
+                                                        display:       "flex",
+                                                        justifyContent:"space-between",
+                                                        alignItems:    "center",
+                                                        gap:           "var(--space-3)",
+                                                        padding:       "var(--space-3) 0",
+                                                        borderTop:     i > 0 ? "1px solid var(--border-subtle)" : "none",
+                                                        flexWrap:      "wrap",
+                                                    }}
                                                 >
-                                                    ${Number(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                                                </Typography>
+                                                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+                                                        {/* Product image / placeholder */}
+                                                        <div style={{
+                                                            width:          "44px",
+                                                            height:         "44px",
+                                                            background:     "var(--surface-high)",
+                                                            border:         "1px solid var(--border)",
+                                                            borderRadius:   "var(--r-sm)",
+                                                            flexShrink:     0,
+                                                            display:        "flex",
+                                                            alignItems:     "center",
+                                                            justifyContent: "center",
+                                                            overflow:       "hidden",
+                                                        }}>
+                                                            {item.imageUrl ? (
+                                                                <img src={item.imageUrl} alt={item.productName} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                                                            ) : (
+                                                                <HiCube style={{ fontSize: "18px", color: "var(--text-4)" }} />
+                                                            )}
+                                                        </div>
 
-                                            </Box>
+                                                        <div>
+                                                            <p style={{ fontFamily: "var(--font-body)", fontWeight: 600, fontSize: "13px", color: "var(--text)", margin: 0 }}>
+                                                                {item.productName}
+                                                            </p>
+                                                            <p style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-3)", margin: "2px 0 0" }}>
+                                                                Qty: {item.quantity} · ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })} ea
+                                                            </p>
+                                                        </div>
+                                                    </div>
 
-                                        ))}
+                                                    <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "14px", color: "var(--text)", whiteSpace: "nowrap" }}>
+                                                        ${Number(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
 
-                                    </Stack>
-
-                                    {/* ── Total Footer ── */}
-                                    <Box
-                                        sx={{
-                                            mt: 2,
-                                            pt: 2,
-                                            borderTop: "2px dashed",
-                                            borderColor: "divider",
-                                            display: "flex",
-                                            justifyContent: "flex-end",
-                                            alignItems: "center",
-                                            gap: 1.5,
-                                        }}
-                                    >
-                                        <Typography variant="body1" color="text.secondary" fontWeight={500}>
-                                            Order Total:
-                                        </Typography>
-                                        <Typography variant="h6" fontWeight="bold" color="success.main">
-                                            ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                                        </Typography>
-                                    </Box>
-
-                                </CardContent>
-
-                            </Card>
-
-                        ))}
-
-                    </Stack>
-
+                                        {/* Order total footer */}
+                                        <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-3)", borderTop: "1px dashed var(--border)", display: "flex", justifyContent: "flex-end", alignItems: "baseline", gap: "var(--space-3)" }}>
+                                            <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>Order Total</span>
+                                            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--accent)" }}>
+                                                ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
+            </div>
 
-            </Container>
-
-        </Box>
+            <style>{`
+                @keyframes solyd-spin { to { transform: rotate(360deg); } }
+                .solyd-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: solyd-spin 0.8s linear infinite; }
+            `}</style>
+        </div>
     );
 };
 
