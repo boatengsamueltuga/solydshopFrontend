@@ -52,8 +52,10 @@ const StatCard = ({ label, value, loading }) => (
         borderRadius: "var(--r-md)",
         padding:      "var(--space-4) var(--space-5)",
         textAlign:    "center",
+        overflow:     "hidden",
+        minWidth:     0,
     }}>
-        <p style={{ fontFamily: "var(--font-mono)", fontSize: "2rem", fontWeight: 700, color: "var(--text)", lineHeight: 1, margin: "0 0 var(--space-1)" }}>
+        <p style={{ fontFamily: "var(--font-mono)", fontSize: "clamp(0.95rem, 3.5vw, 1.75rem)", fontWeight: 700, color: "var(--text)", lineHeight: 1.2, margin: "0 0 var(--space-1)", wordBreak: "break-word" }}>
             {loading ? "—" : value}
         </p>
         <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)", margin: 0 }}>
