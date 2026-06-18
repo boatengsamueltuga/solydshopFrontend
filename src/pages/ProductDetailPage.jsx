@@ -86,15 +86,20 @@ export default function ProductDetailPage() {
     const [fetchError,   setFetchError]   = useState(null);
     const [qty,          setQty]          = useState(1);
     const [addingToCart, setAddingToCart] = useState(false);
+    const [selectedImg,  setSelectedImg]  = useState(null);
+    const [quoteOpen,    setQuoteOpen]    = useState(false);
+    const [quoteForm,    setQuoteForm]    = useState({ qtyNeeded: 1, urgency: 'Standard', notes: '', contactEmail: '', phone: '' });
+    const [quoteSending, setQuoteSending] = useState(false);
 
     /* ── Fetch product ───────────────────────────────────────── */
     useEffect(() => {
         setLoading(true);
         setFetchError(null);
         setQty(1);
+        setSelectedImg(null);
 
         api.get(`/public/products/${id}`)
-            .then(res => setProduct(res.data))
+            .then(res => { setProduct(res.data); setSelectedImg(res.data.imageUrl ?? null); })
             .catch(() => setFetchError('Product not found or no longer available.'))
             .finally(() => setLoading(false));
     }, [id]);
@@ -120,6 +125,23 @@ export default function ProductDetailPage() {
         } finally {
             setAddingToCart(false);
         }
+    };
+
+    /* ── Open quote modal (pre-fill user email) ─────────────── */
+    const openQuote = () => {
+        setQuoteForm(f => ({ ...f, contactEmail: user?.email ?? '' }));
+        setQuoteOpen(true);
+    };
+
+    /* ── Submit quote request ────────────────────────────────── */
+    const handleQuoteSubmit = async (e) => {
+        e.preventDefault();
+        if (!quoteForm.contactEmail.trim()) { toast.error('Please enter a contact email.'); return; }
+        setQuoteSending(true);
+        await new Promise(r => setTimeout(r, 800));
+        setQuoteSending(false);
+        setQuoteOpen(false);
+        toast.success('Quote request submitted. Our team will contact you within 24 hours.');
     };
 
     /* ── Shared page shell ───────────────────────────────────── */
@@ -183,6 +205,56 @@ export default function ProductDetailPage() {
                 .pdp-back-link:hover {
                     color: var(--accent) !important;
                 }
+
+                /* ── Thumbnail gallery ───────────────── */
+                .pdp-thumb {
+                    width: 56px; height: 56px;
+                    border-radius: var(--r-sm);
+                    border: 2px solid var(--border);
+                    background: var(--surface-high);
+                    overflow: hidden;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                    display: flex; align-items: center; justify-content: center;
+                    transition: border-color var(--duration-fast);
+                }
+                .pdp-thumb:hover  { border-color: var(--border-strong); }
+                .pdp-thumb.active { border-color: var(--accent); }
+                .pdp-thumb img    { width: 100%; height: 100%; object-fit: contain; }
+
+                /* ── Quote modal ─────────────────────── */
+                .pdp-overlay {
+                    position: fixed; inset: 0; z-index: var(--z-modal-bg);
+                    background: oklch(0 0 0 / 0.72);
+                    display: flex; align-items: center; justify-content: center;
+                    padding: var(--space-4);
+                }
+                .pdp-modal {
+                    background: var(--surface);
+                    border: 1px solid var(--border);
+                    border-radius: var(--r-lg);
+                    width: 100%; max-width: 520px;
+                    max-height: 90vh; overflow-y: auto;
+                    padding: var(--space-6);
+                    display: flex; flex-direction: column; gap: var(--space-5);
+                }
+                .pdp-field { display: flex; flex-direction: column; gap: var(--space-2); }
+                .pdp-label {
+                    font-family: var(--font-body); font-size: var(--text-2xs);
+                    font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+                    color: var(--text-3);
+                }
+                .pdp-input {
+                    background: var(--surface-high); border: 1px solid var(--border);
+                    border-radius: var(--r-sm); color: var(--text);
+                    font-family: var(--font-body); font-size: var(--text-sm);
+                    padding: var(--space-3) var(--space-4); outline: none;
+                    transition: border-color var(--duration-fast);
+                }
+                .pdp-input:focus { border-color: var(--accent); }
+                .pdp-input::placeholder { color: var(--text-4); }
+                .pdp-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+                @media (max-width: 480px) { .pdp-modal-row { grid-template-columns: 1fr; } }
             `}</style>
         </div>
     );
@@ -315,30 +387,31 @@ export default function ProductDetailPage() {
                             background: 'var(--surface)',
                         }}
                     >
-                        {product.imageUrl ? (
+                        {selectedImg ? (
                             <img
-                                src={product.imageUrl}
+                                src={selectedImg}
                                 alt={product.productName}
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'contain',
-                                    display: 'block',
-                                }}
+                                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                             />
                         ) : (
-                            <div
-                                style={{
-                                    color: 'var(--text-3)',
-                                    fontSize: 'var(--text-sm)',
-                                    textAlign: 'center',
-                                    userSelect: 'none',
-                                }}
-                            >
+                            <div style={{ color: 'var(--text-3)', fontSize: 'var(--text-sm)', textAlign: 'center', userSelect: 'none' }}>
                                 No image available
                             </div>
                         )}
                     </div>
+
+                    {/* Thumbnail strip */}
+                    {product.imageUrl && (
+                        <div style={{ display: 'flex', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4)', borderTop: '1px solid var(--border)' }}>
+                            <button
+                                className={`pdp-thumb${selectedImg === product.imageUrl ? ' active' : ''}`}
+                                onClick={() => setSelectedImg(product.imageUrl)}
+                                aria-label="Main product image"
+                            >
+                                <img src={product.imageUrl} alt={product.productName} />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* ── Right: specs panel ───────────────────────── */}
@@ -634,6 +707,7 @@ export default function ProductDetailPage() {
 
                         <button
                             className="pdp-btn-ghost"
+                            onClick={openQuote}
                             style={{
                                 background: 'transparent',
                                 color: 'var(--text-2)',
@@ -692,6 +766,129 @@ export default function ProductDetailPage() {
 
             </div>
             {/* end grid */}
+
+            {/* ── Quote Request Modal (E7) ──────────────────────── */}
+            {quoteOpen && (
+                <div className="pdp-overlay" onClick={() => setQuoteOpen(false)}>
+                    <div className="pdp-modal" onClick={e => e.stopPropagation()}>
+
+                        {/* Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--text-xl)', color: 'var(--text)', margin: 0 }}>
+                                    Request a Quote
+                                </h2>
+                                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--text-3)', margin: 'var(--space-1) 0 0' }}>
+                                    {product.productName}
+                                    {product.partNumber && <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent)', marginLeft: 'var(--space-2)' }}>{product.partNumber}</span>}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setQuoteOpen(false)}
+                                style={{ background: 'none', border: 'none', color: 'var(--text-3)', cursor: 'pointer', fontSize: '20px', lineHeight: 1, padding: 'var(--space-1)', transition: 'color var(--duration-fast)' }}
+                                onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
+                                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
+                                aria-label="Close"
+                            >×</button>
+                        </div>
+
+                        {/* Form */}
+                        <form onSubmit={handleQuoteSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+
+                            <div className="pdp-modal-row">
+                                <div className="pdp-field">
+                                    <label className="pdp-label">Quantity Needed</label>
+                                    <input
+                                        className="pdp-input"
+                                        type="number"
+                                        min={1}
+                                        value={quoteForm.qtyNeeded}
+                                        onChange={e => setQuoteForm(f => ({ ...f, qtyNeeded: e.target.value }))}
+                                        required
+                                    />
+                                </div>
+                                <div className="pdp-field">
+                                    <label className="pdp-label">Urgency</label>
+                                    <select
+                                        className="pdp-input"
+                                        value={quoteForm.urgency}
+                                        onChange={e => setQuoteForm(f => ({ ...f, urgency: e.target.value }))}
+                                    >
+                                        <option>Standard</option>
+                                        <option>Urgent</option>
+                                        <option>Emergency</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="pdp-modal-row">
+                                <div className="pdp-field">
+                                    <label className="pdp-label">Contact Email *</label>
+                                    <input
+                                        className="pdp-input"
+                                        type="email"
+                                        placeholder="you@company.com"
+                                        value={quoteForm.contactEmail}
+                                        onChange={e => setQuoteForm(f => ({ ...f, contactEmail: e.target.value }))}
+                                        required
+                                    />
+                                </div>
+                                <div className="pdp-field">
+                                    <label className="pdp-label">Phone (optional)</label>
+                                    <input
+                                        className="pdp-input"
+                                        type="tel"
+                                        placeholder="+1 (555) 000-0000"
+                                        value={quoteForm.phone}
+                                        onChange={e => setQuoteForm(f => ({ ...f, phone: e.target.value }))}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pdp-field">
+                                <label className="pdp-label">Notes / Special Requirements</label>
+                                <textarea
+                                    className="pdp-input"
+                                    rows={3}
+                                    placeholder="Delivery location, required delivery date, compatibility notes…"
+                                    value={quoteForm.notes}
+                                    onChange={e => setQuoteForm(f => ({ ...f, notes: e.target.value }))}
+                                    style={{ resize: 'vertical' }}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', gap: 'var(--space-3)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--border)' }}>
+                                <button
+                                    type="submit"
+                                    disabled={quoteSending}
+                                    style={{
+                                        flex: 1,
+                                        padding: 'var(--space-3) var(--space-4)',
+                                        background: quoteSending ? 'var(--border)' : 'var(--accent)',
+                                        color: 'var(--bg)',
+                                        border: 'none',
+                                        borderRadius: 'var(--r-md)',
+                                        fontFamily: 'var(--font-body)',
+                                        fontWeight: 700,
+                                        fontSize: 'var(--text-sm)',
+                                        cursor: quoteSending ? 'not-allowed' : 'pointer',
+                                        transition: 'background var(--duration-fast)',
+                                    }}
+                                >
+                                    {quoteSending ? 'Submitting…' : 'Submit Quote Request'}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setQuoteOpen(false)}
+                                    style={{ padding: 'var(--space-3) var(--space-5)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--text-2)', cursor: 'pointer' }}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

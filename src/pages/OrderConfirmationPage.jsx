@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import api from "../api/api";
 import { HiCheckCircle, HiExternalLink } from "react-icons/hi";
 
 const OrderConfirmationPage = () => {
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get("orderId");
+    const { user } = useSelector((s) => s.auth);
 
     const [order,   setOrder]   = useState(null);
     const [loading, setLoading] = useState(Boolean(orderId));
 
     useEffect(() => {
-        if (!orderId) return;
+        if (!orderId || !user?.userId) return;
         const fetchOrder = async () => {
             try {
-                const res = await api.get(`/order/admin`);
+                const res = await api.get(`/order/${user.userId}`);
                 const found = (res.data ?? []).find(o => String(o.orderId) === String(orderId));
                 setOrder(found ?? null);
             } catch {
@@ -24,7 +26,7 @@ const OrderConfirmationPage = () => {
             }
         };
         fetchOrder();
-    }, [orderId]);
+    }, [orderId, user?.userId]);
 
     return (
         <div style={{
