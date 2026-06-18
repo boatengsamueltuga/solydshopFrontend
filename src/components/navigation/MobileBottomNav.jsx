@@ -72,7 +72,7 @@ const MobileBottomNav = () => {
                     height:     "64px",
                     background: "var(--surface)",
                     borderTop:  "1px solid var(--border)",
-                    zIndex:     "var(--z-sticky)",
+                    zIndex:     10000,
                 }}
             >
                 <NavTab icon={HiHome}         label="Home"    active={path === "/"}         onClick={() => navigate("/")}        />

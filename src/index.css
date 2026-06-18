@@ -1,6 +1,18 @@
 @import "./styles/tokens.css";
 @import "./styles/typography.css";
 @import "tailwindcss";
+
+/* ── Stripe Link floating button ─────────────────────────────────────────────
+   Stripe injects a persistent fixed-position Link button into document.body
+   outside the React root. Hide it on every page except the checkout page,
+   which adds .solyd-in-checkout to <body> while mounted.
+   ──────────────────────────────────────────────────────────────────────────── */
+body:not(.solyd-in-checkout) iframe[name*="privateStripe"],
+body:not(.solyd-in-checkout) [id*="stripe-link"],
+body:not(.solyd-in-checkout) [id*="link"][id*="stripe"],
+body:not(.solyd-in-checkout) [id^="stripe"] {
+    display: none !important;
+}
 /* :root {
   --text: #6b6375;
   --text-h: #08060d;

@@ -324,13 +324,10 @@ const CheckoutPage = () => {
     const [step,            setStep]            = useState("address");
     const [shippingAddress, setShippingAddress] = useState("");
 
-    /* Hide any Stripe-injected floating elements when leaving checkout */
+    /* Body class lets CSS hide Stripe's injected Link button everywhere except checkout */
     useEffect(() => {
-        return () => {
-            document.querySelectorAll(
-                '[id*="stripe"],[class*="StripeLink"],[data-stripe-modal]'
-            ).forEach(el => { el.style.display = "none"; });
-        };
+        document.body.classList.add("solyd-in-checkout");
+        return () => document.body.classList.remove("solyd-in-checkout");
     }, []);
 
     useEffect(() => {

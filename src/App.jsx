@@ -1,8 +1,40 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import { useEffect } from "react";
 
 import { useDispatch } from "react-redux";
+
+function StripeFloatingHider() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        if (pathname === "/checkout") return;
+        const hide = () => {
+            document.querySelectorAll("iframe").forEach(iframe => {
+                const src  = iframe.src  || "";
+                const name = iframe.name || "";
+                if (src.includes("stripe") || name.toLowerCase().includes("stripe")) {
+                    iframe.style.setProperty("display", "none", "important");
+                    const p = iframe.parentElement;
+                    if (p && p !== document.body && p.parentElement === document.body) {
+                        p.style.setProperty("display", "none", "important");
+                    }
+                }
+            });
+            Array.from(document.body.children).forEach(el => {
+                if (el.id === "root") return;
+                const id  = (el.id        || "").toLowerCase();
+                const cls = (el.className || "").toLowerCase();
+                if (id.includes("stripe") || cls.includes("stripe")) {
+                    el.style.setProperty("display", "none", "important");
+                }
+            });
+        };
+        hide();
+        const t = setTimeout(hide, 800);
+        return () => clearTimeout(t);
+    }, [pathname]);
+    return null;
+}
 
 import Navbar from "./components/Navbar";
 
@@ -86,6 +118,8 @@ function App() {
     return (
 
         <div>
+
+            <StripeFloatingHider />
 
             <Navbar />
 
