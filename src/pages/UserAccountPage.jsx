@@ -105,10 +105,10 @@ const UserAccountPage = () => {
                         Account
                     </p>
                     <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-3xl)", color: "var(--text)", letterSpacing: "-0.01em", margin: "0 0 var(--space-3)" }}>
-                        {user?.userName ?? "My Account"}
+                        {user?.name ?? "My Account"}
                     </h1>
                     <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
-                        {roles.map(r => <RoleBadge key={r.roleName} role={r.roleName} />)}
+                        {roles.map(r => <RoleBadge key={r} role={r} />)}
                     </div>
                 </div>
 
@@ -133,12 +133,12 @@ const UserAccountPage = () => {
                     <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "var(--space-4)" }}>
                         Profile
                     </p>
-                    <InfoRow icon={HiUser}       label="Name"  value={user?.userName  ?? "—"} />
-                    <InfoRow icon={HiMail}       label="Email" value={user?.email     ?? "—"} />
+                    <InfoRow icon={HiUser}       label="Name"  value={user?.name ?? "—"} />
+                    <InfoRow icon={HiMail}       label="Email" value={user?.email    ?? "—"} />
                     <InfoRow icon={HiShieldCheck} label="Role"
                         value={
                             <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", marginTop: "2px" }}>
-                                {roles.map(r => <RoleBadge key={r.roleName} role={r.roleName} />)}
+                                {roles.map(r => <RoleBadge key={r} role={r} />)}
                             </div>
                         }
                     />

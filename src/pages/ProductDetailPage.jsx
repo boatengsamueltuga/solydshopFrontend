@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import api from '../api/api';
+import './ProductDetailPage.css';
 
 /* ── XSRF helper (mirrors the pattern used in HomePage.jsx) ─── */
 const getXsrfToken = () =>
@@ -41,6 +42,7 @@ function stockLabel(qty) {
 function SpecRow({ label, value, mono, last }) {
     return (
         <div
+            className="pdp-spec-row"
             style={{
                 display: 'grid',
                 gridTemplateColumns: '140px 1fr',
@@ -48,6 +50,7 @@ function SpecRow({ label, value, mono, last }) {
             }}
         >
             <div
+                className="pdp-spec-label"
                 style={{
                     padding: '9px 14px',
                     fontSize: 'var(--text-xs)',
@@ -59,6 +62,7 @@ function SpecRow({ label, value, mono, last }) {
                 {label}
             </div>
             <div
+                className="pdp-spec-value"
                 style={{
                     padding: '9px 14px',
                     fontSize: 'var(--text-sm)',
@@ -66,6 +70,9 @@ function SpecRow({ label, value, mono, last }) {
                     fontFamily: mono ? 'var(--font-mono)' : 'var(--font-body)',
                     fontWeight: mono ? 500 : 400,
                     letterSpacing: mono ? '0.01em' : 'normal',
+                    overflowWrap: 'break-word',
+                    minWidth: 0,
+                    wordBreak: 'break-all',
                 }}
             >
                 {value}
@@ -156,105 +163,16 @@ export default function ProductDetailPage() {
             }}
         >
             <div
+                className="pdp-content-inner"
                 style={{
-                    maxWidth: 'var(--content-max)',
+                    maxWidth: '1440px',
                     margin: '0 auto',
-                    padding: 'var(--space-6) var(--space-5) var(--space-20)',
+                    padding: '24px 16px 80px',
                 }}
             >
                 {children}
             </div>
 
-            <style>{`
-                @keyframes solyd-pulse {
-                    0%, 100% { opacity: 1; }
-                    50%       { opacity: 0.45; }
-                }
-
-                /* ── Responsive grid ─────────────────── */
-                .pdp-grid {
-                    display: grid;
-                    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-                    gap: var(--space-12);
-                    align-items: start;
-                }
-                @media (max-width: 1023px) {
-                    .pdp-grid { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
-                }
-                @media (max-width: 767px) {
-                    .pdp-grid { grid-template-columns: 1fr; gap: var(--space-6); }
-                    .pdp-image-panel { position: static !important; }
-                    .pdp-image-inner {
-                        aspect-ratio: unset !important;
-                        height: clamp(220px, 56vw, 320px) !important;
-                    }
-                }
-
-                /* ── Button hover states ─────────────── */
-                .pdp-btn-primary:hover:not(:disabled) {
-                    background: var(--accent-hi) !important;
-                }
-                .pdp-btn-ghost:hover {
-                    border-color: var(--accent) !important;
-                    color: var(--accent) !important;
-                }
-                .pdp-qty-btn:hover:not(:disabled) {
-                    background: var(--surface-hover) !important;
-                }
-                .pdp-back-link:hover {
-                    color: var(--accent) !important;
-                }
-
-                /* ── Thumbnail gallery ───────────────── */
-                .pdp-thumb {
-                    width: 56px; height: 56px;
-                    border-radius: var(--r-sm);
-                    border: 2px solid var(--border);
-                    background: var(--surface-high);
-                    overflow: hidden;
-                    cursor: pointer;
-                    flex-shrink: 0;
-                    display: flex; align-items: center; justify-content: center;
-                    transition: border-color var(--duration-fast);
-                }
-                .pdp-thumb:hover  { border-color: var(--border-strong); }
-                .pdp-thumb.active { border-color: var(--accent); }
-                .pdp-thumb img    { width: 100%; height: 100%; object-fit: contain; }
-
-                /* ── Quote modal ─────────────────────── */
-                .pdp-overlay {
-                    position: fixed; inset: 0; z-index: var(--z-modal-bg);
-                    background: oklch(0 0 0 / 0.72);
-                    display: flex; align-items: center; justify-content: center;
-                    padding: var(--space-4);
-                }
-                .pdp-modal {
-                    background: var(--surface);
-                    border: 1px solid var(--border);
-                    border-radius: var(--r-lg);
-                    width: 100%; max-width: 520px;
-                    max-height: 90vh; overflow-y: auto;
-                    padding: var(--space-6);
-                    display: flex; flex-direction: column; gap: var(--space-5);
-                }
-                .pdp-field { display: flex; flex-direction: column; gap: var(--space-2); }
-                .pdp-label {
-                    font-family: var(--font-body); font-size: var(--text-2xs);
-                    font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-                    color: var(--text-3);
-                }
-                .pdp-input {
-                    background: var(--surface-high); border: 1px solid var(--border);
-                    border-radius: var(--r-sm); color: var(--text);
-                    font-family: var(--font-body); font-size: var(--text-sm);
-                    padding: var(--space-3) var(--space-4); outline: none;
-                    transition: border-color var(--duration-fast);
-                }
-                .pdp-input:focus { border-color: var(--accent); }
-                .pdp-input::placeholder { color: var(--text-4); }
-                .pdp-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
-                @media (max-width: 480px) { .pdp-modal-row { grid-template-columns: 1fr; } }
-            `}</style>
         </div>
     );
 
@@ -367,47 +285,67 @@ export default function ProductDetailPage() {
                 <div
                     className="pdp-image-panel"
                     style={{
-                        background: 'var(--surface)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--r-md)',
-                        overflow: 'hidden',
-                        position: 'sticky',
-                        top: 'calc(var(--topbar-height) + var(--space-4))',
+                        background:   'var(--surface)',
+                        border:       '1px solid var(--border)',
+                        borderRadius: '8px',
+                        overflow:     'hidden',
                     }}
                 >
+                    {/* Image box — placeholder always in DOM behind the img */}
                     <div
-                        className="pdp-image-inner"
                         style={{
-                            position:    'relative',
-                            aspectRatio: '4 / 3',
-                            background:  'var(--surface)',
-                            overflow:    'hidden',
+                            width:    '100%',
+                            height:   '280px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            background: 'oklch(0.26 0.018 58)',
                         }}
                     >
-                        {selectedImg ? (
+                        {/* Placeholder icon: always visible, behind the product image */}
+                        <div
+                            style={{
+                                position:        'absolute',
+                                inset:           0,
+                                display:         'flex',
+                                flexDirection:   'column',
+                                alignItems:      'center',
+                                justifyContent:  'center',
+                                gap:             '10px',
+                                userSelect:      'none',
+                            }}
+                        >
+                            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.2 }}>
+                                <rect x="2" y="2" width="20" height="20" rx="2" stroke="white" strokeWidth="1.5"/>
+                                <circle cx="8.5" cy="8.5" r="2.5" stroke="white" strokeWidth="1.5"/>
+                                <path d="M2 15l5-5 4 4 3-3 8 7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: 'rgba(255,255,255,0.22)', fontSize: '11px', fontFamily: 'sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                No image
+                            </span>
+                        </div>
+
+                        {/* Product image: absolutely fills the box, covers placeholder */}
+                        {selectedImg && (
                             <img
                                 src={selectedImg}
                                 alt={product.productName}
                                 style={{
-                                    position:   'absolute',
-                                    inset:      0,
-                                    width:      '100%',
-                                    height:     '100%',
-                                    objectFit:  'contain',
-                                    padding:    'var(--space-8)',
-                                    boxSizing:  'border-box',
+                                    position:  'absolute',
+                                    inset:     '24px',
+                                    width:     'calc(100% - 48px)',
+                                    height:    'calc(100% - 48px)',
+                                    objectFit: 'contain',
+                                    display:   'block',
+                                    background: 'oklch(0.26 0.018 58)',
                                 }}
+                                onError={e => { e.currentTarget.style.display = 'none'; }}
                             />
-                        ) : (
-                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)', fontSize: 'var(--text-sm)', userSelect: 'none' }}>
-                                No image available
-                            </div>
                         )}
                     </div>
 
-                    {/* Thumbnail strip */}
+                    {/* Thumbnail strip — CSS class handles desktop-only visibility */}
                     {product.imageUrl && (
-                        <div style={{ display: 'flex', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4)', borderTop: '1px solid var(--border)' }}>
+                        <div className="pdp-thumb-strip">
                             <button
                                 className={`pdp-thumb${selectedImg === product.imageUrl ? ' active' : ''}`}
                                 onClick={() => setSelectedImg(product.imageUrl)}
@@ -420,7 +358,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* ── Right: specs panel ───────────────────────── */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', minWidth: 0 }}>
 
                     {/* Product name + category */}
                     <div>
@@ -583,7 +521,7 @@ export default function ProductDetailPage() {
 
                     {/* Quantity selector */}
                     {inStock && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                        <div className="pdp-qty-row" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                             <span
                                 style={{
                                     fontSize: 'var(--text-2xs)',
@@ -686,8 +624,8 @@ export default function ProductDetailPage() {
                         </div>
                     )}
 
-                    {/* CTA buttons */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {/* CTA buttons — hidden on mobile, replaced by sticky action bar */}
+                    <div className="pdp-cta-desktop">
                         <button
                             className="pdp-btn-primary"
                             onClick={handleAddToCart}
@@ -759,6 +697,8 @@ export default function ProductDetailPage() {
                                     lineHeight: 1.65,
                                     margin: 0,
                                     fontFamily: 'var(--font-body)',
+                                    overflowWrap: 'break-word',
+                                    wordBreak: 'break-word',
                                 }}
                             >
                                 {product.description}
@@ -771,6 +711,30 @@ export default function ProductDetailPage() {
 
             </div>
             {/* end grid */}
+
+            {/* ── Mobile sticky action bar (< 768px) ──────────── */}
+            <div className="pdp-action-bar">
+                <div className="pdp-action-bar-price">
+                    <div className="pdp-action-bar-label">Unit Price</div>
+                    <div className="pdp-action-bar-amount">
+                        ${Number(product.price).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}
+                    </div>
+                </div>
+                <button
+                    className="pdp-action-bar-btn"
+                    onClick={handleAddToCart}
+                    disabled={!inStock || addingToCart}
+                    style={{
+                        background: inStock ? 'var(--accent)' : 'var(--surface-high)',
+                        color:      inStock ? 'var(--bg)'    : 'var(--text-3)',
+                    }}
+                >
+                    {addingToCart ? 'Adding…' : inStock ? 'Add to Cart' : 'Out of Stock'}
+                </button>
+            </div>
 
             {/* ── Quote Request Modal (E7) ──────────────────────── */}
             {quoteOpen && (

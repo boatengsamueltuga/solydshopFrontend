@@ -1,0 +1,215 @@
+/* ══════════════════════════════════════════════════════════
+   ProductDetailPage.css
+   Loaded via Vite import — guaranteed correct cascade order.
+   Mobile-first: base rules = mobile, enhanced with min-width.
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes solyd-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.45; }
+}
+
+/* ── Layout grid ──────────────────────────────────────────── */
+.pdp-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    align-items: start;
+}
+@media (min-width: 768px) {
+    .pdp-grid {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+        gap: 48px;
+    }
+}
+@media (min-width: 1024px) {
+    .pdp-grid { gap: 64px; }
+}
+
+/* ── Image panel outer card ───────────────────────────────── */
+.pdp-image-panel {
+    background:    var(--surface);
+    border:        1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    /* mobile: static, stays in document flow */
+}
+@media (min-width: 768px) {
+    .pdp-image-panel {
+        position: sticky;
+        top: calc(var(--topbar-height) + 16px);
+    }
+}
+
+/* ── Thumbnail strip (desktop only) ──────────────────────── */
+.pdp-thumb-strip {
+    display: none;
+}
+@media (min-width: 768px) {
+    .pdp-thumb-strip {
+        display:    flex;
+        gap:        var(--space-2);
+        padding:    var(--space-3) var(--space-4);
+        border-top: 1px solid var(--border);
+    }
+}
+
+/* ── Thumbnails ───────────────────────────────────────────── */
+.pdp-thumb {
+    width: 56px; height: 56px;
+    border-radius: var(--r-sm);
+    border: 2px solid var(--border);
+    background: var(--surface-high);
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color var(--duration-fast);
+}
+.pdp-thumb:hover  { border-color: var(--border-strong); }
+.pdp-thumb.active { border-color: var(--accent); }
+.pdp-thumb img    { width: 100%; height: 100%; object-fit: contain; }
+
+/* ── Content padding (bottom needs to clear action-bar + nav) */
+@media (max-width: 767px) {
+    .pdp-content-inner {
+        padding-bottom: 152px !important;
+    }
+}
+
+/* ── Spec table ───────────────────────────────────────────── */
+@media (max-width: 479px) {
+    .pdp-spec-row   { grid-template-columns: 1fr !important; }
+    .pdp-spec-label {
+        border-right:   none !important;
+        border-bottom:  1px solid var(--border-subtle) !important;
+        padding-bottom: 5px !important;
+    }
+    .pdp-spec-value { padding-top: 5px !important; }
+}
+
+/* ── Qty row ──────────────────────────────────────────────── */
+.pdp-qty-row { flex-wrap: wrap; }
+
+/* ── Desktop CTA block / Mobile sticky action bar ─────────── */
+.pdp-cta-desktop {
+    display:        flex;
+    flex-direction: column;
+    gap:            var(--space-3);
+}
+@media (max-width: 767px) {
+    .pdp-cta-desktop { display: none; }
+}
+
+.pdp-action-bar { display: none; }
+@media (max-width: 767px) {
+    .pdp-action-bar {
+        display:     flex;
+        position:    fixed;
+        bottom:      64px;
+        left:        0;
+        right:       0;
+        z-index:     9000;
+        align-items: center;
+        gap:         var(--space-3);
+        padding:     var(--space-3) var(--space-4);
+        background:  var(--surface);
+        border-top:  2px solid var(--accent);
+        box-shadow:  0 -6px 24px oklch(0 0 0 / 0.50);
+    }
+}
+
+/* ── Action bar internals ─────────────────────────────────── */
+.pdp-action-bar-price  { flex: 1; min-width: 0; }
+.pdp-action-bar-label  {
+    font-family:    var(--font-body);
+    font-size:      10px;
+    font-weight:    600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color:          var(--text-3);
+    line-height:    1;
+    margin-bottom:  3px;
+}
+.pdp-action-bar-amount {
+    font-family:    var(--font-mono);
+    font-weight:    600;
+    font-size:      var(--text-2xl);
+    color:          var(--accent);
+    letter-spacing: -0.02em;
+    line-height:    1;
+    white-space:    nowrap;
+    overflow:       hidden;
+    text-overflow:  ellipsis;
+}
+.pdp-action-bar-btn {
+    border:         none;
+    border-radius:  var(--r-md);
+    padding:        var(--space-3) var(--space-5);
+    font-family:    var(--font-body);
+    font-weight:    700;
+    font-size:      var(--text-sm);
+    cursor:         pointer;
+    white-space:    nowrap;
+    min-height:     44px;
+    transition:     opacity var(--duration-fast);
+}
+.pdp-action-bar-btn:hover:not(:disabled) { opacity: 0.88; }
+.pdp-action-bar-btn:disabled             { cursor: default; }
+
+/* ── Button hover states ──────────────────────────────────── */
+.pdp-btn-primary:hover:not(:disabled) { background: var(--accent-hi) !important; }
+.pdp-btn-ghost:hover  { border-color: var(--accent) !important; color: var(--accent) !important; }
+.pdp-qty-btn:hover:not(:disabled)     { background: var(--surface-hover) !important; }
+.pdp-back-link:hover  { color: var(--accent) !important; }
+
+/* ── Quote modal ──────────────────────────────────────────── */
+.pdp-overlay {
+    position:        fixed;
+    inset:           0;
+    z-index:         var(--z-modal-bg);
+    background:      oklch(0 0 0 / 0.72);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    padding:         var(--space-4);
+}
+.pdp-modal {
+    background:    var(--surface);
+    border:        1px solid var(--border);
+    border-radius: var(--r-lg);
+    width:         100%;
+    max-width:     520px;
+    max-height:    90vh;
+    overflow-y:    auto;
+    padding:       var(--space-6);
+    display:       flex;
+    flex-direction: column;
+    gap:           var(--space-5);
+}
+@media (max-width: 479px) { .pdp-modal { padding: var(--space-4); } }
+
+.pdp-field { display: flex; flex-direction: column; gap: var(--space-2); }
+.pdp-label {
+    font-family:    var(--font-body);
+    font-size:      var(--text-2xs);
+    font-weight:    600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color:          var(--text-3);
+}
+.pdp-input {
+    background:   var(--surface-high);
+    border:       1px solid var(--border);
+    border-radius: var(--r-sm);
+    color:        var(--text);
+    font-family:  var(--font-body);
+    font-size:    var(--text-sm);
+    padding:      var(--space-3) var(--space-4);
+    outline:      none;
+    transition:   border-color var(--duration-fast);
+}
+.pdp-input:focus        { border-color: var(--accent); }
+.pdp-input::placeholder { color: var(--text-4); }
+.pdp-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+@media (max-width: 479px) { .pdp-modal-row { grid-template-columns: 1fr; } }
