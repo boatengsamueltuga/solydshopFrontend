@@ -45,6 +45,7 @@ const HomePage = () => {
     const [productError,     setProductError]     = useState(null);
     const [pageNumber,       setPageNumber]       = useState(0);
     const [totalPages,       setTotalPages]       = useState(1);
+    const [inStockOnly,      setInStockOnly]      = useState(false);
 
     const modalRef            = useRef(null);
     const quickViewTriggerRef = useRef(null);
@@ -57,7 +58,7 @@ const HomePage = () => {
         } catch (e) { console.log(e); }
     };
 
-    const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax, page = pageNumber) => {
+    const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax, page = pageNumber, inStock = inStockOnly) => {
         dispatch(fetchProductsStart());
         setProductError(null);
         try {
@@ -65,6 +66,7 @@ const HomePage = () => {
             if (kw.trim())    url += `keyword=${encodeURIComponent(kw)}&`;
             if (catId)        url += `categoryId=${catId}&`;
             if (max < 100000) url += `maxPrice=${max}&`;
+            if (inStock)      url += `inStock=true&`;
             const res = await api.get(url);
             dispatch(fetchProductsSuccess(res.data.content));
             setTotalPages(res.data.totalPages ?? 1);
@@ -90,9 +92,9 @@ const HomePage = () => {
 
     useEffect(() => {
         setPageNumber(0);
-        const t = setTimeout(() => fetchProducts(keyword, categoryId, priceMax, 0), 400);
+        const t = setTimeout(() => fetchProducts(keyword, categoryId, priceMax, 0, inStockOnly), 400);
         return () => clearTimeout(t);
-    }, [keyword, categoryId, priceMax]);
+    }, [keyword, categoryId, priceMax, inStockOnly]);
 
     /* ── Quick View focus management ── */
     useEffect(() => {
@@ -168,8 +170,9 @@ const HomePage = () => {
         setKeyword("");
         setCategoryId("");
         setPriceMax(100000);
+        setInStockOnly(false);
         setPageNumber(0);
-        fetchProducts("", "", 100000, 0);
+        fetchProducts("", "", 100000, 0, false);
     };
 
     const handlePageChange = (newPage) => {
@@ -298,10 +301,15 @@ const HomePage = () => {
                             </p>
                             <div className="flex flex-wrap gap-2">
                                 <button
-                                    disabled
-                                    aria-disabled="true"
-                                    className="px-2 py-1 rounded-sm text-[10px] font-bold opacity-40 cursor-not-allowed"
-                                    style={{ background: "var(--success-subtle)", color: "var(--success)", border: "1px solid var(--success)" }}
+                                    onClick={() => setInStockOnly((v) => !v)}
+                                    aria-pressed={inStockOnly}
+                                    className="px-2 py-1 rounded-sm text-[10px] font-bold"
+                                    style={{
+                                        background: inStockOnly ? "var(--success)" : "var(--success-subtle)",
+                                        color:      inStockOnly ? "var(--bg)"      : "var(--success)",
+                                        border:     "1px solid var(--success)",
+                                        cursor:     "pointer",
+                                    }}
                                 >
                                     In Stock
                                 </button>
@@ -323,7 +331,7 @@ const HomePage = () => {
                         style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}
                     >
                         <button
-                            onClick={() => { setPageNumber(0); fetchProducts(keyword, categoryId, priceMax, 0); }}
+                            onClick={() => { setPageNumber(0); fetchProducts(keyword, categoryId, priceMax, 0, inStockOnly); }}
                             className="flex-1 py-2.5 rounded font-bold text-xs transition-colors hover:opacity-90 min-h-[44px]"
                             style={{ background: "var(--accent)", color: "var(--bg)" }}
                         >

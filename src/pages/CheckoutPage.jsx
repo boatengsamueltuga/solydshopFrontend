@@ -114,14 +114,14 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
                 return;
             }
 
-            await api.post(
+            const orderRes = await api.post(
                 `/order/${userId}/checkout`,
                 { shippingAddress },
                 { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
 
             toast.success("Payment successful! Order placed.");
-            window.location.href = "/orders";
+            navigate(`/order-confirmation?orderId=${orderRes.data.orderId}`);
 
         } catch (err) {
             console.error(err);
