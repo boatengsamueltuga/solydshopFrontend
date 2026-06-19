@@ -1,46 +1,46 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    SolydShop Design Tokens
-   OKLCH color system — warm-shifted graphite + copper/brass accent
-   Source: UI_REDESIGN_MASTER_PLAN.md § 2.2
+   OKLCH color system — sage & caramel, light theme
+   Palette: ccd5ae · e9edc9 · fefae0 · faedcd · d4a373 (coolors.co)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
 
   /* ── Background scale ─────────────────────────────────────────────────── */
-  --bg:             oklch(0.10 0.012 58);   /* deep machined graphite */
-  --surface:        oklch(0.15 0.014 58);   /* panel surface           */
-  --surface-mid:    oklch(0.20 0.016 58);   /* raised panel            */
-  --surface-high:   oklch(0.26 0.018 58);   /* card / input bg         */
-  --surface-hover:  oklch(0.30 0.018 58);   /* hover state on cards    */
+  --bg:             oklch(0.98 0.018 96);    /* #fefae0 — cream canvas       */
+  --surface:        oklch(0.95 0.025 81);    /* #faedcd — warm sand panel    */
+  --surface-mid:    oklch(0.93 0.038 106);   /* #e9edc9 — light sage raised  */
+  --surface-high:   oklch(0.84 0.056 119);   /* #ccd5ae — sage card          */
+  --surface-hover:  oklch(0.79 0.058 119);   /* hover state on sage cards    */
 
   /* ── Border scale ─────────────────────────────────────────────────────── */
-  --border-subtle:  oklch(0.24 0.016 58);   /* hairline, barely visible */
-  --border:         oklch(0.32 0.018 58);   /* standard border          */
-  --border-mid:     oklch(0.40 0.020 58);   /* visible dividers         */
-  --border-strong:  oklch(0.50 0.022 58);   /* emphasis borders         */
+  --border-subtle:  oklch(0.90 0.040 110);   /* hairline sage tint           */
+  --border:         oklch(0.82 0.056 116);   /* standard sage border         */
+  --border-mid:     oklch(0.74 0.065 110);   /* visible dividers             */
+  --border-strong:  oklch(0.65 0.080 65);    /* caramel-tinted emphasis      */
 
   /* ── Text scale ───────────────────────────────────────────────────────── */
-  --text:           oklch(0.94 0.008 58);   /* primary — warm near-white */
-  --text-2:         oklch(0.72 0.012 58);   /* secondary                */
-  --text-3:         oklch(0.52 0.010 58);   /* tertiary / disabled      */
-  --text-4:         oklch(0.38 0.008 58);   /* placeholder              */
+  --text:           oklch(0.22 0.045 55);    /* very dark warm brown         */
+  --text-2:         oklch(0.38 0.045 55);    /* dark caramel brown           */
+  --text-3:         oklch(0.56 0.040 55);    /* medium warm brown (muted)    */
+  --text-4:         oklch(0.70 0.030 60);    /* placeholder warm brown       */
 
-  /* ── Brand accent — Copper/Brass ──────────────────────────────────────── */
-  --accent:         oklch(0.67 0.115 55);   /* copper — primary brand   */
-  --accent-hi:      oklch(0.74 0.130 55);   /* hover                    */
-  --accent-lo:      oklch(0.54 0.095 55);   /* pressed / deep           */
-  --accent-subtle:  oklch(0.20 0.030 55);   /* tinted bg for accent     */
-  --accent-border:  oklch(0.40 0.060 55);   /* accent-tinted border     */
+  /* ── Brand accent — Caramel ──────────────────────────────────────────── */
+  --accent:         oklch(0.73 0.100 63);    /* #d4a373 — caramel            */
+  --accent-hi:      oklch(0.80 0.090 63);    /* hover                        */
+  --accent-lo:      oklch(0.62 0.100 63);    /* pressed / deep               */
+  --accent-subtle:  oklch(0.95 0.022 63);    /* tinted bg for accent         */
+  --accent-border:  oklch(0.76 0.080 63);    /* accent-tinted border         */
 
   /* ── Semantic ─────────────────────────────────────────────────────────── */
-  --success:        oklch(0.63 0.10 160);   /* teal-green — in stock    */
-  --success-subtle: oklch(0.18 0.04 160);
-  --warning:        oklch(0.72 0.10 78);    /* amber — low stock        */
-  --warning-subtle: oklch(0.18 0.04 78);
-  --error:          oklch(0.54 0.14 28);    /* deep red                 */
-  --error-subtle:   oklch(0.18 0.05 28);
-  --info:           oklch(0.62 0.09 230);   /* cool blue — status info  */
-  --info-subtle:    oklch(0.18 0.04 230);
+  --success:        oklch(0.40 0.14 150);    /* dark teal-green — in stock   */
+  --success-subtle: oklch(0.92 0.050 150);   /* light sage tint              */
+  --warning:        oklch(0.50 0.14 75);     /* dark amber — low stock       */
+  --warning-subtle: oklch(0.95 0.030 75);    /* light amber tint             */
+  --error:          oklch(0.44 0.16 28);     /* dark red                     */
+  --error-subtle:   oklch(0.94 0.035 28);    /* light rose tint              */
+  --info:           oklch(0.44 0.12 248);    /* dark blue — status info      */
+  --info-subtle:    oklch(0.92 0.035 248);   /* light blue tint              */
 
   /* ── Font families ────────────────────────────────────────────────────── */
   --font-display: 'Space Grotesk', system-ui, sans-serif;
@@ -83,10 +83,10 @@
   --r-pill: 9999px;   /* badges and pills only           */
 
   /* ── Shadows ──────────────────────────────────────────────────────────── */
-  --shadow-1:      0 1px  2px  oklch(0 0 0 / 0.50);
-  --shadow-2:      0 2px  8px  oklch(0 0 0 / 0.60);
-  --shadow-3:      0 4px  16px oklch(0 0 0 / 0.70);
-  --shadow-accent: 0 0    16px oklch(0.67 0.115 55 / 0.25);
+  --shadow-1:      0 1px  2px  oklch(0.22 0.045 55 / 0.12);
+  --shadow-2:      0 2px  8px  oklch(0.22 0.045 55 / 0.15);
+  --shadow-3:      0 4px  16px oklch(0.22 0.045 55 / 0.20);
+  --shadow-accent: 0 0    16px oklch(0.73 0.100 63 / 0.30);
 
   /* ── Z-index scale ────────────────────────────────────────────────────── */
   --z-dropdown:  100;

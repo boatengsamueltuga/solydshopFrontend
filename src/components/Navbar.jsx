@@ -8,14 +8,14 @@ import { FaShoppingCart } from "react-icons/fa";
 
 // ── Design tokens ────────────────────────────────────────────
 const C = {
-    bg:          "#1B2A3D",
-    border:      "#2D4263",
-    primary:     "#8ed5ff",
-    text:        "#dee3e8",
-    textMuted:   "#bdc8d1",
-    surfaceHigh: "#243447",
-    btnBg:       "#38bdf8",
-    btnText:     "#003a57",
+    bg:          "#fefae0",   /* --bg            */
+    border:      "#bccf98",   /* --border        */
+    primary:     "#d4a373",   /* --accent        */
+    text:        "#3a2010",   /* --text          */
+    textMuted:   "#8a6440",   /* --text-3        */
+    surfaceHigh: "#ccd5ae",   /* --surface-high  */
+    btnBg:       "#d4a373",   /* --accent        */
+    btnText:     "#3a2010",   /* dark text on caramel */
 };
 
 const Navbar = () => {
@@ -45,7 +45,7 @@ const Navbar = () => {
 
     const initials = user?.email?.[0]?.toUpperCase() ?? "U";
 
-    const roleColor = isAdmin ? "#ef4444" : isSeller ? "#f97316" : C.btnBg;
+    const roleColor = isAdmin ? "#8a1c12" : isSeller ? "#7a4e0a" : C.btnBg;
 
     // ── Desktop link helper ──────────────────────────────────
     const NavLink = ({ to, children }) => {

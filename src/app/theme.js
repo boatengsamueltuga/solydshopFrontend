@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SolydShop MUI Theme
+   SolydShop MUI Theme — light / sage & caramel
    Palette uses sRGB hex (MUI's colorManipulator cannot parse oklch at
    JS-evaluation time). styleOverrides use oklch directly since those values
    go straight to CSS without JS color processing.
@@ -10,99 +10,95 @@ import { createTheme } from '@mui/material/styles';
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Color map (oklch → sRGB hex) ─────────────────────────────────────────
-   --bg              oklch(0.10 0.012 58)  →  #191510
-   --surface         oklch(0.15 0.014 58)  →  #24190f
-   --surface-mid     oklch(0.20 0.016 58)  →  #302114
-   --surface-high    oklch(0.26 0.018 58)  →  #402d1b
-   --surface-hover   oklch(0.30 0.018 58)  →  #4a3520
-   --border-subtle   oklch(0.24 0.016 58)  →  #3a2818
-   --border          oklch(0.32 0.018 58)  →  #543d27
-   --text            oklch(0.94 0.008 58)  →  #ede9e4
-   --text-2          oklch(0.72 0.012 58)  →  #b5b0a8
-   --text-3          oklch(0.52 0.010 58)  →  #837d76
-   --accent          oklch(0.67 0.115 55)  →  #c87940
-   --accent-hi       oklch(0.74 0.130 55)  →  #d8904a
-   --accent-lo       oklch(0.54 0.095 55)  →  #a05e2c
-   --success         oklch(0.63 0.10  160) →  #2a9e7a
-   --success-subtle  oklch(0.18 0.04  160) →  #0c2820
-   --warning         oklch(0.72 0.10  78)  →  #c7a020
-   --warning-subtle  oklch(0.18 0.04  78)  →  #27220b
-   --error           oklch(0.54 0.14  28)  →  #bf3628
-   --error-subtle    oklch(0.18 0.05  28)  →  #2c0e0c
-   --info            oklch(0.62 0.09  230) →  #3a7fbc
-   --info-subtle     oklch(0.18 0.04  230) →  #0d1e2e
+   --bg              oklch(0.98 0.018 96)   →  #fefae0
+   --surface         oklch(0.95 0.025 81)   →  #faedcd
+   --surface-mid     oklch(0.93 0.038 106)  →  #e9edc9
+   --surface-high    oklch(0.84 0.056 119)  →  #ccd5ae
+   --surface-hover   oklch(0.79 0.058 119)  →  #b7cc94
+   --border-subtle   oklch(0.90 0.040 110)  →  #d0e0b0
+   --border          oklch(0.82 0.056 116)  →  #bccf98
+   --text            oklch(0.22 0.045 55)   →  #3a2010
+   --text-2          oklch(0.38 0.045 55)   →  #5e3a1a
+   --text-3          oklch(0.56 0.040 55)   →  #8a6440
+   --accent          oklch(0.73 0.100 63)   →  #d4a373
+   --accent-hi       oklch(0.80 0.090 63)   →  #e4be96
+   --accent-lo       oklch(0.62 0.100 63)   →  #bc8852
+   --success         oklch(0.40 0.14 150)   →  #1a5e3c
+   --warning         oklch(0.50 0.14 75)    →  #7a4e0a
+   --error           oklch(0.44 0.16 28)    →  #8a1c12
+   --info            oklch(0.44 0.12 248)   →  #1c3d88
    ────────────────────────────────────────────────────────────────────────── */
 
 export const solydTheme = createTheme({
 
   /* ── Palette ─────────────────────────────────────────────────────────── */
   palette: {
-    mode: 'dark',
+    mode: 'light',
 
     background: {
-      default: '#191510',   /* --bg      */
-      paper:   '#24190f',   /* --surface */
+      default: '#fefae0',   /* --bg      */
+      paper:   '#faedcd',   /* --surface */
     },
 
     primary: {
-      main:         '#c87940',   /* --accent    */
-      dark:         '#a05e2c',   /* --accent-lo */
-      light:        '#d8904a',   /* --accent-hi */
-      contrastText: '#191510',   /* --bg        */
+      main:         '#d4a373',   /* --accent    */
+      dark:         '#bc8852',   /* --accent-lo */
+      light:        '#e4be96',   /* --accent-hi */
+      contrastText: '#3a2010',   /* --text (dark on caramel) */
     },
 
     secondary: {
-      main:         '#402d1b',   /* --surface-high  */
-      dark:         '#302114',   /* --surface-mid   */
-      light:        '#4a3520',   /* --surface-hover */
-      contrastText: '#ede9e4',   /* --text          */
+      main:         '#ccd5ae',   /* --surface-high  */
+      dark:         '#b7cc94',   /* --surface-hover */
+      light:        '#e9edc9',   /* --surface-mid   */
+      contrastText: '#3a2010',   /* --text          */
     },
 
     success: {
-      main:         '#2a9e7a',   /* --success        */
-      dark:         '#207a5e',
-      light:        '#3bbf94',
-      contrastText: '#ede9e4',
+      main:         '#1a5e3c',   /* --success        */
+      dark:         '#144830',
+      light:        '#237850',
+      contrastText: '#fefae0',
     },
 
     warning: {
-      main:         '#c7a020',   /* --warning        */
-      dark:         '#9c7c18',
-      light:        '#d8b53a',
-      contrastText: '#191510',
+      main:         '#7a4e0a',   /* --warning        */
+      dark:         '#5e3c06',
+      light:        '#9e6812',
+      contrastText: '#fefae0',
     },
 
     error: {
-      main:         '#bf3628',   /* --error          */
-      dark:         '#8f2820',
-      light:        '#d45444',
-      contrastText: '#ede9e4',
+      main:         '#8a1c12',   /* --error          */
+      dark:         '#6c140e',
+      light:        '#a8301e',
+      contrastText: '#fefae0',
     },
 
     info: {
-      main:         '#3a7fbc',   /* --info           */
-      dark:         '#2c628f',
-      light:        '#5799d0',
-      contrastText: '#ede9e4',
+      main:         '#1c3d88',   /* --info           */
+      dark:         '#142e6c',
+      light:        '#2a52a8',
+      contrastText: '#fefae0',
     },
 
     text: {
-      primary:   '#ede9e4',   /* --text   */
-      secondary: '#b5b0a8',   /* --text-2 */
-      disabled:  '#837d76',   /* --text-3 */
+      primary:   '#3a2010',   /* --text   */
+      secondary: '#5e3a1a',   /* --text-2 */
+      disabled:  '#8a6440',   /* --text-3 */
     },
 
-    divider: '#543d27',         /* --border */
+    divider: '#bccf98',         /* --border */
 
     action: {
-      active:             '#ede9e4',
-      hover:              '#302114',   /* --surface-mid  */
+      active:             '#3a2010',
+      hover:              '#e9edc9',   /* --surface-mid  */
       hoverOpacity:       0.08,
-      selected:           '#402d1b',   /* --surface-high */
+      selected:           '#ccd5ae',   /* --surface-high */
       selectedOpacity:    0.12,
-      disabled:           '#837d76',   /* --text-3       */
-      disabledBackground: '#302114',
-      focus:              '#302114',
+      disabled:           '#8a6440',   /* --text-3       */
+      disabledBackground: '#e9edc9',
+      focus:              '#e9edc9',
       focusOpacity:       0.12,
     },
   },
@@ -131,20 +127,20 @@ export const solydTheme = createTheme({
   /* ── Component overrides ─────────────────────────────────────────────── */
   components: {
 
-    /* Paper — suppress MUI's default gradient overlay in dark mode */
+    /* Paper — no gradient overlay */
     MuiPaper: {
       styleOverrides: {
         root: { backgroundImage: 'none' },
       },
     },
 
-    /* Card — surface-high, 1px border, 4px radius */
+    /* Card — sage surface-high, sage border, 4px radius */
     MuiCard: {
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: 'oklch(0.26 0.018 58)',
-          border:          '1px solid oklch(0.32 0.018 58)',
+          backgroundColor: 'oklch(0.84 0.056 119)',
+          border:          '1px solid oklch(0.82 0.056 116)',
           borderRadius:    '4px',
         },
       },
@@ -183,37 +179,37 @@ export const solydTheme = createTheme({
       },
     },
 
-    /* OutlinedInput — dark card bg, copper focus border */
+    /* OutlinedInput — sage bg, caramel focus border */
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          backgroundColor: 'oklch(0.26 0.018 58)',
+          backgroundColor: 'oklch(0.84 0.056 119)',
           borderRadius:    '3px',
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'oklch(0.67 0.115 55)',
+            borderColor: 'oklch(0.73 0.100 63)',
             borderWidth: '1px',
           },
         },
-        notchedOutline: { borderColor: 'oklch(0.32 0.018 58)' },
+        notchedOutline: { borderColor: 'oklch(0.82 0.056 116)' },
       },
     },
 
-    /* InputLabel — copper on focus */
+    /* InputLabel — caramel on focus */
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          '&.Mui-focused': { color: 'oklch(0.67 0.115 55)' },
+          '&.Mui-focused': { color: 'oklch(0.73 0.100 63)' },
         },
       },
     },
 
-    /* Dialog — dark panel, 1px border */
+    /* Dialog — surface panel bg, sage border */
     MuiDialog: {
       styleOverrides: {
         paper: {
           backgroundImage: 'none',
-          backgroundColor: 'oklch(0.15 0.014 58)',
-          border:          '1px solid oklch(0.32 0.018 58)',
+          backgroundColor: 'oklch(0.95 0.025 81)',
+          border:          '1px solid oklch(0.82 0.056 116)',
           borderRadius:    '4px',
         },
       },
@@ -223,9 +219,9 @@ export const solydTheme = createTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: {
-          '&.Mui-selected':       { backgroundColor: 'oklch(0.26 0.018 58)' },
-          '&.Mui-selected:hover': { backgroundColor: 'oklch(0.30 0.018 58)' },
-          '&:hover':              { backgroundColor: 'oklch(0.20 0.016 58)' },
+          '&.Mui-selected':       { backgroundColor: 'oklch(0.84 0.056 119)' },
+          '&.Mui-selected:hover': { backgroundColor: 'oklch(0.79 0.058 119)' },
+          '&:hover':              { backgroundColor: 'oklch(0.93 0.038 106)' },
         },
       },
     },
@@ -233,36 +229,35 @@ export const solydTheme = createTheme({
     /* Select dropdown icon */
     MuiSelect: {
       styleOverrides: {
-        icon: { color: 'oklch(0.72 0.012 58)' },
+        icon: { color: 'oklch(0.38 0.045 55)' },
       },
     },
 
     /* Divider */
     MuiDivider: {
       styleOverrides: {
-        root: { borderColor: 'oklch(0.32 0.018 58)' },
+        root: { borderColor: 'oklch(0.82 0.056 116)' },
       },
     },
 
-    /* Tooltip — dark surface panel */
+    /* Tooltip — dark brown bg for contrast on light surfaces */
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: 'oklch(0.26 0.018 58)',
-          border:          '1px solid oklch(0.32 0.018 58)',
+          backgroundColor: 'oklch(0.22 0.045 55)',
           borderRadius:    '3px',
           fontSize:        '0.75rem',
-          color:           'oklch(0.94 0.008 58)',
+          color:           'oklch(0.98 0.018 96)',
         },
       },
     },
 
-    /* Avatar — surface-high bg */
+    /* Avatar — caramel bg */
     MuiAvatar: {
       styleOverrides: {
         root: {
-          backgroundColor: 'oklch(0.26 0.018 58)',
-          color:           'oklch(0.72 0.012 58)',
+          backgroundColor: 'oklch(0.73 0.100 63)',
+          color:           'oklch(0.22 0.045 55)',
         },
       },
     },
@@ -271,12 +266,12 @@ export const solydTheme = createTheme({
     MuiStepIcon: {
       styleOverrides: {
         root: {
-          color: 'oklch(0.32 0.018 58)',
-          '&.Mui-active':    { color: 'oklch(0.67 0.115 55)' },
-          '&.Mui-completed': { color: 'oklch(0.67 0.115 55)' },
+          color: 'oklch(0.82 0.056 116)',
+          '&.Mui-active':    { color: 'oklch(0.73 0.100 63)' },
+          '&.Mui-completed': { color: 'oklch(0.73 0.100 63)' },
         },
         text: {
-          fill:     'oklch(0.94 0.008 58)',
+          fill:     'oklch(0.22 0.045 55)',
           fontSize: '0.7rem',
         },
       },
@@ -291,7 +286,7 @@ export const solydTheme = createTheme({
       },
     },
 
-    /* DataGrid — dark headers, IBM Plex Sans column titles */
+    /* DataGrid — sage-tinted headers, IBM Plex Sans column titles */
     MuiDataGrid: {
       styleOverrides: {
         root: {
@@ -299,8 +294,8 @@ export const solydTheme = createTheme({
           backgroundColor: 'transparent',
 
           '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: 'oklch(0.15 0.014 58)',
-            borderBottom:    '1px solid oklch(0.32 0.018 58)',
+            backgroundColor: 'oklch(0.93 0.038 106)',
+            borderBottom:    '1px solid oklch(0.82 0.056 116)',
           },
 
           '& .MuiDataGrid-columnHeaderTitle': {
@@ -309,24 +304,24 @@ export const solydTheme = createTheme({
             fontSize:      '0.75rem',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
-            color:         'oklch(0.72 0.012 58)',
+            color:         'oklch(0.38 0.045 55)',
           },
 
           '& .MuiDataGrid-cell': {
-            borderColor: 'oklch(0.24 0.016 58)',
+            borderColor: 'oklch(0.90 0.040 110)',
           },
 
           '& .MuiDataGrid-row:hover': {
-            backgroundColor: 'oklch(0.20 0.016 58)',
+            backgroundColor: 'oklch(0.93 0.038 106)',
           },
 
           '& .MuiDataGrid-footerContainer': {
-            borderTop:       '1px solid oklch(0.32 0.018 58)',
-            backgroundColor: 'oklch(0.15 0.014 58)',
+            borderTop:       '1px solid oklch(0.82 0.056 116)',
+            backgroundColor: 'oklch(0.93 0.038 106)',
           },
 
           '& .MuiDataGrid-overlay': {
-            backgroundColor: 'oklch(0.15 0.014 58)',
+            backgroundColor: 'oklch(0.93 0.038 106)',
           },
         },
       },
@@ -341,16 +336,16 @@ export const solydTheme = createTheme({
           fontSize:      '0.75rem',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
-          color:         'oklch(0.72 0.012 58)',
-          borderColor:   'oklch(0.32 0.018 58)',
+          color:         'oklch(0.38 0.045 55)',
+          borderColor:   'oklch(0.82 0.056 116)',
         },
         body: {
-          borderColor: 'oklch(0.24 0.016 58)',
+          borderColor: 'oklch(0.90 0.040 110)',
         },
       },
     },
 
-    /* CircularProgress — default to primary copper */
+    /* CircularProgress — default to primary caramel */
     MuiCircularProgress: {
       defaultProps: { color: 'primary' },
     },

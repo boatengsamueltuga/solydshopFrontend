@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-19T00:00:00.000Z",
+  "title": "Design System: SolydShop",
+  "extensions": {
+    "colorMeta": {
+      "accent":         { "role": "primary",  "displayName": "Graphite Blush",   "canonical": "oklch(0.76 0.055 22)",   "tonalRamp": ["#311618","#4d2429","#6b363d","#894a50","#a85e65","#ae8d87","#c9ada7","#e8d4d0"] },
+      "accent-hi":      { "role": "primary",  "displayName": "Lifted Blush",     "canonical": "oklch(0.83 0.048 22)",   "tonalRamp": ["#311618","#4d2429","#6b363d","#894a50","#a85e65","#ae8d87","#c9ada7","#e8d4d0"] },
+      "accent-lo":      { "role": "primary",  "displayName": "Deep Blush",       "canonical": "oklch(0.65 0.055 22)",   "tonalRamp": ["#311618","#4d2429","#6b363d","#894a50","#a85e65","#ae8d87","#c9ada7","#e8d4d0"] },
+      "accent-subtle":  { "role": "primary",  "displayName": "Rose Tint",        "canonical": "oklch(0.21 0.022 325)",  "tonalRamp": ["#1a1020","#2d1b35","#42284d","#57396a","#6e4c80","#866196","#a27eac","#c9b8cc"] },
+      "accent-border":  { "role": "primary",  "displayName": "Rose Border",      "canonical": "oklch(0.44 0.040 10)",   "tonalRamp": ["#1f0f0f","#38201f","#533333","#6e4645","#885a59","#9e706e","#b98c8a","#d9b4b2"] },
+      "bg":             { "role": "neutral",  "displayName": "Vault Indigo",     "canonical": "oklch(0.17 0.063 275)",  "tonalRamp": ["#12101e","#22223b","#2f2c4d","#3e3c5c","#4a4e69","#676b85","#8c8fa6","#b8bac8"] },
+      "surface":        { "role": "neutral",  "displayName": "Lifted Indigo",    "canonical": "oklch(0.20 0.058 276)",  "tonalRamp": ["#12101e","#22223b","#2f2c4d","#3e3c5c","#4a4e69","#676b85","#8c8fa6","#b8bac8"] },
+      "surface-mid":    { "role": "neutral",  "displayName": "Raised Indigo",    "canonical": "oklch(0.24 0.055 277)",  "tonalRamp": ["#12101e","#22223b","#2f2c4d","#3e3c5c","#4a4e69","#676b85","#8c8fa6","#b8bac8"] },
+      "surface-high":   { "role": "neutral",  "displayName": "Storm Slate",      "canonical": "oklch(0.36 0.058 278)",  "tonalRamp": ["#12101e","#22223b","#2f2c4d","#3e3c5c","#4a4e69","#676b85","#8c8fa6","#b8bac8"] },
+      "text":           { "role": "neutral",  "displayName": "Blueprint Linen",  "canonical": "oklch(0.93 0.014 58)",   "tonalRamp": ["#50493f","#6d6560","#8a807a","#9e9a91","#bab5ab","#cfbfb6","#e0d9d3","#f2e9e4"] },
+      "text-2":         { "role": "neutral",  "displayName": "Warm Parchment",   "canonical": "oklch(0.81 0.018 38)",   "tonalRamp": ["#50493f","#6d6560","#8a807a","#9e9a91","#bab5ab","#cfbfb6","#e0d9d3","#f2e9e4"] },
+      "text-3":         { "role": "neutral",  "displayName": "Smoked Mauve",     "canonical": "oklch(0.63 0.035 325)",  "tonalRamp": ["#25182a","#3d2b43","#58415e","#6e6170","#877a8c","#9a8c98","#b8adb4","#ddd3d8"] },
+      "text-4":         { "role": "neutral",  "displayName": "Muted Mauve",      "canonical": "oklch(0.46 0.025 320)",  "tonalRamp": ["#25182a","#3d2b43","#58415e","#6e6170","#877a8c","#9a8c98","#b8adb4","#ddd3d8"] },
+      "success":        { "role": "semantic", "displayName": "Forge Green",      "canonical": "oklch(0.63 0.10 160)",   "tonalRamp": ["#061a13","#0c2820","#133d2f","#1a5540","#216e53","#2a9e7a","#3bbf94","#6fd9b4"] },
+      "warning":        { "role": "semantic", "displayName": "Amber Signal",     "canonical": "oklch(0.72 0.10 78)",    "tonalRamp": ["#1a1500","#27220b","#3d3510","#57491a","#756024","#c7a020","#d8b53a","#e9ce6e"] },
+      "error":          { "role": "semantic", "displayName": "Critical Red",     "canonical": "oklch(0.54 0.14 28)",    "tonalRamp": ["#1c0606","#2c0e0c","#451614","#61201c","#822b25","#bf3628","#d45444","#e88070"] },
+      "info":           { "role": "semantic", "displayName": "Blueprint Blue",   "canonical": "oklch(0.62 0.09 250)",   "tonalRamp": ["#060e1c","#0d1424","#16213a","#223256","#2e4575","#4a72bf","#6690d4","#96b4e8"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display",  "purpose": "Page-level hero headings only. Not used inside the app shell." },
+      "headline": { "displayName": "Headline", "purpose": "Page title h1 on every dashboard, form, and catalog view." },
+      "title":    { "displayName": "Title",    "purpose": "Section headings, dialog titles, panel headers." },
+      "body":     { "displayName": "Body",     "purpose": "All prose and descriptions. Max 65–75ch on reading-heavy views." },
+      "label":    { "displayName": "Label",    "purpose": "All technical metadata: part numbers, IDs, statuses, column headers, role badges. Always uppercase." }
+    },
+    "shadows": [
+      { "name": "ambient",      "value": "0 1px 2px oklch(0 0 0 / 0.50)",  "purpose": "Lightest separation for toolbar elements and floating badges." },
+      { "name": "lifted",       "value": "0 2px 8px oklch(0 0 0 / 0.60)",  "purpose": "Standard overlay shadow — dialogs and side drawers." },
+      { "name": "deep",         "value": "0 4px 16px oklch(0 0 0 / 0.70)", "purpose": "Full-screen modals and side sheets." },
+      { "name": "accent-bloom", "value": "0 0 16px oklch(0.76 0.055 22 / 0.25)", "purpose": "Focused glow ring in blush rose. Primary buttons on hover, focused accent-bordered inputs." }
+    ],
+    "motion": [
+      { "name": "ease-out-quart", "value": "cubic-bezier(0.25, 1, 0.5, 1)",  "purpose": "Standard state transitions (color, border, opacity)." },
+      { "name": "ease-out-expo",  "value": "cubic-bezier(0.16, 1, 0.3, 1)",  "purpose": "Panel entrances and drawer slides." },
+      { "name": "duration-fast",  "value": "120ms", "purpose": "Hover color shifts, focus border transitions." },
+      { "name": "duration-mid",   "value": "220ms", "purpose": "Panel fades, skeleton to content transitions." },
+      { "name": "duration-slow",  "value": "380ms", "purpose": "Page-level transitions and drawer slide-ins." }
+    ],
+    "breakpoints": [
+      { "name": "mobile-nav", "value": "767px", "purpose": "Below this width, top nav hides and mobile bottom nav appears." },
+      { "name": "content-max", "value": "1440px", "purpose": "Maximum content width for all page layouts." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action. Add to Cart, Submit, Create Product.",
+      "html": "<button class=\"ds-btn-primary\">Add to Cart</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: oklch(0.76 0.055 22); color: oklch(0.17 0.063 275); border: none; border-radius: 4px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; transition: opacity 120ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-primary:hover { opacity: 0.88; } .ds-btn-primary:active { opacity: 0.75; } .ds-btn-primary:focus-visible { outline: 2px solid oklch(0.76 0.055 22); outline-offset: 2px; } .ds-btn-primary:disabled { background: oklch(0.30 0.055 277); color: oklch(0.63 0.035 325); cursor: not-allowed; opacity: 1; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary actions. Browse Catalog, Cancel, Back.",
+      "html": "<button class=\"ds-btn-ghost\">Browse Catalog</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; padding: 10px 24px; background: transparent; color: oklch(0.81 0.018 38); border: 1px solid oklch(0.30 0.055 277); border-radius: 4px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: border-color 120ms cubic-bezier(0.25, 1, 0.5, 1), color 120ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-ghost:hover { border-color: oklch(0.76 0.055 22); color: oklch(0.76 0.055 22); } .ds-btn-ghost:focus-visible { outline: 2px solid oklch(0.76 0.055 22); outline-offset: 2px; } .ds-btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The primary buyer-facing content unit. Part name, model number, price, add-to-cart.",
+      "html": "<div class=\"ds-product-card\"><div class=\"ds-product-card-img\"></div><div class=\"ds-product-card-body\"><span class=\"ds-product-card-tag\">CAT 320D</span><p class=\"ds-product-card-name\">Hydraulic Pump Assembly</p><p class=\"ds-product-card-price\">$1,249.00</p><button class=\"ds-product-card-btn\">Add to Cart</button></div></div>",
+      "css": ".ds-product-card { background: oklch(0.20 0.058 276); border: 1px solid oklch(0.30 0.055 277); border-radius: 4px; overflow: hidden; transition: border-color 120ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-product-card:hover { border-color: oklch(0.76 0.055 22); } .ds-product-card-img { height: 140px; background: oklch(0.36 0.058 278); } .ds-product-card-body { padding: 12px; } .ds-product-card-tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.63 0.035 325); margin-bottom: 4px; } .ds-product-card-name { font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: oklch(0.93 0.014 58); margin: 0 0 4px; line-height: 1.3; } .ds-product-card-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.875rem; font-weight: 700; color: oklch(0.76 0.055 22); margin: 0 0 12px; } .ds-product-card-btn { width: 100%; padding: 8px; background: oklch(0.76 0.055 22); color: oklch(0.17 0.063 275); border: none; border-radius: 4px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; transition: opacity 120ms; } .ds-product-card-btn:hover { opacity: 0.88; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Part number and keyword search. The primary entry point for buyers.",
+      "html": "<div class=\"ds-input-wrap\"><svg class=\"ds-input-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/></svg><input class=\"ds-input\" placeholder=\"Search by part number…\" /></div>",
+      "css": ".ds-input-wrap { position: relative; display: flex; align-items: center; } .ds-input-icon { position: absolute; left: 12px; color: oklch(0.63 0.035 325); pointer-events: none; flex-shrink: 0; } .ds-input { width: 100%; padding: 10px 12px 10px 36px; background: oklch(0.36 0.058 278); border: 1px solid oklch(0.30 0.055 277); border-radius: 3px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; color: oklch(0.93 0.014 58); transition: border-color 120ms cubic-bezier(0.25, 1, 0.5, 1), box-shadow 120ms cubic-bezier(0.25, 1, 0.5, 1); outline: none; box-sizing: border-box; } .ds-input::placeholder { color: oklch(0.46 0.025 320); } .ds-input:focus { border-color: oklch(0.76 0.055 22); box-shadow: 0 0 0 2px oklch(0.76 0.055 22 / 0.15); }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "In-stock, low-stock, out-of-stock. Used on every product card and in every data table.",
+      "html": "<span class=\"ds-badge ds-badge--success\">IN STOCK</span> <span class=\"ds-badge ds-badge--warning\">LOW STOCK</span> <span class=\"ds-badge ds-badge--error\">OUT OF STOCK</span>",
+      "css": ".ds-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; } .ds-badge--success { background: oklch(0.18 0.04 160); color: oklch(0.63 0.10 160); } .ds-badge--warning { background: oklch(0.18 0.04 78); color: oklch(0.72 0.10 78); } .ds-badge--error { background: oklch(0.18 0.05 28); color: oklch(0.54 0.14 28); }"
+    },
+    {
+      "name": "Role Badge",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "User role indicator. ROLE_ADMIN, ROLE_SELLER, ROLE_USER. Used in user tables and account page.",
+      "html": "<span class=\"ds-role ds-role--admin\">ADMIN</span> <span class=\"ds-role ds-role--seller\">SELLER</span> <span class=\"ds-role ds-role--user\">USER</span>",
+      "css": ".ds-role { display: inline-block; padding: 2px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; } .ds-role--admin { background: oklch(0.18 0.05 28); color: oklch(0.54 0.14 28); } .ds-role--seller { background: oklch(0.18 0.04 78); color: oklch(0.72 0.10 78); } .ds-role--user { background: oklch(0.18 0.04 250); color: oklch(0.62 0.09 250); }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "Top navigation link. Active state carries blush underline.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" class=\"ds-nav-link ds-nav-link--active\">Home</a><a href=\"#\" class=\"ds-nav-link\">Cart</a><a href=\"#\" class=\"ds-nav-link\">Orders</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 24px; } .ds-nav-link { font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; color: oklch(0.63 0.035 325); text-decoration: none; padding-bottom: 4px; border-bottom: 2px solid transparent; transition: color 120ms cubic-bezier(0.25, 1, 0.5, 1), border-color 120ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-nav-link:hover { color: oklch(0.76 0.055 22); } .ds-nav-link--active { color: oklch(0.76 0.055 22); border-bottom-color: oklch(0.76 0.055 22); } .ds-nav-link:focus-visible { outline: 2px solid oklch(0.76 0.055 22); outline-offset: 3px; border-radius: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Parts Vault",
+    "overview": "SolydShop lives where industrial scale meets technical precision. The visual system is built like a vault: deep indigo surfaces form the secure, weighty base — authoritative and opaque, the domain of professionals. Against that base, the blush rose accent reads like a phosphor readout on aged instrumentation: warm, precise, and deliberately rare. Everything is labeled, measured, and in its place. Procurement specialists trust this interface not because it explains itself, but because it never has to.\n\nThe system rejects decoration entirely. Monospaced type governs all technical metadata — part numbers, order IDs, stock statuses, role labels — because this text is machine-readable and should look it. Body copy runs in IBM Plex Sans, which is warm enough for human reading but carries the lineage of IBM's engineering culture. Space Grotesk handles display and headings with authority: tight tracking, no excess weight above 700.\n\nThis design explicitly refuses: Amazon's promotional density, the rounded-card SaaS visual language, grungy industrial textures, and fashion-store editorial whitespace.",
+    "keyCharacteristics": [
+      "Deep indigo foundation (#22223b) with five-stop tonal layering — depth without shadows",
+      "Blush rose accent (#c9ada7) used at ≤10% surface coverage — rarity is the signal",
+      "IBM Plex Mono for all technical identifiers; IBM Plex Sans for copy",
+      "3–4px border radius throughout; pill reserved for badges only",
+      "Semantic color used exclusively for status signals — never for decoration"
+    ],
+    "rules": [
+      { "name": "The Blush Discipline Rule",     "body": "The blush rose accent appears on ≤10% of any given screen's surface area. Its rarity is its signal. Buttons, prices, and active nav links are its three legitimate territories.", "section": "colors" },
+      { "name": "The Semantic Exclusivity Rule",  "body": "Forge green, amber signal, critical red, and blueprint blue are status colors, not brand colors. They appear only on status badges, stock indicators, alert panels, and role labels — never as stylistic choices.", "section": "colors" },
+      { "name": "The Monospace Manifest Rule",    "body": "Every piece of text that a machine could generate or parse — part numbers, order IDs, prices in data tables, stock status, role badges — renders in IBM Plex Mono. Copy that a human writes renders in IBM Plex Sans. This distinction is semantic, not stylistic.", "section": "typography" },
+      { "name": "The Letter-Spacing Floor Rule",  "body": "Display and headline letter-spacing never tighter than -0.02em. Label letter-spacing never looser than 0.06em.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule",       "body": "Cards, inputs, panels, and buttons are completely flat at rest. Depth comes from background color, not shadow. Applying a box-shadow to a card or input is prohibited.", "section": "elevation" },
+      { "name": "The Radii Floor Rule",           "body": "The maximum border-radius for any non-badge element is 6px. Cards, inputs, dialogs, buttons: 3–4px. Anything rounder than 6px reads as consumer. Pill radius (9999px) is reserved exclusively for role/status badges.", "section": "components" }
+    ],
+    "dos": [
+      "Do use IBM Plex Mono for every part number, order ID, SKU, stock label, column header, and role badge.",
+      "Do keep the blush rose accent to ≤10% of screen coverage.",
+      "Do use the five-stop indigo tonal ramp to convey depth — not shadows.",
+      "Do put semantic colors on status signals only: stock level, order status, user role.",
+      "Do keep border-radius at 3–4px for interactive elements; pill (9999px) for badges only.",
+      "Do render price figures in IBM Plex Mono, blush rose, 700 weight.",
+      "Do label all technical eyebrows in IBM Plex Mono UPPERCASE at 0.625rem with 0.08em letter-spacing.",
+      "Do respect prefers-reduced-motion — zero all duration variables at the media query level."
+    ],
+    "donts": [
+      "Don't use the blush rose accent for decoration, dividers, background tints, or illustration.",
+      "Don't apply drop shadows to cards, panels, inputs, or buttons. Shadows are for floating overlays only.",
+      "Don't use border-radius greater than 6px on any non-badge element.",
+      "Don't add promotional UI patterns — deal banners, urgency badges, rainbow accent colors.",
+      "Don't import SaaS visual language: gradient heroes, glassmorphism, hero metrics, pill nav.",
+      "Don't use grungy industrial tropes — gear imagery, workshop textures, halftone patterns.",
+      "Don't use consumer fashion aesthetics — editorial whitespace, lifestyle photography grids, luxury minimalism.",
+      "Don't put technical text (part numbers, IDs, statuses) in IBM Plex Sans.",
+      "Don't use color alone to signal status — always pair with a text label.",
+      "Don't pair border: 1px solid with box-shadow blur ≥16px on the same element."
+    ]
+  }
+}

@@ -198,7 +198,7 @@ const SellerProductFormPage = () => {
             <div style={{
                 background:   "var(--surface-mid)",
                 border:       "1px solid var(--border)",
-                borderTop:    `3px solid ${isEdit ? "oklch(0.78 0.17 75)" : "var(--accent)"}`,
+                borderTop:    `3px solid ${isEdit ? "var(--accent-lo)" : "var(--accent)"}`,
                 borderRadius: "var(--r-md)",
                 padding:      "var(--space-6)",
                 maxWidth:     "760px",
@@ -372,12 +372,12 @@ const SellerProductFormPage = () => {
                                 padding: "var(--space-2) var(--space-6)",
                                 background: saving ? "var(--border)" : "var(--accent)",
                                 border: "none", borderRadius: "var(--r-md)",
-                                color: "var(--bg)", fontFamily: "var(--font-body)",
+                                color: "var(--text)", fontFamily: "var(--font-body)",
                                 fontSize: "14px", fontWeight: 700,
                                 cursor: saving ? "not-allowed" : "pointer",
                             }}
                         >
-                            {saving && <CircularProgress size={14} sx={{ color: "var(--bg)" }} />}
+                            {saving && <CircularProgress size={14} sx={{ color: "var(--text)" }} />}
                             {saving ? "Saving…" : isEdit ? "Update Product" : "Create Product"}
                         </button>
                     </Box>
