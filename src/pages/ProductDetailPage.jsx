@@ -632,7 +632,7 @@ export default function ProductDetailPage() {
                             disabled={!inStock || addingToCart}
                             style={{
                                 background: inStock ? 'var(--accent)' : 'var(--surface-high)',
-                                color: inStock ? 'var(--bg)' : 'var(--text-3)',
+                                color: inStock ? 'var(--text)' : 'var(--text-3)',
                                 border: 'none',
                                 borderRadius: 'var(--r-md)',
                                 padding: 'var(--space-4) var(--space-6)',
@@ -729,7 +729,7 @@ export default function ProductDetailPage() {
                     disabled={!inStock || addingToCart}
                     style={{
                         background: inStock ? 'var(--accent)' : 'var(--surface-high)',
-                        color:      inStock ? 'var(--bg)'    : 'var(--text-3)',
+                        color:      inStock ? 'var(--text)'  : 'var(--text-3)',
                     }}
                 >
                     {addingToCart ? 'Adding…' : inStock ? 'Add to Cart' : 'Out of Stock'}
@@ -834,7 +834,7 @@ export default function ProductDetailPage() {
                                         flex: 1,
                                         padding: 'var(--space-3) var(--space-4)',
                                         background: quoteSending ? 'var(--border)' : 'var(--accent)',
-                                        color: 'var(--bg)',
+                                        color: 'var(--text)',
                                         border: 'none',
                                         borderRadius: 'var(--r-md)',
                                         fontFamily: 'var(--font-body)',

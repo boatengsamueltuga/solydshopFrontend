@@ -35,7 +35,7 @@ const StepIndicator = ({ step }) => {
                             borderRadius:   "50%",
                             border:         `2px solid ${active || done ? "var(--accent)" : "var(--border)"}`,
                             background:     done ? "var(--accent)" : active ? "var(--accent-subtle)" : "transparent",
-                            color:          done ? "var(--bg)" : active ? "var(--accent)" : "var(--text-4)",
+                            color:          done ? "var(--text)" : active ? "var(--accent)" : "var(--text-4)",
                             display:        "flex",
                             alignItems:     "center",
                             justifyContent: "center",
@@ -196,7 +196,7 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
                         width:         "100%",
                         padding:       "var(--space-4)",
                         background:    !stripe || paying ? "var(--border)" : "var(--accent)",
-                        color:         "var(--bg)",
+                        color:         "var(--text)",
                         border:        "none",
                         borderRadius:  "var(--r-md)",
                         fontFamily:    "var(--font-body)",
@@ -212,7 +212,7 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
                 >
                     {paying ? (
                         <>
-                            <CircularProgress size={14} sx={{ color: "var(--bg)" }} />
+                            <CircularProgress size={14} sx={{ color: "var(--text)" }} />
                             Processing…
                         </>
                     ) : (
@@ -287,7 +287,7 @@ const AddressForm = ({ onContinue }) => {
                     width:         "100%",
                     padding:       "var(--space-4)",
                     background:    "var(--accent)",
-                    color:         "var(--bg)",
+                    color:         "var(--text)",
                     border:        "none",
                     borderRadius:  "var(--r-md)",
                     fontFamily:    "var(--font-body)",

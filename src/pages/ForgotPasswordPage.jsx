@@ -69,7 +69,7 @@ const ForgotPasswordPage = () => {
                 <button type="submit" disabled={loading}
                     style={{
                         width: "100%", background: loading ? "var(--border)" : "var(--accent)",
-                        color: "var(--bg)", border: "none", borderRadius: "var(--r-md)",
+                        color: "var(--text)", border: "none", borderRadius: "var(--r-md)",
                         padding: "var(--space-3)", fontSize: "var(--text-sm)", fontWeight: 700,
                         fontFamily: "var(--font-body)", letterSpacing: "0.04em", textTransform: "uppercase",
                         cursor: loading ? "not-allowed" : "pointer",

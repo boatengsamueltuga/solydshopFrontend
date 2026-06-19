@@ -333,7 +333,7 @@ const HomePage = () => {
                         <button
                             onClick={() => { setPageNumber(0); fetchProducts(keyword, categoryId, priceMax, 0, inStockOnly); }}
                             className="flex-1 py-2.5 rounded font-bold text-xs transition-colors hover:opacity-90 min-h-[44px]"
-                            style={{ background: "var(--accent)", color: "var(--bg)" }}
+                            style={{ background: "var(--accent)", color: "var(--text)" }}
                         >
                             Apply Filters
                         </button>
@@ -391,7 +391,7 @@ const HomePage = () => {
                             <button
                                 onClick={() => fetchProducts()}
                                 className="px-5 py-2 rounded text-sm font-bold transition-opacity hover:opacity-90 min-h-[44px]"
-                                style={{ background: "var(--accent)", color: "var(--bg)" }}
+                                style={{ background: "var(--accent)", color: "var(--text)" }}
                             >
                                 Try again
                             </button>
@@ -464,7 +464,7 @@ const HomePage = () => {
                                             <button
                                                 onClick={(e) => openQuickView(e, product)}
                                                 className="flex items-center gap-1.5 px-4 py-2 rounded text-xs font-bold min-h-[44px]"
-                                                style={{ background: "rgba(255,255,255,0.95)", color: "var(--bg)", border: "1px solid var(--border)" }}
+                                                style={{ background: "rgba(255,255,255,0.95)", color: "var(--text)", border: "1px solid var(--border)" }}
                                             >
                                                 Quick View
                                             </button>
@@ -524,7 +524,7 @@ const HomePage = () => {
                                                 disabled={product.quantity === 0 || cartBusy}
                                                 onClick={() => handleAddToCart(product.productId)}
                                                 className="w-full py-2 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity motion-reduce:transition-none disabled:opacity-40 min-h-[44px]"
-                                                style={{ background: "var(--accent)", color: "var(--bg)", fontFamily: "var(--font-body)" }}
+                                                style={{ background: "var(--accent)", color: "var(--text)", fontFamily: "var(--font-body)" }}
                                             >
                                                 <FaShoppingCart aria-hidden="true" size={12} />
                                                 {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
@@ -701,7 +701,7 @@ const HomePage = () => {
                                 <button
                                     onClick={() => navigate("/checkout")}
                                     className="w-full py-3 rounded font-bold text-xs mt-1 hover:opacity-90 transition-opacity motion-reduce:transition-none flex items-center justify-center gap-1.5 min-h-[44px]"
-                                    style={{ background: "var(--accent)", color: "var(--bg)", fontFamily: "var(--font-body)" }}
+                                    style={{ background: "var(--accent)", color: "var(--text)", fontFamily: "var(--font-body)" }}
                                 >
                                     Proceed to Checkout →
                                 </button>
@@ -831,7 +831,7 @@ const HomePage = () => {
                                     disabled={quickViewProduct.quantity === 0 || cartBusy}
                                     onClick={() => { handleAddToCart(quickViewProduct.productId); closeQuickView(); }}
                                     className="px-4 py-2 rounded text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity motion-reduce:transition-none disabled:opacity-40 min-h-[44px]"
-                                    style={{ background: "var(--accent)", color: "var(--bg)", fontFamily: "var(--font-body)" }}
+                                    style={{ background: "var(--accent)", color: "var(--text)", fontFamily: "var(--font-body)" }}
                                 >
                                     <FaShoppingCart aria-hidden="true" size={12} />
                                     {quickViewProduct.quantity === 0 ? "Out of Stock" : "Add to Cart"}

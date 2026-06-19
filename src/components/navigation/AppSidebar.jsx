@@ -264,7 +264,7 @@ const AppSidebar = ({ variant = 'admin' }) => {
           onClick={handleLogout}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--error-subtle)';
-            e.currentTarget.style.color = '#f87171';
+            e.currentTarget.style.color = 'var(--error)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';

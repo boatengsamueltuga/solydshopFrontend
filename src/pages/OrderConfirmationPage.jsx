@@ -187,7 +187,7 @@ const OrderConfirmationPage = () => {
                         gap:           "var(--space-2)",
                         padding:       "var(--space-3) var(--space-4)",
                         background:    "var(--accent)",
-                        color:         "var(--bg)",
+                        color:         "var(--text)",
                         textDecoration: "none",
                         borderRadius:  "var(--r-md)",
                         fontFamily:    "var(--font-body)",

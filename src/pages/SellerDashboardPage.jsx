@@ -236,7 +236,7 @@ const SellerDashboardPage = () => {
                         display: "flex", alignItems: "center", gap: "var(--space-2)",
                         padding: "var(--space-2) var(--space-4)",
                         background: "var(--accent)", border: "none", borderRadius: "var(--r-md)",
-                        color: "var(--bg)", fontFamily: "var(--font-body)", fontSize: "13px",
+                        color: "var(--text)", fontFamily: "var(--font-body)", fontSize: "13px",
                         fontWeight: 700, cursor: "pointer",
                     }}
                     onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}

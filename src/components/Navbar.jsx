@@ -231,7 +231,7 @@ const Navbar = () => {
                             <button
                                 onClick={() => { handleLogout(); closeMenu(); }}
                                 className="mt-2 py-2.5 text-sm text-left transition-colors"
-                                style={{ color: "#f87171", background: "none", border: "none", cursor: "pointer" }}
+                                style={{ color: "var(--error)", background: "none", border: "none", cursor: "pointer" }}
                             >
                                 Logout
                             </button>

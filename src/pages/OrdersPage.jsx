@@ -142,7 +142,7 @@ const OrdersPage = () => {
                         </p>
                         <button
                             onClick={() => navigate("/")}
-                            style={{ padding: "var(--space-3) var(--space-6)", background: "var(--accent)", color: "var(--bg)", border: "none", borderRadius: "var(--r-md)", fontFamily: "var(--font-body)", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}
+                            style={{ padding: "var(--space-3) var(--space-6)", background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", fontFamily: "var(--font-body)", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}
                         >
                             Browse Catalog
                         </button>

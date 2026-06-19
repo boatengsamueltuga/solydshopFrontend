@@ -225,7 +225,7 @@ const UserAccountPage = () => {
                     <Link to="/orders" style={{
                         padding:       "var(--space-3) var(--space-5)",
                         background:    "var(--accent)",
-                        color:         "var(--bg)",
+                        color:         "var(--text)",
                         textDecoration: "none",
                         borderRadius:  "var(--r-md)",
                         fontFamily:    "var(--font-body)",

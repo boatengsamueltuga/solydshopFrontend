@@ -144,7 +144,7 @@ const CartPage = () => {
                             style={{
                                 padding:      "var(--space-3) var(--space-6)",
                                 background:   "var(--accent)",
-                                color:        "var(--bg)",
+                                color:        "var(--text)",
                                 border:       "none",
                                 borderRadius: "var(--r-md)",
                                 fontFamily:   "var(--font-body)",
@@ -362,7 +362,7 @@ const CartPage = () => {
                                         width:         "100%",
                                         padding:       "var(--space-4)",
                                         background:    "var(--accent)",
-                                        color:         "var(--bg)",
+                                        color:         "var(--text)",
                                         border:        "none",
                                         borderRadius:  "var(--r-md)",
                                         fontFamily:    "var(--font-body)",

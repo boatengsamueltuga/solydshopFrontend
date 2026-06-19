@@ -52,7 +52,7 @@ const NotFoundPage = () => (
                     display:       "inline-block",
                     padding:       "var(--space-3) var(--space-6)",
                     background:    "var(--accent)",
-                    color:         "var(--bg)",
+                    color:         "var(--text)",
                     textDecoration: "none",
                     borderRadius:  "var(--r-md)",
                     fontFamily:    "var(--font-body)",

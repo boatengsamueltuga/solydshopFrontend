@@ -24,13 +24,10 @@ const ProtectedRoute = ({
     if (!isInitialized) {
 
         return (
-
-            <div className="min-h-screen flex justify-center items-center">
-
-                <h1 className="text-2xl font-bold">
-                    Loading...
-                </h1>
-
+            <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "var(--space-3)" }}>
+                <div style={{ width: "28px", height: "28px", border: "3px solid var(--border)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "solyd-spin 0.8s linear infinite" }} />
+                <p style={{ color: "var(--text-3)", fontFamily: "var(--font-body)", fontSize: "14px" }}>Loading…</p>
+                <style>{`@keyframes solyd-spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         );
     }
