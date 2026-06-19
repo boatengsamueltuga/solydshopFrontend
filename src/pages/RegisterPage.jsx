@@ -54,8 +54,6 @@ const RegisterPage = () => {
                 formData
             );
 
-            console.log(response.data);
-
             toast.success("Registration successful");
 
             setFormData({
@@ -65,8 +63,6 @@ const RegisterPage = () => {
             });
 
         } catch (error) {
-
-            console.log(error);
 
             toast.error(
                 error.response?.data?.message ||

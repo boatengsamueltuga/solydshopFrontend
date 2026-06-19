@@ -58,7 +58,6 @@ const ResetPasswordPage = () => {
 
         } catch (error) {
 
-            console.log(error);
             toast.error(
                 typeof error.response?.data === "string"
                     ? error.response.data

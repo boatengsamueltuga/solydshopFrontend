@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -45,7 +45,7 @@ const MUI_STATUS_COLORS = {
 };
 
 /* ── StatusBadge ── */
-const StatusBadge = ({ status }) => {
+const StatusBadge = memo(({ status }) => {
     const s = STATUS_STYLE[status] ?? { color: "var(--text-3)", bg: "var(--surface-mid)" };
     return (
         <span style={{
@@ -63,7 +63,7 @@ const StatusBadge = ({ status }) => {
             {status}
         </span>
     );
-};
+});
 
 /* ── AdminOrdersPage ── */
 const AdminOrdersPage = () => {
@@ -93,17 +93,16 @@ const AdminOrdersPage = () => {
     |----------------------------------------------------------
     */
 
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         try {
             const res = await api.get("/order/admin");
             setOrders(res.data);
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast.error("Failed to load orders");
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchOrders();
@@ -134,11 +133,11 @@ const AdminOrdersPage = () => {
     |----------------------------------------------------------
     */
 
-    const handleViewOrder = (order) => {
+    const handleViewOrder = useCallback((order) => {
         setSelectedOrder(order);
         setNewStatus(order.status);
         setIsSheetOpen(true);
-    };
+    }, []);
 
     const handleUpdateStatus = async () => {
         try {
@@ -146,8 +145,7 @@ const AdminOrdersPage = () => {
             toast.success("Order status updated successfully.");
             fetchOrders();
             setSelectedOrder({ ...selectedOrder, status: newStatus });
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast.error("Failed to update order status.");
         }
     };
@@ -158,7 +156,7 @@ const AdminOrdersPage = () => {
     |----------------------------------------------------------
     */
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: "orderId",
             headerName: "Order",
@@ -221,7 +219,7 @@ const AdminOrdersPage = () => {
                 </Tooltip>
             ),
         },
-    ];
+    ], [isMobile, isCompact, handleViewOrder]);
 
     /*
     |----------------------------------------------------------

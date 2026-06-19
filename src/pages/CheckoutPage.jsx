@@ -123,8 +123,7 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
             toast.success("Payment successful! Order placed.");
             navigate(`/order-confirmation?orderId=${orderRes.data.orderId}`);
 
-        } catch (err) {
-            console.error(err);
+        } catch {
             toast.error("Payment failed. Please try again.");
             setPaymentError("Something went wrong. Please try again.");
             setPaying(false);

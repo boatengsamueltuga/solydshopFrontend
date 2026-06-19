@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -37,7 +37,7 @@ import AdminLayout from "../components/layouts/AdminLayout";
 import SheetPanel  from "../components/common/SheetPanel";
 
 /* ── MonoTag ── */
-const MonoTag = ({ value }) =>
+const MonoTag = memo(({ value }) =>
     value ? (
         <span style={{
             fontFamily:    "var(--font-mono)",
@@ -53,7 +53,7 @@ const MonoTag = ({ value }) =>
         </span>
     ) : (
         <span style={{ color: "var(--text-4)", fontSize: "13px" }}>—</span>
-    );
+    ));
 
 /* ── AdminProductsPage ── */
 const AdminProductsPage = () => {
@@ -100,26 +100,25 @@ const AdminProductsPage = () => {
     |----------------------------------------------------------
     */
 
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         try {
             const res = await api.get("/public/products");
             setProducts(res.data.content);
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast.error("Unable to load products. Please refresh.");
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const fetchCategories = async () => {
+    const fetchCategories = useCallback(async () => {
         try {
             const res = await api.get("/public/categories");
             setCategories(res.data.content);
-        } catch (err) {
-            console.log(err);
+        } catch {
+            // categories are non-critical
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchProducts();
@@ -149,12 +148,12 @@ const AdminProductsPage = () => {
     |----------------------------------------------------------
     */
 
-    const handleViewProduct = (product) => {
+    const handleViewProduct = useCallback((product) => {
         setSelectedProduct(product);
         setIsViewOpen(true);
-    };
+    }, []);
 
-    const handleEditProduct = (product) => {
+    const handleEditProduct = useCallback((product) => {
         setEditingProductId(product.productId);
         setProductForm({
             productName: product.productName,
@@ -167,12 +166,12 @@ const AdminProductsPage = () => {
             categoryId:  String(product.categoryId),
         });
         setIsFormOpen(true);
-    };
+    }, []);
 
-    const handleDeleteProduct = (product) => {
+    const handleDeleteProduct = useCallback((product) => {
         setProductToDelete(product);
         setDeleteConfirmOpen(true);
-    };
+    }, []);
 
     const confirmDelete = async () => {
         try {
@@ -180,7 +179,6 @@ const AdminProductsPage = () => {
             toast.success(`"${productToDelete.productName}" has been deleted.`);
             fetchProducts();
         } catch (err) {
-            console.log(err);
             const msg = err.response?.data?.message || "";
             const linked = ["integrity", "foreign key", "constraint", "order"].some(k => msg.toLowerCase().includes(k));
             toast.error(linked
@@ -206,8 +204,7 @@ const AdminProductsPage = () => {
             });
             setProductForm((prev) => ({ ...prev, imageUrl: res.data }));
             toast.success("Image uploaded successfully.");
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast.error("Image upload failed. Please try again.");
         }
     };
@@ -238,8 +235,7 @@ const AdminProductsPage = () => {
             await fetchProducts();
             resetForm();
             setIsFormOpen(false);
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast.error(editingProductId ? "Failed to update product." : "Failed to create product.");
         }
     };
@@ -250,7 +246,7 @@ const AdminProductsPage = () => {
     |----------------------------------------------------------
     */
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: "image",
             headerName: "Image",
@@ -354,7 +350,7 @@ const AdminProductsPage = () => {
                 </Stack>
             ),
         },
-    ];
+    ], [isMobile, handleViewProduct, handleEditProduct, handleDeleteProduct]);
 
     /*
     |----------------------------------------------------------

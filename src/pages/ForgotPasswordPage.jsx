@@ -30,10 +30,8 @@ const ForgotPasswordPage = () => {
             toast.success("If that email exists, a reset link has been sent.");
             setEmail("");
 
-        } catch (error) {
-
-            console.log(error);
-
+        } catch {
+            // handled by toast interceptor
         } finally {
 
             setLoading(false);

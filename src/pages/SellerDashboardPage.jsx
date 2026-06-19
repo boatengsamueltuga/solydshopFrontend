@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import api from "../api/api";
@@ -15,8 +15,11 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 
 import { HiCube } from "react-icons/hi";
 
+const getXsrfToken = () =>
+    document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
+
 /* ── StatCard ── */
-const StatCard = ({ label, value, sub, loading }) => (
+const StatCard = memo(({ label, value, sub, loading }) => (
     <div style={{
         background:   "var(--surface-mid)",
         border:       "1px solid var(--border)",
@@ -35,7 +38,7 @@ const StatCard = ({ label, value, sub, loading }) => (
             </p>
         )}
     </div>
-);
+));
 
 const SellerDashboardPage = () => {
 
@@ -44,25 +47,22 @@ const SellerDashboardPage = () => {
     const [loading,   setLoading]   = useState(true);
     const [deleting,  setDeleting]  = useState(false);
 
-    const getXsrfToken = () =>
-        document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
-
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         try {
             const res = await api.get("/seller/products?pageSize=1000");
             setProducts(res.data.content ?? []);
-        } catch (e) {
-            console.log(e);
+        } catch {
+            // non-critical
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [fetchProducts]);
 
-    const handleDelete = async (product) => {
+    const handleDelete = useCallback(async (product) => {
         if (!window.confirm(`Delete "${product.productName}"?`)) return;
         setDeleting(true);
         try {
@@ -71,19 +71,19 @@ const SellerDashboardPage = () => {
             });
             toast.success("Product deleted");
             await fetchProducts();
-        } catch (e) {
-            console.log(e);
+        } catch {
+            toast.error("Failed to delete product");
         } finally {
             setDeleting(false);
         }
-    };
+    }, [fetchProducts]);
 
     /* ── Computed stats ── */
     const inStockCount  = products.filter(p => p.quantity > 0).length;
     const catalogValue  = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
 
     /* ── DataTable columns ── */
-    const columns = [
+    const columns = useMemo(() => [
         {
             field:    "imageUrl",
             headerName: "",
@@ -191,7 +191,7 @@ const SellerDashboardPage = () => {
                 </div>
             ),
         },
-    ];
+    ], [navigate, handleDelete, deleting]);
 
     return (
         <SellerLayout title="Seller Dashboard">

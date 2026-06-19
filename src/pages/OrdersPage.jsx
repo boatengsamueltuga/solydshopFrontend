@@ -60,8 +60,7 @@ const OrdersPage = () => {
             try {
                 const res = await api.get(`/order/${user.userId}`);
                 setOrders(res.data);
-            } catch (e) {
-                console.log(e);
+            } catch {
                 setError("Unable to load orders. Please try again.");
             } finally {
                 setLoading(false);
@@ -100,8 +99,7 @@ const OrdersPage = () => {
             ));
             toast.success("Items added to cart");
             navigate("/cart");
-        } catch (e) {
-            console.log(e);
+        } catch {
             toast.error("Reorder failed — some items may no longer be available.");
         } finally {
             setReordering(prev => { const s = new Set(prev); s.delete(order.orderId); return s; });

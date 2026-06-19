@@ -36,7 +36,6 @@ const LoginPage = () => {
             setFormData({ email: "", password: "" });
         } catch (error) {
             dispatch(loginFailure(error.response?.data || "Login failed"));
-            console.log(error);
         }
     };
 

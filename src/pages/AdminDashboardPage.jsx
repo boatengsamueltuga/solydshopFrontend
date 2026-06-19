@@ -143,7 +143,6 @@ const AdminDashboardPage = () => {
             setOrders(ordRes.data ?? []);
             setUsers(usrRes.data ?? []);
         } catch (err) {
-            console.log(err);
         } finally {
             setLoading(false);
         }

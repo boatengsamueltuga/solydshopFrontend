@@ -108,7 +108,6 @@ const AdminCategoriesPage = () => {
             const res = await api.get("/public/categories?pageSize=1000");
             setCategories(res.data.content);
         } catch (err) {
-            console.log(err);
             toast.error("Failed to load categories");
         } finally {
             setLoading(false);
@@ -137,7 +136,6 @@ const AdminCategoriesPage = () => {
             setCategoryName("");
             setIsCreateOpen(false);
         } catch (err) {
-            console.log(err);
             toast.error("Failed to create category.");
         }
     };
@@ -161,7 +159,6 @@ const AdminCategoriesPage = () => {
             setEditCategoryName("");
             setIsEditOpen(false);
         } catch (err) {
-            console.log(err);
             toast.error("Failed to update category.");
         }
     };
@@ -177,7 +174,6 @@ const AdminCategoriesPage = () => {
             toast.success(`"${categoryToDelete.categoryName}" deleted successfully.`);
             fetchCategories();
         } catch (err) {
-            console.log(err);
             toast.error("Failed to delete category.");
         } finally {
             setDeleteConfirmOpen(false);

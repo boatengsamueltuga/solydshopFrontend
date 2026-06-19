@@ -55,7 +55,7 @@ const MobileBottomNav = () => {
     ) return null;
 
     const handleLogout = async () => {
-        try { await api.post("/auth/signout"); } catch (e) { console.log(e); }
+        try { await api.post("/auth/signout"); } catch { /* best-effort */ }
         dispatch(logoutSuccess());
         navigate("/login");
     };

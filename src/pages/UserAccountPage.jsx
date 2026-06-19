@@ -40,7 +40,7 @@ const InfoRow = ({ icon: Icon, label, value }) => (
         <span style={{ color: "var(--accent)", fontSize: "18px", flexShrink: 0 }}><Icon /></span>
         <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)", margin: "0 0 2px" }}>{label}</p>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--text)", margin: 0, wordBreak: "break-word" }}>{value}</p>
+            <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--text)", margin: 0, wordBreak: "break-word" }}>{value}</div>
         </div>
     </div>
 );

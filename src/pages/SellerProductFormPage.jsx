@@ -51,7 +51,7 @@ const SellerProductFormPage = () => {
     useEffect(() => {
         api.get("/public/categories?pageSize=1000")
             .then(r => setCategories(r.data.content ?? []))
-            .catch(e => console.log(e));
+            .catch(() => {});
     }, []);
 
     /* ── Load product for editing ── */
@@ -137,8 +137,8 @@ const SellerProductFormPage = () => {
 
             navigate("/seller/dashboard");
 
-        } catch (e) {
-            console.log(e);
+        } catch {
+            toast.error("Failed to save product. Please try again.");
         } finally {
             setSaving(false);
         }

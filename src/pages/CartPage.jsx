@@ -26,7 +26,6 @@ const CartPage = () => {
             const res = await api.get(`/cart/${user.userId}`);
             setCart(res.data);
         } catch (e) {
-            console.log(e);
         } finally {
             setLoading(false);
         }
@@ -46,7 +45,6 @@ const CartPage = () => {
             );
             await fetchCart();
         } catch (e) {
-            console.log(e);
             toast.error("Failed to increase quantity");
         } finally { setActionLoading(false); }
     };
@@ -61,7 +59,6 @@ const CartPage = () => {
             );
             await fetchCart();
         } catch (e) {
-            console.log(e);
             toast.error("Failed to decrease quantity");
         } finally { setActionLoading(false); }
     };
@@ -75,7 +72,6 @@ const CartPage = () => {
             );
             await fetchCart();
         } catch (e) {
-            console.log(e);
             toast.error("Failed to remove item");
         } finally { setActionLoading(false); }
     };

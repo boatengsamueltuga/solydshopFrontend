@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -36,7 +36,7 @@ const ROLE_STYLE = {
     ROLE_USER:   { color: "var(--info)",    bg: "var(--info-subtle)"    },
 };
 
-const RoleBadge = ({ role }) => {
+const RoleBadge = memo(({ role }) => {
     const s = ROLE_STYLE[role] ?? { color: "var(--text-3)", bg: "var(--surface-mid)" };
     return (
         <span style={{
@@ -54,7 +54,7 @@ const RoleBadge = ({ role }) => {
             {role.replace("ROLE_", "")}
         </span>
     );
-};
+});
 
 /* ── AdminUsersPage ── */
 const AdminUsersPage = () => {
@@ -84,17 +84,16 @@ const AdminUsersPage = () => {
     |----------------------------------------------------------
     */
 
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         try {
             const res = await api.get("/admin/users");
             setUsers(res.data);
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast.error("Failed to load users");
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchUsers();
@@ -128,11 +127,11 @@ const AdminUsersPage = () => {
     |----------------------------------------------------------
     */
 
-    const handleViewUser = (user) => {
+    const handleViewUser = useCallback((user) => {
         setSelectedUser(user);
         setNewRole(user.roles?.[0] ?? "ROLE_USER");
         setIsSheetOpen(true);
-    };
+    }, []);
 
     const handleUpdateRole = async () => {
         try {
@@ -140,25 +139,23 @@ const AdminUsersPage = () => {
             toast.success("Role updated successfully");
             fetchUsers();
             setIsSheetOpen(false);
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast.error("Failed to update role");
         }
     };
 
-    const handleDeleteUser = (userId) => {
+    const handleDeleteUser = useCallback((userId) => {
         confirmToast("Delete this user? This cannot be undone.", async () => {
             try {
                 await api.delete(`/admin/users/${userId}`);
                 toast.success("User deleted successfully");
                 fetchUsers();
                 setIsSheetOpen(false);
-            } catch (err) {
-                console.log(err);
+            } catch {
                 toast.error("Failed to delete user");
             }
         });
-    };
+    }, [fetchUsers]);
 
     /*
     |----------------------------------------------------------
@@ -166,7 +163,7 @@ const AdminUsersPage = () => {
     |----------------------------------------------------------
     */
 
-    const columns = [
+    const columns = useMemo(() => [
         {
             field: "userId",
             headerName: "ID",
@@ -236,7 +233,7 @@ const AdminUsersPage = () => {
                 </Stack>
             ),
         },
-    ];
+    ], [isMobile, isCompact, handleViewUser, handleDeleteUser]);
 
     /*
     |----------------------------------------------------------

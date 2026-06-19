@@ -36,8 +36,8 @@ const Navbar = () => {
             await api.post("/auth/logout");
             dispatch(logoutSuccess());
             navigate("/login");
-        } catch (e) {
-            console.log(e);
+        } catch {
+            // logout is best-effort; clear local state regardless
         }
     };
 

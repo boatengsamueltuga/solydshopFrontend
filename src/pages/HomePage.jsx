@@ -55,7 +55,7 @@ const HomePage = () => {
         try {
             const res = await api.get("/public/categories?pageSize=1000");
             setCategories(res.data.content);
-        } catch (e) { console.log(e); }
+        } catch { /* non-critical */ }
     };
 
     const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax, page = pageNumber, inStock = inStockOnly) => {
@@ -81,7 +81,7 @@ const HomePage = () => {
         try {
             const res = await api.get(`/cart/${user.userId}`);
             setCart(res.data);
-        } catch (e) { console.log(e); }
+        } catch { /* non-critical */ }
     };
 
     useEffect(() => {
@@ -146,7 +146,7 @@ const HomePage = () => {
             );
             toast.success("Added to cart");
             await fetchCart();
-        } catch (e) { console.log(e); }
+        } catch { /* non-critical */ }
         finally { setCartBusy(false); }
     };
 
@@ -159,7 +159,7 @@ const HomePage = () => {
                 { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
             );
             await fetchCart();
-        } catch (e) { console.log(e); }
+        } catch { /* non-critical */ }
         finally { setCartBusy(false); }
     };
 
