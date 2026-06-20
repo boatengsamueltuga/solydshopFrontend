@@ -428,19 +428,31 @@ const HomePage = () => {
                     </div>
 
                     {/* Search */}
-                    <div className="mb-4">
-                        <label htmlFor="product-search" className="sr-only">Search parts by name, model, or number</label>
+                    <div className="mb-4" style={{ position: "relative" }}>
+                        <label htmlFor="product-search" className="sr-only">Search by model or part number</label>
+                        <HiSearch aria-hidden="true" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "var(--text-3)", pointerEvents: "none" }} />
                         <input
                             id="product-search"
                             type="text"
-                            placeholder="Search by part name, model, or number..."
+                            placeholder="Search by part name, model or number..."
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
-                            className="w-full px-4 py-2 text-sm rounded focus:outline-none"
-                            style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)", fontFamily: "var(--font-body)" }}
+                            className="w-full text-sm rounded focus:outline-none"
+                            style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)", fontFamily: "var(--font-body)", padding: "8px 32px 8px 30px" }}
                             onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
                             onBlur={(e)  => (e.target.style.borderColor = "var(--border)")}
                         />
+                        {keyword && (
+                            <button
+                                aria-label="Clear search"
+                                onClick={() => setKeyword("")}
+                                style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex", alignItems: "center", padding: "2px" }}
+                                onMouseEnter={(e) => e.currentTarget.style.color = "var(--text)"}
+                                onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-3)"}
+                            >
+                                <HiX size={14} aria-hidden="true" />
+                            </button>
+                        )}
                     </div>
 
                     {/* Screen-reader count */}
