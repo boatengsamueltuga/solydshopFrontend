@@ -18,13 +18,21 @@ const NotFoundPage = () => (
                 fontFamily:    "var(--font-mono)",
                 fontSize:      "clamp(6rem, 15vw, 9rem)",
                 fontWeight:    700,
-                color:         "var(--accent)",
+                color:         "var(--text)",
                 lineHeight:    1,
-                margin:        "0 0 var(--space-6)",
+                margin:        "0 0 var(--space-4)",
                 letterSpacing: "-0.02em",
             }}>
                 404
             </p>
+
+            <div style={{
+                width:        "48px",
+                height:       "3px",
+                background:   "var(--accent)",
+                borderRadius: "2px",
+                margin:       "0 auto var(--space-6)",
+            }} />
 
             <h1 style={{
                 fontFamily:    "var(--font-display)",

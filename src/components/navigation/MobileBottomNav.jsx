@@ -19,11 +19,24 @@ const NavTab = ({ icon: Icon, label, active, onClick }) => (
             border:         "none",
             cursor:         "pointer",
             padding:        "6px 0",
-            color:          active ? "var(--accent)" : "var(--text-3)",
+            color:          active ? "var(--text)" : "var(--text-3)",
             transition:     "color var(--duration-fast)",
             minHeight:      "44px",
+            position:       "relative",
         }}
     >
+        {active && (
+            <span style={{
+                position:     "absolute",
+                top:          "4px",
+                left:         "50%",
+                transform:    "translateX(-50%)",
+                width:        "4px",
+                height:       "4px",
+                borderRadius: "50%",
+                background:   "var(--accent)",
+            }} />
+        )}
         <Icon style={{ fontSize: "20px" }} />
         <span style={{
             fontSize:   "10px",

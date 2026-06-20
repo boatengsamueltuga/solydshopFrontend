@@ -47,7 +47,7 @@ const PageBanner = ({ title, subtitle, icon, action, children }) => {
                 borderRadius:    'var(--r-md)',
                 backgroundColor: 'var(--accent-subtle)',
                 border:          '1px solid var(--accent-border)',
-                color:           'var(--accent)',
+                color:           'var(--text-2)',
                 flexShrink:      0,
               }}
             >

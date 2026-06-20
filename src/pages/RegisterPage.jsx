@@ -187,9 +187,9 @@ const RegisterPage = () => {
             <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--text-3)", marginTop: "var(--space-6)" }}>
                 Already have an account?{" "}
                 <Link to="/login"
-                    style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}
-                    onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                    onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                    style={{ color: "var(--text-2)", fontWeight: 600, textDecoration: "none" }}
+                    onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.textDecoration = "underline"; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.textDecoration = "none"; }}
                 >
                     Sign In
                 </Link>

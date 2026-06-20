@@ -66,7 +66,7 @@ function SpecRow({ label, value, mono, last }) {
                 style={{
                     padding: '9px 14px',
                     fontSize: 'var(--text-sm)',
-                    color: mono ? 'var(--accent)' : 'var(--text)',
+                    color: mono ? 'var(--text-2)' : 'var(--text)',
                     fontFamily: mono ? 'var(--font-mono)' : 'var(--font-body)',
                     fontWeight: mono ? 500 : 400,
                     letterSpacing: mono ? '0.01em' : 'normal',
@@ -258,6 +258,8 @@ export default function ProductDetailPage() {
                 <Link
                     to="/"
                     style={{ color: 'var(--text-3)', textDecoration: 'none' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.textDecoration = 'underline'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.textDecoration = 'none'; }}
                 >
                     Catalog
                 </Link>
@@ -419,7 +421,7 @@ export default function ProductDetailPage() {
                                         fontFamily: 'var(--font-mono)',
                                         fontWeight: 600,
                                         fontSize: 'clamp(1.5rem, 3vw, var(--text-4xl))',
-                                        color: 'var(--accent)',
+                                        color: 'var(--text)',
                                         letterSpacing: '-0.02em',
                                         lineHeight: 1,
                                     }}

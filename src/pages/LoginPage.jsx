@@ -81,9 +81,9 @@ const LoginPage = () => {
                             Password
                         </label>
                         <Link to="/forgot-password"
-                            style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--accent)", textDecoration: "none" }}
-                            onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                            onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                            style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--text-2)", textDecoration: "none" }}
+                            onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.textDecoration = "underline"; }}
+                            onMouseLeave={e => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.textDecoration = "none"; }}
                         >
                             Forgot password?
                         </Link>
@@ -137,9 +137,9 @@ const LoginPage = () => {
             <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--text-3)" }}>
                 Don&apos;t have an account?{" "}
                 <Link to="/register"
-                    style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}
-                    onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                    onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                    style={{ color: "var(--text-2)", fontWeight: 600, textDecoration: "none" }}
+                    onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.textDecoration = "underline"; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.textDecoration = "none"; }}
                 >
                     Register
                 </Link>

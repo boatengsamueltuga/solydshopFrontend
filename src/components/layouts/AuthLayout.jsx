@@ -41,7 +41,7 @@ const AuthLayout = ({ children }) => (
           fontWeight:    600,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color:         'var(--accent)',
+          color:         'var(--text-3)',
           marginBottom:  'var(--space-3)',
         }}>
           Industrial Procurement
@@ -110,7 +110,7 @@ const AuthLayout = ({ children }) => (
             fontWeight:    600,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
-            color:         'var(--text-4)',
+            color:         'var(--text-3)',
           }}>
             Trusted by professionals
           </span>

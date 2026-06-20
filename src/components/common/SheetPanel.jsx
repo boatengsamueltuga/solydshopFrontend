@@ -30,6 +30,7 @@ const SheetPanel = ({ open, onClose, title, subtitle, children, footer, width = 
           backgroundColor: 'var(--surface)',
           backgroundImage: 'none',
           borderLeft:      '1px solid var(--border)',
+          borderTop:       '3px solid var(--accent)',
           display:         'flex',
           flexDirection:   'column',
           overflowX:       'hidden',

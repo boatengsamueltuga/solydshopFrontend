@@ -138,7 +138,7 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
       {/* Right: notifications (placeholder) + user avatar */}
       <div style={S.right}>
 
-        {/* Notification bell — placeholder, no handler yet */}
+        {/* Notification bell — styled placeholder */}
         <button
           style={S.iconBtn}
           aria-label="Notifications"
@@ -152,7 +152,19 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
             e.currentTarget.style.color = 'var(--text-3)';
           }}
         >
-          <HiBell size={18} />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <HiBell size={18} />
+            <span style={{
+              position:        'absolute',
+              top:             '-2px',
+              right:           '-3px',
+              width:           '6px',
+              height:          '6px',
+              borderRadius:    '50%',
+              backgroundColor: 'var(--accent)',
+              border:          '1.5px solid var(--surface)',
+            }} />
+          </div>
         </button>
 
         {/* User avatar — initials, no dropdown yet */}

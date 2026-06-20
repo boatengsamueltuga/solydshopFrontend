@@ -135,7 +135,7 @@
     font-family:    var(--font-mono);
     font-weight:    600;
     font-size:      var(--text-2xl);
-    color:          var(--accent);
+    color:          var(--text);
     letter-spacing: -0.02em;
     line-height:    1;
     white-space:    nowrap;
@@ -159,7 +159,7 @@
 
 /* ── Button hover states ──────────────────────────────────── */
 .pdp-btn-primary:hover:not(:disabled) { background: var(--accent-hi) !important; }
-.pdp-btn-ghost:hover  { border-color: var(--accent) !important; color: var(--accent) !important; }
+.pdp-btn-ghost:hover  { border-color: var(--accent) !important; color: var(--text) !important; }
 .pdp-qty-btn:hover:not(:disabled)     { background: var(--surface-hover) !important; }
 .pdp-back-link:hover  { color: var(--accent) !important; }
 

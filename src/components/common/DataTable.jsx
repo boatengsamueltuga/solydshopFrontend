@@ -18,7 +18,7 @@ const EmptyOverlay = ({ message = 'No records found' }) => (
       sx={{
         fontFamily: 'var(--font-body)',
         fontSize:   '0.875rem',
-        color:      'var(--text-4)',
+        color:      'var(--text-3)',
       }}
     >
       {message}
@@ -104,6 +104,8 @@ const DataTable = ({
         sx={{
           border: 'none',
           '& .MuiDataGrid-virtualScroller': { minHeight: 120 },
+          '& .MuiDataGrid-row:hover': { backgroundColor: 'var(--surface-hover)' },
+          '& .MuiDataGrid-row.Mui-hovered': { backgroundColor: 'var(--surface-hover)' },
         }}
       />
     </Box>

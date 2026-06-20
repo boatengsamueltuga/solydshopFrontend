@@ -236,7 +236,7 @@ const HomePage = () => {
                             <div className="space-y-0.5">
                                 <label
                                     className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer transition-colors"
-                                    style={{ color: categoryId === "" ? "var(--accent)" : "var(--text-2)" }}
+                                    style={{ color: categoryId === "" ? "var(--text)" : "var(--text-2)" }}
                                     onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
                                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                 >
@@ -252,7 +252,7 @@ const HomePage = () => {
                                     <label
                                         key={cat.categoryId}
                                         className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer transition-colors"
-                                        style={{ color: categoryId === String(cat.categoryId) ? "var(--accent)" : "var(--text-2)" }}
+                                        style={{ color: categoryId === String(cat.categoryId) ? "var(--text)" : "var(--text-2)" }}
                                         onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
                                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                     >
@@ -339,8 +339,10 @@ const HomePage = () => {
                         </button>
                         <button
                             onClick={handleReset}
-                            className="px-4 py-2.5 rounded font-bold text-xs transition-colors hover:opacity-80 min-h-[44px]"
-                            style={{ border: "1px solid var(--border)", color: "var(--accent)", background: "transparent" }}
+                            className="px-4 py-2.5 rounded font-bold text-xs min-h-[44px]"
+                            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
                         >
                             Reset
                         </button>
@@ -488,8 +490,8 @@ const HomePage = () => {
                                             <Link
                                                 to={`/products/${product.productId}`}
                                                 style={{ color: "var(--text)", textDecoration: "none" }}
-                                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-                                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text)")}
+                                                onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                                                onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
                                             >
                                                 {product.productName}
                                             </Link>
@@ -505,7 +507,7 @@ const HomePage = () => {
                                                 <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>
                                                     Part No.
                                                 </span>
-                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--accent)", fontWeight: 500 }}>
+                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-2)", fontWeight: 500 }}>
                                                     {product.partNumber}
                                                 </span>
                                             </div>
@@ -657,7 +659,7 @@ const HomePage = () => {
                                             <p className="text-[10px] mt-0.5" style={{ color: "var(--text-2)" }}>
                                                 Qty: {item.quantity}
                                             </p>
-                                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--accent)" }}>
+                                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--text-2)" }}>
                                                 ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                             </span>
                                         </div>
@@ -694,7 +696,7 @@ const HomePage = () => {
                                 </div>
                                 <div className="flex justify-between pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
                                     <span className="text-sm font-bold" style={{ color: "var(--text)", fontFamily: "var(--font-body)" }}>Total</span>
-                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--accent)" }}>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>
                                         ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
@@ -805,7 +807,7 @@ const HomePage = () => {
                             {quickViewProduct.partNumber && (
                                 <div>
                                     <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>Part No.</span>
-                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--accent)", fontWeight: 500 }}>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text-2)", fontWeight: 500 }}>
                                         {quickViewProduct.partNumber}
                                     </span>
                                 </div>
@@ -842,8 +844,10 @@ const HomePage = () => {
                             <Link
                                 to={`/products/${quickViewProduct.productId}`}
                                 onClick={closeQuickView}
-                                className="block text-center text-xs font-bold py-2 rounded transition-opacity hover:opacity-80 motion-reduce:transition-none"
-                                style={{ color: "var(--accent)", border: "1px solid var(--border)", textDecoration: "none", lineHeight: "2.5", minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}
+                                className="block text-center text-xs font-bold py-2 rounded"
+                                style={{ color: "var(--text-2)", border: "1px solid var(--border)", textDecoration: "none", lineHeight: "2.5", minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text)"; e.currentTarget.style.borderColor = "var(--border-strong)"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.borderColor = "var(--border)"; }}
                             >
                                 View Full Details →
                             </Link>

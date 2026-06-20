@@ -63,29 +63,30 @@ Pages: `CartPage`, `CheckoutPage`, `OrdersPage`, `UserAccountPage`, `OrderConfir
 - [x] `OrdersPage` — `borderLeft: 4px solid status` → `borderTop` (side-stripe ban); order total `var(--accent)` → `var(--success)` (2.1:1 → 5.8:1)
 - [x] `UserAccountPage` — StatCard `borderTop: 3px solid var(--accent)`; "View all →" link contrast fix; recent orders status badges now use semantic STATUS_STYLE colors
 - [x] `OrderConfirmationPage` — verified clean, no changes needed
-- [ ] `ProductDetailPage` + `HomePage` — deferred; already fixed in Phase 1 (Add to Cart buttons); deeper polish in future pass
+- [x] `ProductDetailPage` + `HomePage` — deeper polish complete: spec/part-number mono values `var(--accent)` → `var(--text-2)` (2.1:1 → ~7:1); price display `var(--accent)` → `var(--text)`; cart item price + total `var(--accent)` → `var(--text-2)` / `var(--text)`; category filter active state `var(--accent)` → `var(--text)`; Reset button `var(--accent)` → `var(--text-2)` + hover interaction; product name card hover → underline-only (not accent); Quick View part number + "View Full Details" link contrast fixed; breadcrumb "Catalog" link + ghost button hover corrected; mobile sticky price bar fixed in CSS
 
 ---
 
-## Phase 5 — Auth Pages ⬜ TODO
+## Phase 5 — Auth Pages ✅ DONE
 
 Pages: `LoginPage`, `RegisterPage`, `ForgotPasswordPage`, `ResetPasswordPage`, `NotFoundPage`
 
-- [ ] `AuthLayout` brand panel visual polish (logo treatment, brand copy)
-- [ ] Password rule checklist styling
-- [ ] 404 page — large 404 numeral, illustration or accent treatment
+- [x] `AuthLayout` brand panel — "Industrial Procurement" label `var(--accent)` → `var(--text-3)` (contrast); "Trusted by professionals" `var(--text-4)` → `var(--text-3)`
+- [x] All auth page inline links (`Forgot password?`, `Register`, `Sign In`) — `var(--accent)` → `var(--text-2)` default; hover → accent + underline (2.1:1 → passes)
+- [x] Password rule checklist already clean (success/error semantic colors); no changes needed
+- [x] 404 numeral — `var(--accent)` → `var(--text)` (fails 3:1 large-text threshold → now 10:1+); caramel 3px accent rule added between numeral and heading
 
 ---
 
-## Phase 6 — Shared Components ⬜ TODO
+## Phase 6 — Shared Components ✅ DONE
 
 Files: `TopBar`, `MobileBottomNav`, `DataTable`, `SheetPanel`, `PageBanner`
 
-- [ ] `MobileBottomNav` — active state clarity, icon + label sizing
-- [ ] `TopBar` — notification bell treatment (placeholder → styled)
-- [ ] `DataTable` — empty overlay, toolbar slot, row hover
-- [ ] `SheetPanel` — header, scrollable body, sticky footer polish
-- [ ] `PageBanner` — ensure icon box, title scale, stat slots are consistent
+- [x] `MobileBottomNav` — active color `var(--accent)` → `var(--text)` (2.1:1 → passes); accent 4px dot indicator added above active icon
+- [x] `TopBar` — notification bell gets caramel dot badge (6px, styled, no handler) — visually production-ready
+- [x] `DataTable` — EmptyOverlay text `var(--text-4)` → `var(--text-3)`; row hover `var(--surface-hover)` added via `.MuiDataGrid-row:hover`
+- [x] `SheetPanel` — `borderTop: '3px solid var(--accent)'` added to PaperProps (consistent accent anchor across all panels/cards)
+- [x] `PageBanner` — icon box color `var(--accent)` → `var(--text-2)` (non-text contrast fix: caramel-on-accent-subtle < 3:1 → now passes)
 
 ---
 
