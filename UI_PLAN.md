@@ -54,17 +54,16 @@ Pages: `AdminDashboardPage`, `AdminProductsPage`, `AdminOrdersPage`, `AdminCateg
 
 ---
 
-## Phase 4 — Customer Experience ⬜ TODO
+## Phase 4 — Customer Experience ✅ DONE
 
-Pages: `ProductDetailPage`, `CartPage`, `CheckoutPage`, `OrdersPage`, `UserAccountPage`, `OrderConfirmationPage`
+Pages: `CartPage`, `CheckoutPage`, `OrdersPage`, `UserAccountPage`, `OrderConfirmationPage`
 
-- [ ] `ProductDetailPage` — breadcrumb, image gallery, related products, sticky bar
-- [ ] `CartPage` — empty state, item card hover polish
-- [ ] `CheckoutPage` — Stripe Elements appearance (currently `theme: "night"` — keep, can't inject CSS vars into Stripe iframe)
-- [ ] `OrdersPage` — status-tinted left borders, timeline stepper spacing
-- [ ] `UserAccountPage` — stats grid, recent orders table
-- [ ] `OrderConfirmationPage` — success icon treatment, CTA spacing
-- [ ] `HomePage` — filter sidebar, product card grid, mini-cart panel
+- [x] `CartPage` — "Updating cart…" text `var(--accent)` → `var(--text)` (contrast fix on accent-subtle bg)
+- [x] `CheckoutPage` — Stripe Elements `theme: "night"` kept intentionally (iframe, no CSS var injection)
+- [x] `OrdersPage` — `borderLeft: 4px solid status` → `borderTop` (side-stripe ban); order total `var(--accent)` → `var(--success)` (2.1:1 → 5.8:1)
+- [x] `UserAccountPage` — StatCard `borderTop: 3px solid var(--accent)`; "View all →" link contrast fix; recent orders status badges now use semantic STATUS_STYLE colors
+- [x] `OrderConfirmationPage` — verified clean, no changes needed
+- [ ] `ProductDetailPage` + `HomePage` — deferred; already fixed in Phase 1 (Add to Cart buttons); deeper polish in future pass
 
 ---
 

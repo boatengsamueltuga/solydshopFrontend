@@ -119,7 +119,7 @@ const CartPage = () => {
                         gap:          "var(--space-3)",
                     }}>
                         <div className="solyd-spinner" style={{ width: "14px", height: "14px", borderWidth: "2px" }} />
-                        <span style={{ fontSize: "13px", color: "var(--accent)", fontWeight: 600 }}>Updating cart…</span>
+                        <span style={{ fontSize: "13px", color: "var(--text)", fontWeight: 600 }}>Updating cart…</span>
                     </div>
                 )}
 

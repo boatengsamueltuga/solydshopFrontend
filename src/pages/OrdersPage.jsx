@@ -160,7 +160,7 @@ const OrdersPage = () => {
                                     style={{
                                         background:   "var(--surface-mid)",
                                         border:       "1px solid var(--border)",
-                                        borderLeft:   `4px solid ${s.border}`,
+                                        borderTop:    `4px solid ${s.border}`,
                                         borderRadius: "var(--r-lg)",
                                         overflow:     "hidden",
                                         transition:   "border-color var(--duration-fast)",
@@ -303,7 +303,7 @@ const OrdersPage = () => {
                                         <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-3)", borderTop: "1px dashed var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
                                             <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-3)" }}>
                                                 <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>Order Total</span>
-                                                <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--accent)" }}>
+                                                <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--success)" }}>
                                                     ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                                 </span>
                                             </div>

@@ -10,6 +10,14 @@ const ROLE_STYLE = {
     ROLE_USER:   { label: "User",   color: "var(--info)",    bg: "var(--info-subtle)"    },
 };
 
+const ORDER_STATUS_STYLE = {
+    PENDING:    { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
+    PROCESSING: { color: "var(--info)",     bg: "var(--info-subtle)"     },
+    SHIPPED:    { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
+    DELIVERED:  { color: "var(--success)",  bg: "var(--success-subtle)"  },
+    CANCELLED:  { color: "var(--error)",    bg: "var(--error-subtle)"    },
+};
+
 const RoleBadge = ({ role }) => {
     const s = ROLE_STYLE[role] ?? { label: role, color: "var(--text-3)", bg: "var(--surface-mid)" };
     return (
@@ -49,6 +57,7 @@ const StatCard = ({ label, value, loading }) => (
     <div style={{
         background:   "var(--surface-mid)",
         border:       "1px solid var(--border)",
+        borderTop:    "3px solid var(--accent)",
         borderRadius: "var(--r-md)",
         padding:      "var(--space-4) var(--space-5)",
         textAlign:    "center",
@@ -156,9 +165,9 @@ const UserAccountPage = () => {
                         <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)", margin: 0 }}>
                             Recent Orders
                         </p>
-                        <Link to="/orders" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--accent)", textDecoration: "none" }}
-                            onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                            onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                        <Link to="/orders" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", color: "var(--text-2)", textDecoration: "none" }}
+                            onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.textDecoration = "underline"; }}
+                            onMouseLeave={e => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.textDecoration = "none"; }}
                         >
                             View all →
                         </Link>
@@ -198,19 +207,24 @@ const UserAccountPage = () => {
                                                 ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                             </td>
                                             <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                                                <span style={{
-                                                    fontFamily:    "var(--font-mono)",
-                                                    fontSize:      "11px",
-                                                    fontWeight:    600,
-                                                    letterSpacing: "0.04em",
-                                                    textTransform: "uppercase",
-                                                    padding:       "2px 8px",
-                                                    borderRadius:  "var(--r-sm)",
-                                                    background:    "var(--surface-high)",
-                                                    color:         "var(--text-2)",
-                                                }}>
-                                                    {order.status}
-                                                </span>
+                                                {(() => {
+                                                    const ss = ORDER_STATUS_STYLE[order.status] ?? { color: "var(--text-3)", bg: "var(--surface-high)" };
+                                                    return (
+                                                        <span style={{
+                                                            fontFamily:    "var(--font-mono)",
+                                                            fontSize:      "11px",
+                                                            fontWeight:    600,
+                                                            letterSpacing: "0.04em",
+                                                            textTransform: "uppercase",
+                                                            padding:       "2px 8px",
+                                                            borderRadius:  "var(--r-sm)",
+                                                            background:    ss.bg,
+                                                            color:         ss.color,
+                                                        }}>
+                                                            {order.status}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </td>
                                         </tr>
                                     ))}
