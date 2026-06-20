@@ -20,10 +20,13 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import SyncIcon      from "@mui/icons-material/Sync";
 
-import api         from "../api/api";
-import toast       from "react-hot-toast";
-import AdminLayout from "../components/layouts/AdminLayout";
-import SheetPanel  from "../components/common/SheetPanel";
+import api          from "../api/api";
+import toast        from "react-hot-toast";
+import AdminLayout  from "../components/layouts/AdminLayout";
+import SheetPanel   from "../components/common/SheetPanel";
+import PageBanner   from "../components/common/PageBanner";
+
+import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 
 /* ── Constants ── */
 const ALL_STATUSES = ["ALL", "PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
@@ -230,6 +233,15 @@ const AdminOrdersPage = () => {
     return (
         <AdminLayout title="Orders">
 
+            {/* ── Page banner ── */}
+            <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>
+                <PageBanner
+                    title="Orders"
+                    subtitle="View and update customer orders"
+                    icon={<ListAltOutlinedIcon sx={{ fontSize: 20 }} />}
+                />
+            </div>
+
             {/* ── Status tabs ── */}
             <div style={{
                 display:      "flex",
@@ -334,7 +346,7 @@ const AdminOrdersPage = () => {
                         <Box sx={{
                             background:   "var(--surface-high)",
                             border:       "1px solid var(--border)",
-                            borderLeft:   "3px solid var(--accent)",
+                            borderTop:    "3px solid var(--accent)",
                             borderRadius: "var(--r-md)",
                             p:            2,
                         }}>

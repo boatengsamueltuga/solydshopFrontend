@@ -26,6 +26,9 @@ import toast         from "react-hot-toast";
 import confirmToast  from "../utils/confirmToast";
 import AdminLayout   from "../components/layouts/AdminLayout";
 import SheetPanel    from "../components/common/SheetPanel";
+import PageBanner    from "../components/common/PageBanner";
+
+import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 
 /* ── Constants ── */
 const ROLE_TABS = ["ALL", "USERS", "SELLERS", "ADMINS"];
@@ -244,6 +247,15 @@ const AdminUsersPage = () => {
     return (
         <AdminLayout title="Users">
 
+            {/* ── Page banner ── */}
+            <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>
+                <PageBanner
+                    title="Users"
+                    subtitle="Manage roles and account access"
+                    icon={<PeopleOutlinedIcon sx={{ fontSize: 20 }} />}
+                />
+            </div>
+
             {/* ── Role tabs ── */}
             <div style={{
                 display:      "flex",
@@ -359,7 +371,7 @@ const AdminUsersPage = () => {
                         <Box sx={{
                             background:   "var(--surface-high)",
                             border:       "1px solid var(--border)",
-                            borderLeft:   "3px solid var(--accent)",
+                            borderTop:    "3px solid var(--accent)",
                             borderRadius: "var(--r-md)",
                             p:            2,
                         }}>

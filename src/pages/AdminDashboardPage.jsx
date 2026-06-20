@@ -8,10 +8,12 @@ import {
     HiUsers,
     HiArrowRight,
     HiCurrencyDollar,
+    HiViewGridAdd,
 } from "react-icons/hi";
 
-import api from "../api/api";
+import api         from "../api/api";
 import AdminLayout from "../components/layouts/AdminLayout";
+import PageBanner  from "../components/common/PageBanner";
 
 /* ── Status colour map ─────────────────────────────────────────────────────── */
 const STATUS_STYLE = {
@@ -47,6 +49,7 @@ const StatCard = ({ label, value, Icon, loading }) => (
     <div style={{
         background:     "var(--surface-mid)",
         border:         "1px solid var(--border)",
+        borderTop:      "3px solid var(--accent)",
         borderRadius:   "var(--r-md)",
         padding:        "var(--space-5)",
         display:        "flex",
@@ -161,6 +164,15 @@ const AdminDashboardPage = () => {
 
     return (
         <AdminLayout title="Dashboard">
+
+            {/* ── Page banner ── */}
+            <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-6)" }}>
+                <PageBanner
+                    title="Dashboard"
+                    subtitle="Platform overview · live stats"
+                    icon={<HiViewGridAdd style={{ fontSize: "20px" }} />}
+                />
+            </div>
 
             {/* ── Stats ── */}
             <div style={{

@@ -16,9 +16,12 @@ import EditIcon   from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon    from "@mui/icons-material/Add";
 
-import api        from "../api/api";
-import toast      from "react-hot-toast";
-import AdminLayout from "../components/layouts/AdminLayout";
+import api          from "../api/api";
+import toast        from "react-hot-toast";
+import AdminLayout  from "../components/layouts/AdminLayout";
+import PageBanner   from "../components/common/PageBanner";
+
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 
 /* ── CategoryCard ── */
 const CategoryCard = ({ category, onEdit, onDelete }) => (
@@ -190,32 +193,24 @@ const AdminCategoriesPage = () => {
     return (
         <AdminLayout title="Categories">
 
-            {/* ── Toolbar ── */}
-            <div style={{
-                display:        "flex",
-                alignItems:     "center",
-                justifyContent: "space-between",
-                gap:            "var(--space-4)",
-                marginBottom:   "var(--space-4)",
-                flexWrap:       "wrap",
-            }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-                    <span style={{ color: "var(--text-3)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>
-                        Total
-                    </span>
-                    <span style={{ color: "var(--text)", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "14px" }}>
-                        {loading ? "—" : categories.length}
-                    </span>
-                </div>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<AddIcon />}
-                    onClick={() => { setCategoryName(""); setIsCreateOpen(true); }}
-                    sx={{ fontWeight: 700 }}
-                >
-                    Create Category
-                </Button>
+            {/* ── Page banner ── */}
+            <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>
+                <PageBanner
+                    title="Categories"
+                    subtitle={loading ? "Loading…" : `${categories.length} categories`}
+                    icon={<CategoryOutlinedIcon sx={{ fontSize: 20 }} />}
+                    action={
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            onClick={() => { setCategoryName(""); setIsCreateOpen(true); }}
+                            sx={{ fontWeight: 700 }}
+                        >
+                            Create Category
+                        </Button>
+                    }
+                />
             </div>
 
             {/* ── Card Grid ── */}

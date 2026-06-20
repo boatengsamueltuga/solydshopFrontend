@@ -41,15 +41,16 @@ button/link with `background: "var(--accent)"` (caramel). Old: 2.1:1 (fail). New
 
 ---
 
-## Phase 3 — Admin Pages ⬜ TODO
+## Phase 3 — Admin Pages ✅ DONE
 
 Pages: `AdminDashboardPage`, `AdminProductsPage`, `AdminOrdersPage`, `AdminCategoriesPage`, `AdminUsersPage`
 
-- [ ] Verify DataGrid/table header backgrounds use `--surface-mid`
-- [ ] Add `PageBanner` component (icon + title + subtitle) to each page
-- [ ] Remove any remaining hardcoded colors or dark-theme artifacts
-- [ ] Improve stat cards (accent border-top, icon treatment)
-- [ ] Confirm form dialogs / SheetPanel match light theme
+- [x] Verify DataGrid/table header backgrounds use `--surface-mid` — confirmed via MUI theme
+- [x] Add `PageBanner` component (icon + title + subtitle) to each page — full-bleed via -24px negative margins
+- [x] Remove any remaining hardcoded colors or dark-theme artifacts — all pages use CSS vars
+- [x] Improve stat cards (accent border-top, icon treatment) — `borderTop: "3px solid var(--accent)"` added
+- [x] Fix side-stripe border violations — `borderLeft` → `borderTop` in AdminOrders + AdminUsers SheetPanel cards
+- [x] Confirm form dialogs / SheetPanel match light theme — verified, all use semantic vars
 
 ---
 

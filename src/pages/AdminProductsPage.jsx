@@ -31,10 +31,13 @@ import CloudUploadIcon       from "@mui/icons-material/CloudUpload";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import SearchIcon            from "@mui/icons-material/Search";
 
-import api         from "../api/api";
-import toast       from "react-hot-toast";
-import AdminLayout from "../components/layouts/AdminLayout";
-import SheetPanel  from "../components/common/SheetPanel";
+import api          from "../api/api";
+import toast        from "react-hot-toast";
+import AdminLayout  from "../components/layouts/AdminLayout";
+import SheetPanel   from "../components/common/SheetPanel";
+import PageBanner   from "../components/common/PageBanner";
+
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 
 /* ── MonoTag ── */
 const MonoTag = memo(({ value }) =>
@@ -361,14 +364,33 @@ const AdminProductsPage = () => {
     return (
         <AdminLayout title="Products">
 
-            {/* ── Toolbar ── */}
+            {/* ── Page banner ── */}
+            <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-4)" }}>
+                <PageBanner
+                    title="Products"
+                    subtitle="Manage the product catalog"
+                    icon={<InventoryOutlinedIcon sx={{ fontSize: 20 }} />}
+                    action={
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddCircleOutlinedIcon />}
+                            onClick={() => { resetForm(); setIsFormOpen(true); }}
+                            sx={{ fontWeight: 700, whiteSpace: "nowrap" }}
+                        >
+                            Create Product
+                        </Button>
+                    }
+                />
+            </div>
+
+            {/* ── Search ── */}
             <div style={{
-                display:        "flex",
-                alignItems:     "center",
-                justifyContent: "space-between",
-                gap:            "var(--space-4)",
-                marginBottom:   "var(--space-4)",
-                flexWrap:       "wrap",
+                display:      "flex",
+                alignItems:   "center",
+                gap:          "var(--space-4)",
+                marginBottom: "var(--space-4)",
+                flexWrap:     "wrap",
             }}>
                 <TextField
                     size="small"
@@ -384,15 +406,6 @@ const AdminProductsPage = () => {
                     }}
                     sx={{ minWidth: 280, flex: 1, maxWidth: 480 }}
                 />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<AddCircleOutlinedIcon />}
-                    onClick={() => { resetForm(); setIsFormOpen(true); }}
-                    sx={{ fontWeight: 700, whiteSpace: "nowrap" }}
-                >
-                    Create Product
-                </Button>
             </div>
 
             {/* ── Stats row ── */}
