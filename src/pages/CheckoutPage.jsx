@@ -35,7 +35,7 @@ const StepIndicator = ({ step }) => {
                             borderRadius:   "50%",
                             border:         `2px solid ${active || done ? "var(--accent)" : "var(--border)"}`,
                             background:     done ? "var(--accent)" : active ? "var(--accent-subtle)" : "transparent",
-                            color:          done ? "var(--text)" : active ? "var(--accent)" : "var(--text-4)",
+                            color:          done ? "var(--text)" : active ? "var(--text-2)" : "var(--text-4)",
                             display:        "flex",
                             alignItems:     "center",
                             justifyContent: "center",
@@ -50,7 +50,7 @@ const StepIndicator = ({ step }) => {
                             fontSize:   "13px",
                             fontFamily: "var(--font-body)",
                             fontWeight: active ? 600 : 400,
-                            color:      active ? "var(--text)" : done ? "var(--accent)" : "var(--text-4)",
+                            color:      active ? "var(--text)" : done ? "var(--text-2)" : "var(--text-4)",
                         }}>
                             {label}
                         </span>
@@ -137,7 +137,7 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
             <div style={{
                 background:    "var(--surface-high)",
                 border:        "1px solid var(--border)",
-                borderLeft:    "3px solid var(--accent)",
+                borderTop:     "3px solid var(--accent)",
                 borderRadius:  "var(--r-md)",
                 padding:       "var(--space-4)",
                 marginBottom:  "var(--space-5)",
@@ -154,7 +154,7 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
                     <button
                         type="button"
                         onClick={onEditAddress}
-                        style={{ background: "none", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", color: "var(--accent)", fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 600, cursor: "pointer", padding: "4px 10px", flexShrink: 0, transition: "border-color var(--duration-fast)" }}
+                        style={{ background: "none", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", color: "var(--text-2)", fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 600, cursor: "pointer", padding: "4px 10px", flexShrink: 0, transition: "border-color var(--duration-fast)" }}
                         onMouseEnter={(e) => e.currentTarget.style.borderColor = "var(--accent)"}
                         onMouseLeave={(e) => e.currentTarget.style.borderColor = "var(--border)"}
                     >
@@ -408,8 +408,8 @@ const CheckoutPage = () => {
                         marginBottom:"var(--space-5)",
                         transition:  "color var(--duration-fast)",
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = "var(--accent)"}
-                    onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-3)"}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.textDecoration = "underline"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-3)"; e.currentTarget.style.textDecoration = "none"; }}
                 >
                     <HiArrowLeft style={{ fontSize: 14 }} />
                     {step === "payment" ? "Back to Shipping" : "Back to Cart"}

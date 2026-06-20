@@ -182,8 +182,8 @@ const CartPage = () => {
                                     width:        "fit-content",
                                     transition:   "color var(--duration-fast)",
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.color = "var(--accent)"}
-                                onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-3)"}
+                                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.textDecoration = "underline"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-3)"; e.currentTarget.style.textDecoration = "none"; }}
                             >
                                 <HiArrowLeft style={{ fontSize: 14 }} /> Continue Shopping
                             </button>
@@ -260,7 +260,7 @@ const CartPage = () => {
                                                 size="small"
                                                 onClick={() => handleDecreaseQuantity(item.productId)}
                                                 disabled={actionLoading}
-                                                sx={{ color: "var(--text-3)", borderRadius: 0, "&:hover": { color: "var(--accent)", background: "var(--accent-subtle)" } }}
+                                                sx={{ color: "var(--text-3)", borderRadius: 0, "&:hover": { color: "var(--text)", background: "var(--accent-subtle)" } }}
                                             >
                                                 <RemoveIcon sx={{ fontSize: 14 }} />
                                             </IconButton>
@@ -279,7 +279,7 @@ const CartPage = () => {
                                                 size="small"
                                                 onClick={() => handleIncreaseQuantity(item.productId)}
                                                 disabled={actionLoading}
-                                                sx={{ color: "var(--accent)", borderRadius: 0, "&:hover": { background: "var(--accent-subtle)" } }}
+                                                sx={{ color: "var(--text-2)", borderRadius: 0, "&:hover": { color: "var(--text)", background: "var(--accent-subtle)" } }}
                                             >
                                                 <AddIcon sx={{ fontSize: 14 }} />
                                             </IconButton>
