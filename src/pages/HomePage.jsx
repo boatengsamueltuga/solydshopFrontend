@@ -184,6 +184,14 @@ const HomePage = () => {
     const cartItems = cart?.items ?? [];
     const cartTotal = Number(cart?.totalPrice ?? 0);
     const itemCount = cartItems.reduce((s, i) => s + i.quantity, 0);
+    const activeFilterCount = [categoryId !== "", priceMax < 100000, inStockOnly].filter(Boolean).length;
+
+    /* ── Body scroll-lock when filter drawer is open on mobile ── */
+    useEffect(() => {
+        if (filtersOpen) document.body.style.overflow = "hidden";
+        else document.body.style.overflow = "";
+        return () => { document.body.style.overflow = ""; };
+    }, [filtersOpen]);
 
     /* ── Render ── */
     return (
@@ -195,32 +203,89 @@ const HomePage = () => {
             <main className="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-12 gap-6 py-6">
 
                 {/* ── Mobile filter toggle ── */}
-                <div className="col-span-12 lg:hidden">
+                <div className="col-span-12 lg:hidden flex items-center gap-2">
                     <button
-                        onClick={() => setFiltersOpen((o) => !o)}
+                        onClick={() => setFiltersOpen(true)}
                         aria-expanded={filtersOpen}
                         aria-controls="filters-aside"
-                        className="w-full py-3 rounded font-bold text-sm flex items-center justify-center gap-2 transition-colors hover:opacity-90 min-h-[44px]"
-                        style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)" }}
+                        aria-label={activeFilterCount > 0 ? `Filters (${activeFilterCount} active)` : "Filters"}
+                        className="flex-1 py-3 rounded font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 min-h-[44px]"
+                        style={{
+                            background:  "var(--surface-high)",
+                            border:      activeFilterCount > 0 ? "1px solid var(--accent)" : "1px solid var(--border)",
+                            color:       "var(--text)",
+                            transition:  "opacity var(--duration-fast), border-color var(--duration-fast)",
+                        }}
                     >
-                        <HiSearch aria-hidden="true" size={16} />
-                        {filtersOpen ? "Hide Filters" : "Show Filters"}
+                        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                            <HiAdjustments aria-hidden="true" size={16} />
+                            {activeFilterCount > 0 && (
+                                <span
+                                    aria-hidden="true"
+                                    style={{
+                                        position:        "absolute",
+                                        top:             "-3px",
+                                        right:           "-4px",
+                                        width:           "6px",
+                                        height:          "6px",
+                                        borderRadius:    "50%",
+                                        background:      "var(--accent)",
+                                        border:          "1.5px solid var(--surface-high)",
+                                    }}
+                                />
+                            )}
+                        </div>
+                        Filters
                     </button>
+                    {activeFilterCount > 0 && (
+                        <button
+                            onClick={handleReset}
+                            className="py-3 px-4 rounded font-bold text-xs min-h-[44px]"
+                            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                        >
+                            Clear
+                        </button>
+                    )}
                 </div>
 
-                {/* ── LEFT: Filters ── */}
+                {/* ── LEFT: Filters — fixed left drawer on mobile, sticky column on desktop ── */}
                 <aside
                     id="filters-aside"
-                    className={`${filtersOpen ? "flex" : "hidden"} lg:flex flex-col col-span-12 lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-112px)] rounded overflow-hidden`}
-                    style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                    aria-label="Product filters"
+                    className={[
+                        "flex flex-col overflow-hidden",
+                        "fixed top-0 left-0 h-screen z-[500] w-[min(320px,85vw)]",
+                        filtersOpen ? "translate-x-0" : "-translate-x-full",
+                        "lg:sticky lg:top-24 lg:h-[calc(100vh-112px)] lg:w-auto lg:z-auto lg:translate-x-0 lg:col-span-3 lg:rounded",
+                    ].join(" ")}
+                    style={{
+                        background: "var(--surface)",
+                        border: "1px solid var(--border)",
+                        transition: "transform var(--duration-mid) var(--ease-out-quart)",
+                    }}
+                    onKeyDown={(e) => { if (e.key === "Escape") setFiltersOpen(false); }}
                 >
                     {/* Card header */}
                     <div
-                        className="flex items-center gap-2 px-4 py-3 flex-shrink-0"
+                        className="flex items-center justify-between px-4 py-3 flex-shrink-0"
                         style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}
                     >
-                        <HiAdjustments aria-hidden="true" size={16} style={{ color: "var(--text-3)" }} />
-                        <h2 className="text-sm font-bold" style={{ color: "var(--text)" }}>Filters</h2>
+                        <div className="flex items-center gap-2">
+                            <HiAdjustments aria-hidden="true" size={16} style={{ color: "var(--text-3)" }} />
+                            <h2 className="text-sm font-bold" style={{ color: "var(--text)" }}>Filters</h2>
+                        </div>
+                        <button
+                            onClick={() => setFiltersOpen(false)}
+                            className="lg:hidden flex items-center justify-center w-7 h-7 rounded"
+                            aria-label="Close filters"
+                            style={{ color: "var(--text-3)", border: "1px solid var(--border)", background: "none", cursor: "pointer", transition: "color var(--duration-fast)" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
+                        >
+                            <HiX aria-hidden="true" size={14} />
+                        </button>
                     </div>
 
                     {/* Scrollable body */}
@@ -331,14 +396,14 @@ const HomePage = () => {
                         style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}
                     >
                         <button
-                            onClick={() => { setPageNumber(0); fetchProducts(keyword, categoryId, priceMax, 0, inStockOnly); }}
-                            className="flex-1 py-2.5 rounded font-bold text-xs transition-colors hover:opacity-90 min-h-[44px]"
-                            style={{ background: "var(--accent)", color: "var(--text)" }}
+                            onClick={() => { setPageNumber(0); fetchProducts(keyword, categoryId, priceMax, 0, inStockOnly); setFiltersOpen(false); }}
+                            className="flex-1 py-2.5 rounded font-bold text-xs hover:opacity-90 min-h-[44px]"
+                            style={{ background: "var(--accent)", color: "var(--text)", transition: "opacity var(--duration-fast)" }}
                         >
                             Apply Filters
                         </button>
                         <button
-                            onClick={handleReset}
+                            onClick={() => { handleReset(); setFiltersOpen(false); }}
                             className="px-4 py-2.5 rounded font-bold text-xs min-h-[44px]"
                             style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
                             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text)"; }}
@@ -712,6 +777,16 @@ const HomePage = () => {
                     </div>
                 </aside>
             </main>
+
+            {/* ══ Mobile filter backdrop ══ */}
+            {filtersOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 z-[400]"
+                    style={{ background: "rgba(0,0,0,0.55)" }}
+                    onClick={() => setFiltersOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
 
             {/* ══ Footer ══ */}
             <footer style={{ background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
