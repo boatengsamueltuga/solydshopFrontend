@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logoutSuccess } from "../features/auth/authSlice";
 import api from "../api/api";
 import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd } from "react-icons/hi";
+import SolydLogo from "./SolydLogo";
 import { FaShoppingCart } from "react-icons/fa";
 
 // ── Design tokens ────────────────────────────────────────────
@@ -117,6 +118,7 @@ const Navbar = () => {
                     {/* ── Left: Logo + Nav links ──────────────────── */}
                     <div className="flex items-center gap-8">
                         <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
+                            <SolydLogo size={36} />
                             <span style={{ fontSize: "22px", fontWeight: 700, color: C.primary, fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
                                 SolydShop
                             </span>

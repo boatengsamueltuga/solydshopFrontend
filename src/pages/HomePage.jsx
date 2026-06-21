@@ -10,6 +10,7 @@ import {
     fetchProductsSuccess,
     fetchProductsFailure,
 } from "../features/product/productSlice";
+import SolydLogo from "../components/SolydLogo";
 
 const getXsrfToken = () =>
     document.cookie.split("; ").find((r) => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -902,7 +903,10 @@ const HomePage = () => {
                 <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Brand */}
                     <div>
-                        <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, color: "var(--accent)", letterSpacing: "-0.02em" }}>SolydShop</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
+                            <SolydLogo size={28} />
+                            <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, color: "var(--accent)", letterSpacing: "-0.02em" }}>SolydShop</span>
+                        </div>
                         <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-3)", marginTop: "6px", lineHeight: 1.55, maxWidth: "30ch" }}>
                             B2B industrial procurement for heavy machinery components and assemblies.
                         </p>
