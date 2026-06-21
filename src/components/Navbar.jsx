@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutSuccess } from "../features/auth/authSlice";
 import api from "../api/api";
-import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout } from "react-icons/hi";
+import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd } from "react-icons/hi";
 import { FaShoppingCart } from "react-icons/fa";
 
 // ── Design tokens ────────────────────────────────────────────
@@ -75,12 +75,15 @@ const Navbar = () => {
     const closeMenu = () => setMenuOpen(false);
 
     // ── Desktop nav link ─────────────────────────────────────
-    const NavLink = ({ to, children }) => {
+    const NavLink = ({ to, children, Icon }) => {
         const active = isActive(to);
         return (
             <Link
                 to={to}
                 style={{
+                    display:       "flex",
+                    alignItems:    "center",
+                    gap:           "5px",
                     fontSize:      "14px",
                     fontWeight:    500,
                     letterSpacing: "0.01em",
@@ -94,6 +97,7 @@ const Navbar = () => {
                 onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = C.text; }}
                 onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = C.textMuted; }}
             >
+                {Icon && <Icon size={14} aria-hidden="true" style={{ flexShrink: 0 }} />}
                 {children}
             </Link>
         );
@@ -112,17 +116,20 @@ const Navbar = () => {
                 >
                     {/* ── Left: Logo + Nav links ──────────────────── */}
                     <div className="flex items-center gap-8">
-                        <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
-                            <span style={{ fontSize: "24px", fontWeight: 700, color: C.primary, fontFamily: "Inter, sans-serif", letterSpacing: "-0.01em" }}>
+                        <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
+                            <span style={{ fontSize: "22px", fontWeight: 700, color: C.primary, fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
                                 SolydShop
+                            </span>
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", color: C.textMuted, textTransform: "uppercase", border: `1px solid ${C.border}`, borderRadius: "3px", padding: "2px 6px", whiteSpace: "nowrap" }}>
+                                PROCUREMENT PORTAL
                             </span>
                         </Link>
 
                         <nav className="hidden md:flex items-center gap-6">
-                            <NavLink to="/">Home</NavLink>
-                            {isAuthenticated && <NavLink to="/orders">Orders</NavLink>}
-                            {isSeller        && <NavLink to="/seller/dashboard">Seller</NavLink>}
-                            {isAdmin         && <NavLink to="/admin/dashboard">Admin</NavLink>}
+                            <NavLink to="/"                  Icon={HiHome}>Home</NavLink>
+                            {isAuthenticated && <NavLink to="/orders"           Icon={HiClipboardList}>Orders</NavLink>}
+                            {isSeller        && <NavLink to="/seller/dashboard" Icon={HiShoppingBag}>Seller</NavLink>}
+                            {isAdmin         && <NavLink to="/admin/dashboard"  Icon={HiViewGrid}>Admin</NavLink>}
                         </nav>
                     </div>
 
@@ -258,17 +265,19 @@ const Navbar = () => {
                             <div className="flex items-center gap-3">
                                 <Link
                                     to="/login"
-                                    style={{ fontSize: "14px", fontWeight: 500, color: C.textMuted, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                    style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "14px", fontWeight: 500, color: C.textMuted, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
                                     onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
                                     onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
                                 >
+                                    <HiLogin size={15} aria-hidden="true" />
                                     Login
                                 </Link>
                                 <Link
                                     to="/register"
                                     className="text-sm font-bold rounded-lg px-4 py-2 transition-opacity hover:opacity-90"
-                                    style={{ background: C.btnBg, color: C.btnText, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                    style={{ display: "flex", alignItems: "center", gap: "5px", background: C.btnBg, color: C.btnText, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
                                 >
+                                    <HiUserAdd size={15} aria-hidden="true" />
                                     Register
                                 </Link>
                             </div>
@@ -309,35 +318,41 @@ const Navbar = () => {
 
                         {/* Mobile links */}
                         {[
-                            { to: "/",                   label: "Home",             show: true },
-                            { to: "/cart",               label: "Cart",             show: isAuthenticated },
-                            { to: "/orders",             label: "Orders",           show: isAuthenticated },
-                            { to: "/account",            label: "My Account",       show: isAuthenticated },
-                            { to: "/seller/dashboard",   label: "Seller Dashboard", show: isSeller },
-                            { to: "/admin/dashboard",    label: "Admin Dashboard",  show: isAdmin },
+                            { to: "/",                   label: "Home",             Icon: HiHome,          show: true },
+                            { to: "/cart",               label: "Cart",             Icon: FaShoppingCart,  show: isAuthenticated },
+                            { to: "/orders",             label: "Orders",           Icon: HiClipboardList, show: isAuthenticated },
+                            { to: "/account",            label: "My Account",       Icon: HiUser,          show: isAuthenticated },
+                            { to: "/seller/dashboard",   label: "Seller Dashboard", Icon: HiShoppingBag,   show: isSeller },
+                            { to: "/admin/dashboard",    label: "Admin Dashboard",  Icon: HiViewGrid,      show: isAdmin },
                         ].filter((l) => l.show).map((l) => (
                             <Link
                                 key={l.to}
                                 to={l.to}
                                 onClick={closeMenu}
-                                className="py-2.5 text-sm font-medium transition-colors"
+                                className="py-2.5 text-sm font-medium transition-colors flex items-center gap-2.5"
                                 style={{ color: isActive(l.to) ? C.text : C.textMuted, textDecoration: "none" }}
                             >
+                                <l.Icon size={16} aria-hidden="true" style={{ flexShrink: 0, color: isActive(l.to) ? C.primary : C.textMuted }} />
                                 {l.label}
                             </Link>
                         ))}
 
                         {!isAuthenticated ? (
                             <div className="flex gap-3 mt-2">
-                                <Link to="/login"    onClick={closeMenu} className="flex-1 text-center py-2 text-sm rounded-lg" style={{ border: `1px solid ${C.border}`, color: C.textMuted, textDecoration: "none" }}>Login</Link>
-                                <Link to="/register" onClick={closeMenu} className="flex-1 text-center py-2 text-sm font-bold rounded-lg" style={{ background: C.btnBg, color: C.btnText, textDecoration: "none" }}>Register</Link>
+                                <Link to="/login"    onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm rounded-lg" style={{ border: `1px solid ${C.border}`, color: C.textMuted, textDecoration: "none" }}>
+                                    <HiLogin size={14} aria-hidden="true" /> Login
+                                </Link>
+                                <Link to="/register" onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-bold rounded-lg" style={{ background: C.btnBg, color: C.btnText, textDecoration: "none" }}>
+                                    <HiUserAdd size={14} aria-hidden="true" /> Register
+                                </Link>
                             </div>
                         ) : (
                             <button
                                 onClick={() => { handleLogout(); closeMenu(); }}
-                                className="mt-2 py-2.5 text-sm text-left transition-colors"
+                                className="mt-2 py-2.5 text-sm text-left transition-colors flex items-center gap-2.5"
                                 style={{ color: "var(--error)", background: "none", border: "none", cursor: "pointer" }}
                             >
+                                <HiLogout size={16} aria-hidden="true" style={{ flexShrink: 0 }} />
                                 Logout
                             </button>
                         )}

@@ -14,19 +14,94 @@ import {
 const getXsrfToken = () =>
     document.cookie.split("; ").find((r) => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
 
-/* ── Skeleton card ── */
+/* ── Static data ─────────────────────────────────────────────────────── */
+const HERO_GRID = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="#ccd5ae" stroke-width="0.5"/></svg>')}")`;
+
+const BEARING_BALLS = Array.from({ length: 12 }, (_, i) => ({
+    cx: Math.round(220 + 92 * Math.cos((i * 30 * Math.PI) / 180)),
+    cy: Math.round(195 + 92 * Math.sin((i * 30 * Math.PI) / 180)),
+}));
+
+const TRUST_PILLARS = [
+    { symbol: "✓", label: "ISO 9001 CERTIFIED",   copy: "Every part meets international quality management standards." },
+    { symbol: "◈", label: "OEM VERIFIED STOCK",   copy: "Cross-referenced OEM specs before every order ships." },
+    { symbol: "⊠", label: "SECURE B2B PORTAL",    copy: "End-to-end encrypted transactions, GDPR compliant." },
+    { symbol: "→", label: "FAST GLOBAL DISPATCH", copy: "Most orders dispatched within 48 business hours." },
+];
+
+const SUPPLIERS = ["Komatsu", "Caterpillar", "Hitachi", "Volvo CE", "Liebherr", "Doosan"];
+
+/* ── Ball bearing technical illustration ─────────────────────────────── */
+const BearingIllustration = () => (
+    <svg viewBox="0 0 440 370" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: "100%", maxHeight: "420px" }}>
+        <defs>
+            <pattern id="bp" width="22" height="22" patternUnits="userSpaceOnUse">
+                <path d="M 22 0 L 0 0 0 22" stroke="#ccd5ae" strokeWidth="0.4" fill="none"/>
+            </pattern>
+        </defs>
+        {/* Grid background */}
+        <rect width="440" height="370" fill="url(#bp)" opacity="0.6" rx="3"/>
+        {/* Centre lines */}
+        <line x1="220" y1="10"  x2="220" y2="356" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="8 4"/>
+        <line x1="10"  y1="195" x2="430" y2="195" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="8 4"/>
+        {/* Outer races */}
+        <circle cx="220" cy="195" r="130" stroke="#8a9d6a" strokeWidth="2.5"/>
+        <circle cx="220" cy="195" r="115" stroke="#8a9d6a" strokeWidth="1"/>
+        {/* Ball track guide */}
+        <circle cx="220" cy="195" r="92"  stroke="#8a9d6a" strokeWidth="0.6" strokeDasharray="3 3" opacity="0.35"/>
+        {/* Bearing balls */}
+        {BEARING_BALLS.map((b, i) => (
+            <circle key={i} cx={b.cx} cy={b.cy} r="11" stroke="#7a9055" strokeWidth="1.5" fill="#e9edc9"/>
+        ))}
+        {/* Inner races */}
+        <circle cx="220" cy="195" r="72" stroke="#8a9d6a" strokeWidth="1.5"/>
+        <circle cx="220" cy="195" r="60" stroke="#8a9d6a" strokeWidth="2"/>
+        {/* Hub */}
+        <circle cx="220" cy="195" r="34" fill="#e9edc9" stroke="#8a9d6a" strokeWidth="1.5"/>
+        <circle cx="220" cy="195" r="19" fill="#ccd5ae" stroke="#8a9d6a" strokeWidth="2"/>
+        {/* Centre bore */}
+        <circle cx="220" cy="195" r="9"  fill="#faedcd" stroke="#7a9055" strokeWidth="1.5"/>
+        {/* Outer Ø dimension (above circle — top at y=65) */}
+        <line x1="90"  y1="65"  x2="90"  y2="40"  stroke="#d4a373" strokeWidth="0.8"/>
+        <line x1="350" y1="65"  x2="350" y2="40"  stroke="#d4a373" strokeWidth="0.8"/>
+        <line x1="85"  y1="36"  x2="355" y2="36"  stroke="#d4a373" strokeWidth="0.8"/>
+        <line x1="85"  y1="31"  x2="85"  y2="41"  stroke="#d4a373" strokeWidth="1.5"/>
+        <line x1="355" y1="31"  x2="355" y2="41"  stroke="#d4a373" strokeWidth="1.5"/>
+        <text x="220" y="27" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="9" fill="#d4a373" fontWeight="600">Ø 260.0 mm</text>
+        {/* Bore dimension (right side) */}
+        <line x1="229" y1="195" x2="388" y2="195" stroke="#d4a373" strokeWidth="0.7" opacity="0.5"/>
+        <line x1="388" y1="177" x2="388" y2="213" stroke="#d4a373" strokeWidth="0.9"/>
+        <line x1="383" y1="177" x2="393" y2="177" stroke="#d4a373" strokeWidth="1.3"/>
+        <line x1="383" y1="213" x2="393" y2="213" stroke="#d4a373" strokeWidth="1.3"/>
+        <text x="415" y="193" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="9"   fill="#d4a373" fontWeight="600">Ø 18</text>
+        <text x="415" y="205" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#a0845c">mm</text>
+        {/* Ball callout */}
+        <line x1="220" y1="103" x2="270" y2="56" stroke="#8a9d6a" strokeWidth="0.8"/>
+        <rect x="268" y="42" width="92" height="30" rx="2" fill="#faedcd" stroke="#ccd5ae" strokeWidth="1"/>
+        <text x="314" y="55"  textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#a0845c" fontWeight="700">BALL BEARING</text>
+        <text x="314" y="66"  textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7" fill="#8a9d6a">BRG-260-B12</text>
+        {/* IN STOCK badge */}
+        <rect x="10" y="10" width="72" height="22" rx="11" fill="#d4ead4" stroke="#4a8a4a" strokeWidth="1"/>
+        <text x="46" y="25" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#2a5a2a" fontWeight="700">IN STOCK</text>
+        {/* Bottom spec line */}
+        <text x="12"  y="363" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#8a9d6a">MATERIAL: AISI 52100 BEARING STEEL · GRADE 10</text>
+        <text x="428" y="363" textAnchor="end" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#d4a373" fontWeight="600">SLY-BRG-2024</text>
+    </svg>
+);
+
+/* ── Skeleton card ───────────────────────────────────────────────────── */
 const SkeletonCard = () => (
     <div className="rounded overflow-hidden animate-pulse" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-        <div className="h-32 w-full" style={{ background: "var(--surface-high)" }} />
+        <div className="h-40 w-full" style={{ background: "var(--surface-high)" }} />
         <div className="p-3 space-y-2">
             <div className="h-2.5 rounded w-4/5" style={{ background: "var(--surface-high)" }} />
             <div className="h-2.5 rounded w-3/5" style={{ background: "var(--surface-high)" }} />
-            <div className="h-7 rounded mt-3" style={{ background: "var(--surface-high)" }} />
+            <div className="h-7 rounded mt-3"    style={{ background: "var(--surface-high)" }} />
         </div>
     </div>
 );
 
-/* ── Main component ── */
+/* ── Main component ──────────────────────────────────────────────────── */
 const HomePage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -49,20 +124,27 @@ const HomePage = () => {
 
     const modalRef            = useRef(null);
     const quickViewTriggerRef = useRef(null);
+    const catalogRef          = useRef(null);
 
-    /* ── Fetchers ── */
+    /* ── Fetchers ────────────────────────────────────────────────────── */
     const fetchCategories = async () => {
         try {
             const res = await api.get("/public/categories?pageSize=1000");
             setCategories(res.data.content);
-        } catch { /* non-critical */ }
+        } catch { }
     };
 
-    const fetchProducts = async (kw = keyword, catId = categoryId, max = priceMax, page = pageNumber, inStock = inStockOnly) => {
+    const fetchProducts = async (
+        kw      = keyword,
+        catId   = categoryId,
+        max     = priceMax,
+        page    = pageNumber,
+        inStock = inStockOnly,
+    ) => {
         dispatch(fetchProductsStart());
         setProductError(null);
         try {
-            let url = `/public/products?pageNumber=${page}&pageSize=12&`;
+            let url = `/public/products?pageNumber=${page}&pageSize=8&`;
             if (kw.trim())    url += `keyword=${encodeURIComponent(kw)}&`;
             if (catId)        url += `categoryId=${catId}&`;
             if (max < 100000) url += `maxPrice=${max}&`;
@@ -81,7 +163,7 @@ const HomePage = () => {
         try {
             const res = await api.get(`/cart/${user.userId}`);
             setCart(res.data);
-        } catch { /* non-critical */ }
+        } catch { }
     };
 
     useEffect(() => {
@@ -96,7 +178,7 @@ const HomePage = () => {
         return () => clearTimeout(t);
     }, [keyword, categoryId, priceMax, inStockOnly]);
 
-    /* ── Quick View focus management ── */
+    /* ── Quick View focus trap ───────────────────────────────────────── */
     useEffect(() => {
         if (!quickViewProduct || !modalRef.current) return;
         const focusable = modalRef.current.querySelectorAll(
@@ -134,7 +216,7 @@ const HomePage = () => {
         }
     };
 
-    /* ── Cart actions ── */
+    /* ── Cart actions ────────────────────────────────────────────────── */
     const handleAddToCart = async (productId) => {
         if (!user) { toast.error("Please login to add items to cart"); return; }
         setCartBusy(true);
@@ -142,11 +224,11 @@ const HomePage = () => {
             await api.post(
                 `/cart/${user.userId}/items`,
                 { productId, quantity: 1 },
-                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } },
             );
             toast.success("Added to cart");
             await fetchCart();
-        } catch { /* non-critical */ }
+        } catch { }
         finally { setCartBusy(false); }
     };
 
@@ -156,10 +238,10 @@ const HomePage = () => {
         try {
             await api.delete(
                 `/cart/${user.userId}/items/${productId}`,
-                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } },
             );
             await fetchCart();
-        } catch { /* non-critical */ }
+        } catch { }
         finally { setCartBusy(false); }
     };
 
@@ -178,79 +260,180 @@ const HomePage = () => {
     const handlePageChange = (newPage) => {
         setPageNumber(newPage);
         fetchProducts(keyword, categoryId, priceMax, newPage);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
-    const cartItems = cart?.items ?? [];
-    const cartTotal = Number(cart?.totalPrice ?? 0);
-    const itemCount = cartItems.reduce((s, i) => s + i.quantity, 0);
-    const activeFilterCount = [categoryId !== "", priceMax < 100000, inStockOnly].filter(Boolean).length;
-
-    /* ── Body scroll-lock when filter drawer is open on mobile ── */
+    /* ── Body scroll-lock for mobile filter drawer ───────────────────── */
     useEffect(() => {
         if (filtersOpen) document.body.style.overflow = "hidden";
-        else document.body.style.overflow = "";
+        else             document.body.style.overflow = "";
         return () => { document.body.style.overflow = ""; };
     }, [filtersOpen]);
 
-    /* ── Render ── */
-    return (
-        <div
-            className="min-h-screen flex flex-col"
-            style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}
-        >
-            {/* ══ Three-column main ══ */}
-            <main className="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-12 gap-6 py-6">
+    /* ── Derived ─────────────────────────────────────────────────────── */
+    const cartItems        = cart?.items ?? [];
+    const cartTotal        = Number(cart?.totalPrice ?? 0);
+    const itemCount        = cartItems.reduce((s, i) => s + i.quantity, 0);
+    const activeFilterCount = [priceMax < 100000, inStockOnly].filter(Boolean).length;
+    const hasAnyFilter      = categoryId !== "" || priceMax < 100000 || inStockOnly;
 
-                {/* ── Mobile filter toggle ── */}
+    /* ═══════════════════════════════════════════════════════════════════
+       RENDER
+    ═══════════════════════════════════════════════════════════════════ */
+    return (
+        <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}>
+
+            {/* ══════════════════════════════════════════
+                HERO — warm sand + blueprint grid
+            ══════════════════════════════════════════ */}
+            <section style={{ background: "var(--surface)", backgroundImage: HERO_GRID, borderBottom: "1px solid var(--border)" }}>
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-10 lg:gap-16 items-center">
+
+                    {/* Left: headline + CTAs + stats */}
+                    <div>
+                        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.25rem, 4vw, 3.25rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.05, color: "var(--text)", margin: 0, textWrap: "balance" }}>
+                            Your Solid Industrial<br className="hidden sm:block" /> Parts Portal.
+                        </h1>
+
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", color: "var(--text-2)", marginTop: "20px", lineHeight: 1.65, maxWidth: "48ch" }}>
+                            Manage sourcing, verify OEM specs, and place orders — all in one secure platform for heavy machinery components.
+                        </p>
+
+                        <div className="flex flex-wrap gap-3" style={{ marginTop: "28px" }}>
+                            <button
+                                onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
+                                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                            >
+                                Enter Catalog
+                            </button>
+                            <button
+                                onClick={() => navigate("/orders")}
+                                style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                            >
+                                My Orders
+                            </button>
+                        </div>
+
+                        {/* Stats row */}
+                        <div className="flex flex-wrap gap-6 mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                            {[
+                                { num: "24K+", label: "Parts Available" },
+                                { num: "500+", label: "OEM Brands"      },
+                                { num: "48h",  label: "Global Dispatch"  },
+                                { num: "ISO",  label: "9001 Certified"  },
+                            ].map(({ num, label }) => (
+                                <div key={label}>
+                                    <div style={{ fontFamily: "var(--font-mono)", fontSize: "20px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>{num}</div>
+                                    <div style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginTop: "2px" }}>{label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Right: industrial bearing illustration */}
+                    <div className="hidden lg:flex items-center justify-center" style={{ opacity: 0.9 }}>
+                        <BearingIllustration />
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                CATEGORY STRIP
+            ══════════════════════════════════════════ */}
+            <section style={{ background: "var(--bg)", borderBottom: "1px solid var(--border)" }}>
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10" style={{ paddingTop: "12px", paddingBottom: "12px", display: "flex", alignItems: "center", gap: "16px" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "var(--text-3)", textTransform: "uppercase", whiteSpace: "nowrap", flexShrink: 0 }}>
+                        CATEGORY
+                    </span>
+                    <div style={{ width: "1px", height: "16px", background: "var(--border)", flexShrink: 0 }} />
+                    <div style={{ display: "flex", gap: "8px", overflowX: "auto", scrollbarWidth: "none", flexWrap: "nowrap", flex: 1, minWidth: 0, paddingRight: "4px" }}>
+                        <button
+                            onClick={() => setCategoryId("")}
+                            style={{
+                                background:   categoryId === "" ? "var(--accent)" : "transparent",
+                                color:        categoryId === "" ? "var(--text)"   : "var(--text-3)",
+                                border:       "1px solid",
+                                borderColor:  categoryId === "" ? "var(--accent)" : "var(--border-mid)",
+                                borderRadius: "var(--r-pill)",
+                                padding:      "4px 14px",
+                                fontFamily:   "var(--font-mono)",
+                                fontSize:     "11px",
+                                letterSpacing: "0.04em",
+                                cursor:       "pointer",
+                                whiteSpace:   "nowrap",
+                                flexShrink:   0,
+                                transition:   "all var(--duration-fast)",
+                            }}
+                        >
+                            All
+                        </button>
+                        {categories.map((cat) => (
+                            <button
+                                key={cat.categoryId}
+                                onClick={() => handleCategoryToggle(cat.categoryId)}
+                                style={{
+                                    background:   String(cat.categoryId) === categoryId ? "var(--accent)" : "transparent",
+                                    color:        String(cat.categoryId) === categoryId ? "var(--text)"   : "var(--text-3)",
+                                    border:       "1px solid",
+                                    borderColor:  String(cat.categoryId) === categoryId ? "var(--accent)" : "var(--border-mid)",
+                                    borderRadius: "var(--r-pill)",
+                                    padding:      "4px 14px",
+                                    fontFamily:   "var(--font-mono)",
+                                    fontSize:     "11px",
+                                    letterSpacing: "0.04em",
+                                    cursor:       "pointer",
+                                    whiteSpace:   "nowrap",
+                                    flexShrink:   0,
+                                    transition:   "all var(--duration-fast)",
+                                }}
+                            >
+                                {cat.categoryName}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                MAIN 3-COLUMN: filters | products | cart
+            ══════════════════════════════════════════ */}
+            <main ref={catalogRef} className="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-12 gap-6 py-6">
+
+                {/* Mobile filter toggle */}
                 <div className="col-span-12 lg:hidden flex items-center gap-2">
                     <button
                         onClick={() => setFiltersOpen(true)}
                         aria-expanded={filtersOpen}
                         aria-controls="filters-aside"
-                        aria-label={activeFilterCount > 0 ? `Filters (${activeFilterCount} active)` : "Filters"}
-                        className="flex-1 py-3 rounded font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 min-h-[44px]"
-                        style={{
-                            background:  "var(--surface-high)",
-                            border:      activeFilterCount > 0 ? "1px solid var(--accent)" : "1px solid var(--border)",
-                            color:       "var(--text)",
-                            transition:  "opacity var(--duration-fast), border-color var(--duration-fast)",
-                        }}
+                        aria-label={hasAnyFilter ? "Filters (active)" : "Filters"}
+                        className="flex-1 py-3 rounded font-bold text-sm flex items-center justify-center gap-2 min-h-[44px]"
+                        style={{ background: "var(--surface-high)", border: hasAnyFilter ? "1px solid var(--accent)" : "1px solid var(--border)", color: "var(--text)" }}
                     >
-                        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                            <HiAdjustments aria-hidden="true" size={16} />
-                            {activeFilterCount > 0 && (
-                                <span
-                                    aria-hidden="true"
-                                    style={{
-                                        position:        "absolute",
-                                        top:             "-3px",
-                                        right:           "-4px",
-                                        width:           "6px",
-                                        height:          "6px",
-                                        borderRadius:    "50%",
-                                        background:      "var(--accent)",
-                                        border:          "1.5px solid var(--surface-high)",
-                                    }}
-                                />
-                            )}
-                        </div>
+                        <HiAdjustments aria-hidden="true" size={16} />
                         Filters
+                        {hasAnyFilter && (
+                            <span
+                                aria-hidden="true"
+                                style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--accent)", flexShrink: 0, display: "inline-block" }}
+                            />
+                        )}
                     </button>
-                    {activeFilterCount > 0 && (
+                    {hasAnyFilter && (
                         <button
                             onClick={handleReset}
-                            className="py-3 px-4 rounded font-bold text-xs min-h-[44px]"
-                            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
-                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text)"; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                            className="py-3 px-4 rounded text-xs font-bold min-h-[44px]"
+                            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent", cursor: "pointer" }}
                         >
                             Clear
                         </button>
                     )}
                 </div>
 
-                {/* ── LEFT: Filters — fixed left drawer on mobile, sticky column on desktop ── */}
+                {/* ── LEFT: Filter sidebar ───────────────────────── */}
                 <aside
                     id="filters-aside"
                     aria-label="Product filters"
@@ -260,88 +443,89 @@ const HomePage = () => {
                         filtersOpen ? "translate-x-0" : "-translate-x-full",
                         "lg:sticky lg:top-24 lg:h-[calc(100vh-112px)] lg:w-auto lg:z-auto lg:translate-x-0 lg:col-span-3 lg:rounded",
                     ].join(" ")}
-                    style={{
-                        background: "var(--surface)",
-                        border: "1px solid var(--border)",
-                        transition: "transform var(--duration-mid) var(--ease-out-quart)",
-                    }}
+                    style={{ background: "var(--surface)", border: "1px solid var(--border)", transition: "transform var(--duration-mid) var(--ease-out-quart)" }}
                     onKeyDown={(e) => { if (e.key === "Escape") setFiltersOpen(false); }}
                 >
-                    {/* Card header */}
-                    <div
-                        className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-                        style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}
-                    >
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}>
                         <div className="flex items-center gap-2">
-                            <HiAdjustments aria-hidden="true" size={16} style={{ color: "var(--text-3)" }} />
-                            <h2 className="text-sm font-bold" style={{ color: "var(--text)" }}>Filters</h2>
+                            <HiAdjustments aria-hidden="true" size={14} style={{ color: "var(--text-3)" }} />
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text)" }}>Buying Filters</span>
                         </div>
-                        <button
-                            onClick={() => setFiltersOpen(false)}
-                            className="lg:hidden flex items-center justify-center w-7 h-7 rounded"
-                            aria-label="Close filters"
-                            style={{ color: "var(--text-3)", border: "1px solid var(--border)", background: "none", cursor: "pointer", transition: "color var(--duration-fast)" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
-                        >
-                            <HiX aria-hidden="true" size={14} />
+                        <button onClick={() => setFiltersOpen(false)} className="lg:hidden w-7 h-7 flex items-center justify-center rounded" aria-label="Close filters" style={{ color: "var(--text-3)", border: "1px solid var(--border)", background: "none", cursor: "pointer" }}>
+                            <HiX aria-hidden="true" size={13} />
                         </button>
                     </div>
 
                     {/* Scrollable body */}
-                    <div
-                        className="flex-grow overflow-y-auto p-4 space-y-5"
-                        style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) var(--bg)" }}
-                    >
-                        {/* Categories */}
+                    <div className="flex-grow overflow-y-auto p-4 space-y-5" style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) transparent" }}>
+
+                        {/* Search */}
                         <div>
-                            <p className="text-xs font-semibold mb-2" style={{ color: "var(--text-3)" }}>
+                            <label htmlFor="product-search" style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
+                                Search Parts
+                            </label>
+                            <div style={{ position: "relative" }}>
+                                <HiSearch aria-hidden="true" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", pointerEvents: "none" }} size={13} />
+                                <input
+                                    id="product-search"
+                                    type="text"
+                                    placeholder="Part name, SKU, model..."
+                                    value={keyword}
+                                    onChange={(e) => setKeyword(e.target.value)}
+                                    className="w-full rounded focus:outline-none"
+                                    style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)", fontFamily: "var(--font-mono)", fontSize: "12px", padding: "8px 28px 8px 30px" }}
+                                    onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
+                                    onBlur={(e)  => (e.target.style.borderColor = "var(--border)")}
+                                />
+                                {keyword && (
+                                    <button aria-label="Clear search" onClick={() => setKeyword("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex", alignItems: "center" }}>
+                                        <HiX aria-hidden="true" size={12} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Category */}
+                        <div style={{ paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+                            <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
                                 Category
                             </p>
                             <div className="space-y-0.5">
                                 <label
-                                    className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer transition-colors"
+                                    className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer"
                                     style={{ color: categoryId === "" ? "var(--text)" : "var(--text-2)" }}
                                     onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
                                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                 >
-                                    <input
-                                        type="checkbox"
-                                        checked={categoryId === ""}
-                                        onChange={() => setCategoryId("")}
-                                        style={{ accentColor: "var(--accent)" }}
-                                    />
+                                    <input type="checkbox" checked={categoryId === ""} onChange={() => setCategoryId("")} style={{ accentColor: "var(--accent)" }} />
                                     All Categories
                                 </label>
                                 {categories.map((cat) => (
                                     <label
                                         key={cat.categoryId}
-                                        className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer transition-colors"
+                                        className="flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer"
                                         style={{ color: categoryId === String(cat.categoryId) ? "var(--text)" : "var(--text-2)" }}
                                         onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
                                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                     >
-                                        <input
-                                            type="checkbox"
-                                            checked={categoryId === String(cat.categoryId)}
-                                            onChange={() => handleCategoryToggle(cat.categoryId)}
-                                            style={{ accentColor: "var(--accent)" }}
-                                        />
+                                        <input type="checkbox" checked={categoryId === String(cat.categoryId)} onChange={() => handleCategoryToggle(cat.categoryId)} style={{ accentColor: "var(--accent)" }} />
                                         {cat.categoryName}
                                     </label>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Price Range */}
-                        <div className="pt-4" style={{ borderTop: "1px solid var(--border)" }}>
-                            <label
-                                htmlFor="price-range"
-                                className="block text-xs font-semibold mb-3"
-                                style={{ color: "var(--text-3)" }}
-                            >
-                                Price range (USD)
-                            </label>
+                        {/* Price range */}
+                        <div style={{ paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                                <label htmlFor="price-range" style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)" }}>
+                                    Price Range (USD)
+                                </label>
+                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "var(--accent)" }}>
+                                    ${Number(priceMax).toLocaleString()}+
+                                </span>
+                            </div>
                             <input
                                 id="price-range"
                                 type="range"
@@ -350,62 +534,47 @@ const HomePage = () => {
                                 value={priceMax}
                                 onChange={(e) => setPriceMax(Number(e.target.value))}
                                 aria-valuetext={`Up to $${Number(priceMax).toLocaleString()}`}
-                                className="w-full h-1 rounded-lg appearance-none cursor-pointer"
+                                className="w-full h-1 cursor-pointer"
                                 style={{ accentColor: "var(--accent)", background: "var(--border-mid)" }}
                             />
-                            <div className="flex justify-between mt-2 text-[10px]" style={{ color: "var(--text-2)" }}>
+                            <div className="flex justify-between mt-1" style={{ fontFamily: "var(--font-mono)", fontSize: "9px", color: "var(--text-4)" }}>
                                 <span>$0</span>
-                                <span style={{ fontFamily: "var(--font-mono)" }}>${Number(priceMax).toLocaleString()}+</span>
+                                <span>$100K</span>
                             </div>
                         </div>
 
                         {/* Availability */}
-                        <div className="pt-4" style={{ borderTop: "1px solid var(--border)" }}>
-                            <p className="text-xs font-semibold mb-3" style={{ color: "var(--text-3)" }}>
+                        <div style={{ paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+                            <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "10px" }}>
                                 Availability
                             </p>
-                            <div className="flex flex-wrap gap-2">
-                                <button
+                            <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+                                <div
+                                    role="switch"
+                                    aria-checked={inStockOnly}
                                     onClick={() => setInStockOnly((v) => !v)}
-                                    aria-pressed={inStockOnly}
-                                    className="px-2 py-1 rounded-sm text-[10px] font-bold"
-                                    style={{
-                                        background: inStockOnly ? "var(--success)" : "var(--success-subtle)",
-                                        color:      inStockOnly ? "var(--bg)"      : "var(--success)",
-                                        border:     "1px solid var(--success)",
-                                        cursor:     "pointer",
-                                    }}
+                                    style={{ width: "36px", height: "20px", borderRadius: "var(--r-pill)", background: inStockOnly ? "var(--accent)" : "var(--surface-high)", border: "1px solid", borderColor: inStockOnly ? "var(--accent)" : "var(--border)", position: "relative", cursor: "pointer", transition: "background var(--duration-fast)", flexShrink: 0 }}
                                 >
-                                    In Stock
-                                </button>
-                                <button
-                                    disabled
-                                    aria-disabled="true"
-                                    className="px-2 py-1 rounded-sm text-[10px] font-bold opacity-40 cursor-not-allowed"
-                                    style={{ background: "var(--surface-high)", color: "var(--text-2)", border: "1px solid var(--border)" }}
-                                >
-                                    On Demand
-                                </button>
-                            </div>
+                                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: "#fff", position: "absolute", top: "2px", left: inStockOnly ? "18px" : "2px", transition: "left var(--duration-fast)" }} />
+                                </div>
+                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-2)", letterSpacing: "0.04em" }}>In Stock Only</span>
+                            </label>
                         </div>
                     </div>
 
-                    {/* Footer — Apply / Reset */}
-                    <div
-                        className="flex gap-2 p-4 flex-shrink-0"
-                        style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}
-                    >
+                    {/* Footer */}
+                    <div className="flex gap-2 p-4 flex-shrink-0" style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}>
                         <button
                             onClick={() => { setPageNumber(0); fetchProducts(keyword, categoryId, priceMax, 0, inStockOnly); setFiltersOpen(false); }}
-                            className="flex-1 py-2.5 rounded font-bold text-xs hover:opacity-90 min-h-[44px]"
-                            style={{ background: "var(--accent)", color: "var(--text)", transition: "opacity var(--duration-fast)" }}
+                            className="flex-1 py-2.5 rounded font-bold text-xs min-h-[44px]"
+                            style={{ background: "var(--accent)", color: "var(--text)", border: "none", cursor: "pointer", fontFamily: "var(--font-mono)", letterSpacing: "0.06em", textTransform: "uppercase" }}
                         >
                             Apply Filters
                         </button>
                         <button
                             onClick={() => { handleReset(); setFiltersOpen(false); }}
                             className="px-4 py-2.5 rounded font-bold text-xs min-h-[44px]"
-                            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
+                            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent", cursor: "pointer" }}
                             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text)"; }}
                             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
                         >
@@ -414,64 +583,37 @@ const HomePage = () => {
                     </div>
                 </aside>
 
-                {/* ── CENTER: Products ── */}
+                {/* ── CENTER: Product grid ────────────────────────── */}
                 <section className="col-span-12 lg:col-span-6 flex flex-col">
-                    {/* Section header */}
-                    <div className="mb-4 pb-3" style={{ borderBottom: "1px solid var(--border)" }}>
-                        <h1 className="text-xl font-semibold inline-block relative" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>
-                            Featured Parts
-                            <span
-                                className="absolute bottom-[-13px] left-0 w-1/2 h-[3px] rounded-t"
-                                style={{ background: "var(--accent)" }}
-                            />
-                        </h1>
-                    </div>
-
-                    {/* Search */}
-                    <div className="mb-4" style={{ position: "relative" }}>
-                        <label htmlFor="product-search" className="sr-only">Search by model or part number</label>
-                        <HiSearch aria-hidden="true" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", color: "var(--text-3)", pointerEvents: "none" }} />
-                        <input
-                            id="product-search"
-                            type="text"
-                            placeholder="Search by part name, model or number..."
-                            value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)}
-                            className="w-full text-sm rounded focus:outline-none"
-                            style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)", fontFamily: "var(--font-body)", padding: "8px 32px 8px 30px" }}
-                            onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-                            onBlur={(e)  => (e.target.style.borderColor = "var(--border)")}
-                        />
-                        {keyword && (
+                    {/* Header */}
+                    <div className="flex items-end justify-between mb-4">
+                        <div>
+                            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.125rem", fontWeight: 700, color: "var(--text)", margin: 0 }}>
+                                Procurement Catalog
+                            </h2>
+                            <div aria-live="polite" aria-atomic="true" style={{ fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-4)", marginTop: "2px" }}>
+                                {!loading && !productError && `${products.length} PARTS AVAILABLE`}
+                            </div>
+                        </div>
+                        {hasAnyFilter && (
                             <button
-                                aria-label="Clear search"
-                                onClick={() => setKeyword("")}
-                                style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex", alignItems: "center", padding: "2px" }}
-                                onMouseEnter={(e) => e.currentTarget.style.color = "var(--text)"}
-                                onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-3)"}
+                                onClick={handleReset}
+                                className="hidden lg:block text-xs"
+                                style={{ background: "none", border: "none", color: "var(--text-3)", fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", textDecoration: "underline" }}
                             >
-                                <HiX size={14} aria-hidden="true" />
+                                Clear filters
                             </button>
                         )}
                     </div>
 
-                    {/* Screen-reader count */}
-                    <div aria-live="polite" aria-atomic="true" className="sr-only">
-                        {!loading && !productError && `${products.length} products`}
-                    </div>
-
                     {loading ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
                         </div>
                     ) : productError ? (
                         <div className="py-20 text-center">
-                            <p className="text-base mb-4" style={{ color: "var(--error)" }}>{productError}</p>
-                            <button
-                                onClick={() => fetchProducts()}
-                                className="px-5 py-2 rounded text-sm font-bold transition-opacity hover:opacity-90 min-h-[44px]"
-                                style={{ background: "var(--accent)", color: "var(--text)" }}
-                            >
+                            <p className="mb-4" style={{ color: "var(--error)" }}>{productError}</p>
+                            <button onClick={() => fetchProducts()} className="px-5 py-2 rounded text-sm font-bold min-h-[44px]" style={{ background: "var(--accent)", color: "var(--text)", border: "none", cursor: "pointer" }}>
                                 Try again
                             </button>
                         </div>
@@ -482,19 +624,19 @@ const HomePage = () => {
                         </div>
                     ) : (
                         <>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             {products.map((product) => (
                                 <article
                                     key={product.productId}
-                                    className="rounded overflow-hidden flex flex-col transition-colors duration-200"
-                                    style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+                                    className="rounded overflow-hidden flex flex-col"
+                                    style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
                                 >
-                                    {/* Product image */}
+                                    {/* Image */}
                                     <div
-                                        className="h-32 w-full relative overflow-hidden group"
-                                        style={{ background: "var(--bg)", borderBottom: "1px solid var(--border)" }}
+                                        className="h-40 w-full relative overflow-hidden group"
+                                        style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}
                                     >
                                         {product.imageUrl ? (
                                             <img
@@ -504,58 +646,33 @@ const HomePage = () => {
                                                 className="w-full h-full object-contain group-hover:scale-105 transition-transform motion-reduce:transition-none duration-200"
                                             />
                                         ) : (
-                                            <div
-                                                className="w-full h-full flex items-center justify-center text-3xl"
-                                                style={{ color: "var(--text-4)" }}
-                                                aria-hidden="true"
-                                            >
+                                            <div className="w-full h-full flex items-center justify-center text-3xl" style={{ color: "var(--text-4)" }} aria-hidden="true">
                                                 &#128230;
                                             </div>
                                         )}
-
-                                        {/* Model badge — top left */}
-                                        <div
-                                            className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-bold rounded-sm z-10"
-                                            style={{ background: "var(--surface-mid)", color: "var(--text-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)" }}
-                                        >
-                                            {product.modelNumber || product.categoryName || "PART"}
+                                        {/* Model badge */}
+                                        <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-sm text-[10px] font-bold z-10" style={{ background: "var(--surface)", color: "var(--text-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)" }}>
+                                            {product.modelNumber || "PART"}
                                         </div>
-
-                                        {/* Stock badge — top right */}
+                                        {/* Stock badge */}
                                         {product.quantity > 0 ? (
-                                            <div
-                                                className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded-sm z-10"
-                                                style={{ background: "var(--success-subtle)", color: "var(--success)", border: "1px solid var(--success)" }}
-                                            >
-                                                IN STOCK
-                                            </div>
+                                            <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-sm text-[10px] font-bold z-10" style={{ background: "var(--success-subtle)", color: "var(--success)", border: "1px solid var(--success)" }}>IN STOCK</div>
                                         ) : (
-                                            <div
-                                                className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded-sm z-10"
-                                                style={{ background: "var(--error-subtle)", color: "var(--error)", border: "1px solid var(--error)" }}
-                                            >
-                                                OUT
-                                            </div>
+                                            <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-sm text-[10px] font-bold z-10" style={{ background: "var(--error-subtle)", color: "var(--error)", border: "1px solid var(--error)" }}>OUT</div>
                                         )}
-
-                                        {/* Quick View overlay — desktop */}
+                                        {/* Quick View — desktop overlay */}
                                         <div className="absolute inset-0 hidden md:flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity motion-reduce:transition-none duration-200 z-20">
                                             <button
                                                 onClick={(e) => openQuickView(e, product)}
-                                                className="flex items-center gap-1.5 px-4 py-2 rounded text-xs font-bold min-h-[44px]"
-                                                style={{ background: "rgba(255,255,255,0.95)", color: "var(--text)", border: "1px solid var(--border)" }}
+                                                className="px-4 py-2 rounded text-xs font-bold min-h-[44px]"
+                                                style={{ background: "rgba(255,255,255,0.93)", color: "var(--text)", border: "1px solid var(--border)" }}
                                             >
                                                 Quick View
                                             </button>
                                         </div>
-
-                                        {/* Quick View pill — mobile */}
+                                        {/* Quick View — mobile pill */}
                                         <div className="absolute bottom-2 left-0 right-0 flex justify-center md:hidden z-20">
-                                            <button
-                                                onClick={(e) => openQuickView(e, product)}
-                                                className="px-4 py-2 rounded-full text-[10px] font-bold backdrop-blur-sm min-h-[44px]"
-                                                style={{ background: "rgba(0,0,0,0.65)", color: "#fff", border: "1px solid rgba(255,255,255,0.25)" }}
-                                            >
+                                            <button onClick={(e) => openQuickView(e, product)} className="px-4 py-2 rounded-full text-[10px] font-bold min-h-[44px]" style={{ background: "rgba(0,0,0,0.65)", color: "#fff", border: "1px solid rgba(255,255,255,0.25)" }}>
                                                 Quick View
                                             </button>
                                         </div>
@@ -573,28 +690,18 @@ const HomePage = () => {
                                                 {product.productName}
                                             </Link>
                                         </h3>
-
                                         <p className="text-[11px] mb-2 line-clamp-2" style={{ color: "var(--text-2)" }}>
                                             {product.description}
                                         </p>
-
-                                        {/* Part number */}
                                         {product.partNumber && (
                                             <div className="mb-2">
-                                                <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>
-                                                    Part No.
-                                                </span>
-                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-2)", fontWeight: 500 }}>
-                                                    {product.partNumber}
-                                                </span>
+                                                <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>Part No.</span>
+                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-2)", fontWeight: 500 }}>{product.partNumber}</span>
                                             </div>
                                         )}
-
                                         <div className="mt-auto flex flex-col gap-2 pt-2" style={{ borderTop: "1px solid var(--border-subtle)" }}>
                                             <div>
-                                                <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>
-                                                    Unit Price
-                                                </span>
+                                                <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>Unit Price</span>
                                                 <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>
                                                     ${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                                 </span>
@@ -603,9 +710,9 @@ const HomePage = () => {
                                                 disabled={product.quantity === 0 || cartBusy}
                                                 onClick={() => handleAddToCart(product.productId)}
                                                 className="w-full py-2 rounded text-[11px] font-bold flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity motion-reduce:transition-none disabled:opacity-40 min-h-[44px]"
-                                                style={{ background: "var(--accent)", color: "var(--text)", fontFamily: "var(--font-body)" }}
+                                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", cursor: product.quantity === 0 ? "not-allowed" : "pointer", fontFamily: "var(--font-body)" }}
                                             >
-                                                <FaShoppingCart aria-hidden="true" size={12} />
+                                                <FaShoppingCart aria-hidden="true" size={11} />
                                                 {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
                                             </button>
                                         </div>
@@ -616,49 +723,25 @@ const HomePage = () => {
 
                         {/* Pagination */}
                         {totalPages > 1 && (
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-3)", marginTop: "var(--space-6)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--border)" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
                                 <button
                                     onClick={() => handlePageChange(pageNumber - 1)}
                                     disabled={pageNumber === 0 || loading}
-                                    style={{
-                                        padding:      "var(--space-2) var(--space-4)",
-                                        background:   "var(--surface-mid)",
-                                        border:       "1px solid var(--border)",
-                                        borderRadius: "var(--r-sm)",
-                                        color:        pageNumber === 0 ? "var(--text-4)" : "var(--text-2)",
-                                        fontFamily:   "var(--font-body)",
-                                        fontSize:     "var(--text-sm)",
-                                        fontWeight:   600,
-                                        cursor:       pageNumber === 0 ? "not-allowed" : "pointer",
-                                        transition:   "border-color var(--duration-fast)",
-                                    }}
-                                    onMouseEnter={e => { if (pageNumber > 0) e.currentTarget.style.borderColor = "var(--accent)"; }}
-                                    onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+                                    style={{ padding: "8px 16px", background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", color: pageNumber === 0 ? "var(--text-4)" : "var(--text-2)", fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 600, cursor: pageNumber === 0 ? "not-allowed" : "pointer", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => { if (pageNumber > 0) e.currentTarget.style.borderColor = "var(--accent)"; }}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
                                 >
                                     ← Prev
                                 </button>
-
-                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", color: "var(--text-3)" }}>
+                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text-3)" }}>
                                     {pageNumber + 1} / {totalPages}
                                 </span>
-
                                 <button
                                     onClick={() => handlePageChange(pageNumber + 1)}
                                     disabled={pageNumber >= totalPages - 1 || loading}
-                                    style={{
-                                        padding:      "var(--space-2) var(--space-4)",
-                                        background:   "var(--surface-mid)",
-                                        border:       "1px solid var(--border)",
-                                        borderRadius: "var(--r-sm)",
-                                        color:        pageNumber >= totalPages - 1 ? "var(--text-4)" : "var(--text-2)",
-                                        fontFamily:   "var(--font-body)",
-                                        fontSize:     "var(--text-sm)",
-                                        fontWeight:   600,
-                                        cursor:       pageNumber >= totalPages - 1 ? "not-allowed" : "pointer",
-                                        transition:   "border-color var(--duration-fast)",
-                                    }}
-                                    onMouseEnter={e => { if (pageNumber < totalPages - 1) e.currentTarget.style.borderColor = "var(--accent)"; }}
-                                    onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+                                    style={{ padding: "8px 16px", background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", color: pageNumber >= totalPages - 1 ? "var(--text-4)" : "var(--text-2)", fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 600, cursor: pageNumber >= totalPages - 1 ? "not-allowed" : "pointer", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => { if (pageNumber < totalPages - 1) e.currentTarget.style.borderColor = "var(--accent)"; }}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
                                 >
                                     Next →
                                 </button>
@@ -668,87 +751,63 @@ const HomePage = () => {
                     )}
                 </section>
 
-                {/* ── RIGHT: Mini Cart ── */}
+                {/* ── RIGHT: Mini-cart ────────────────────────────── */}
                 <aside className="col-span-12 lg:col-span-3">
                     <div
                         className="rounded overflow-hidden flex flex-col lg:sticky lg:top-24 lg:max-h-[calc(100vh-112px)]"
                         style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
                     >
-                        {/* Cart header */}
-                        <div
-                            className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-                            style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}
-                        >
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}>
                             <div className="flex items-center gap-2">
-                                <FaShoppingCart aria-hidden="true" size={14} style={{ color: "var(--text-3)" }} />
-                                <h2 className="text-sm font-bold" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>Your Cart</h2>
+                                <FaShoppingCart aria-hidden="true" size={13} style={{ color: "var(--text-3)" }} />
+                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text)" }}>Current Order</span>
                             </div>
                             {itemCount > 0 && (
                                 <span
-                                    className="text-[10px] font-bold px-2 py-0.5 rounded"
-                                    style={{ background: "var(--accent-subtle)", color: "var(--accent)", fontFamily: "var(--font-mono)" }}
                                     aria-live="polite"
+                                    style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "var(--accent)", background: "var(--accent-subtle)", padding: "2px 8px", borderRadius: "var(--r-pill)", border: "1px solid var(--accent-border)" }}
                                 >
                                     {itemCount} {itemCount === 1 ? "ITEM" : "ITEMS"}
                                 </span>
                             )}
                         </div>
 
-                        {/* Items list */}
-                        <div
-                            className="flex-grow overflow-y-auto p-3 space-y-3"
-                            style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) var(--bg)" }}
-                        >
+                        {/* Items */}
+                        <div className="flex-grow overflow-y-auto p-3 space-y-3" style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) transparent" }}>
                             {!user ? (
-                                <p className="text-sm text-center py-10" style={{ color: "var(--text-3)" }}>
-                                    Login to view your cart
-                                </p>
+                                <p className="text-sm text-center py-10" style={{ color: "var(--text-3)" }}>Login to view your cart</p>
                             ) : cartItems.length === 0 ? (
                                 <div className="text-center py-10">
-                                    <FaShoppingCart aria-hidden="true" size={28} className="mx-auto mb-3" style={{ color: "var(--text-4)" }} />
-                                    <p className="text-sm mb-1" style={{ color: "var(--text-2)" }}>Cart is empty</p>
+                                    <FaShoppingCart aria-hidden="true" size={26} className="mx-auto mb-3" style={{ color: "var(--text-4)" }} />
+                                    <p className="text-sm mb-1" style={{ color: "var(--text-2)" }}>No items yet</p>
                                     <p className="text-xs" style={{ color: "var(--text-3)" }}>Add products to get started</p>
                                 </div>
                             ) : (
                                 cartItems.map((item) => (
-                                    <div
-                                        key={item.productId}
-                                        className="flex gap-2 p-2 rounded relative"
-                                        style={{ background: "var(--bg)", border: "1px solid var(--border)" }}
-                                    >
-                                        {/* Thumbnail */}
-                                        <div
-                                            className="w-12 h-12 rounded flex-shrink-0 overflow-hidden flex items-center justify-center"
-                                            style={{ background: "var(--surface-high)", border: "1px solid var(--border)" }}
-                                        >
-                                            {item.imageUrl ? (
-                                                <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-contain" />
-                                            ) : (
-                                                <span aria-hidden="true" className="text-xl" style={{ color: "var(--text-4)" }}>&#128230;</span>
-                                            )}
+                                    <div key={item.productId} className="flex gap-2 p-2 rounded relative" style={{ background: "var(--surface-mid)", border: "1px solid var(--border)" }}>
+                                        <div className="w-11 h-11 rounded flex-shrink-0 overflow-hidden flex items-center justify-center" style={{ background: "var(--surface-high)", border: "1px solid var(--border)" }}>
+                                            {item.imageUrl
+                                                ? <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-contain" />
+                                                : <span aria-hidden="true" className="text-lg" style={{ color: "var(--text-4)" }}>&#128230;</span>
+                                            }
                                         </div>
-
-                                        {/* Details */}
-                                        <div className="flex-grow min-w-0 pr-8">
-                                            <h4 className="text-[11px] font-bold truncate" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>
-                                                {item.productName}
-                                            </h4>
-                                            <p className="text-[10px] mt-0.5" style={{ color: "var(--text-2)" }}>
-                                                Qty: {item.quantity}
-                                            </p>
+                                        <div className="flex-grow min-w-0 pr-7">
+                                            <h4 className="text-[11px] font-bold truncate" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>{item.productName}</h4>
+                                            <p className="text-[10px] mt-0.5" style={{ color: "var(--text-3)" }}>Qty: {item.quantity}</p>
                                             <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--text-2)" }}>
                                                 ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                             </span>
                                         </div>
-
-                                        {/* Remove */}
                                         <button
                                             onClick={() => handleRemoveFromCart(item.productId)}
                                             aria-label={`Remove ${item.productName} from cart`}
-                                            className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center rounded transition-opacity hover:opacity-70"
-                                            style={{ color: "var(--text-3)", background: "none", border: "none", cursor: "pointer" }}
+                                            className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded"
+                                            style={{ color: "var(--text-3)", background: "none", border: "none", cursor: "pointer", transition: "color var(--duration-fast)" }}
+                                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--error)")}
+                                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
                                         >
-                                            <HiX aria-hidden="true" size={12} />
+                                            <HiX aria-hidden="true" size={11} />
                                         </button>
                                     </div>
                                 ))
@@ -757,10 +816,7 @@ const HomePage = () => {
 
                         {/* Summary + checkout */}
                         {user && cartItems.length > 0 && (
-                            <div
-                                className="p-4 space-y-2.5 flex-shrink-0"
-                                style={{ borderTop: "1px solid var(--border)", background: "var(--surface-high)" }}
-                            >
+                            <div className="p-4 space-y-2.5 flex-shrink-0" style={{ borderTop: "1px solid var(--border)", background: "var(--surface-high)" }}>
                                 <div className="flex justify-between text-xs">
                                     <span style={{ color: "var(--text-2)" }}>Subtotal</span>
                                     <span style={{ fontFamily: "var(--font-mono)", color: "var(--text)", fontWeight: 600 }}>
@@ -772,17 +828,17 @@ const HomePage = () => {
                                     <span style={{ color: "var(--text-3)" }}>TBD</span>
                                 </div>
                                 <div className="flex justify-between pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
-                                    <span className="text-sm font-bold" style={{ color: "var(--text)", fontFamily: "var(--font-body)" }}>Total</span>
+                                    <span className="text-sm font-bold" style={{ color: "var(--text)" }}>Total</span>
                                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>
                                         ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
                                 <button
                                     onClick={() => navigate("/checkout")}
-                                    className="w-full py-3 rounded font-bold text-xs mt-1 hover:opacity-90 transition-opacity motion-reduce:transition-none flex items-center justify-center gap-1.5 min-h-[44px]"
-                                    style={{ background: "var(--accent)", color: "var(--text)", fontFamily: "var(--font-body)" }}
+                                    className="w-full py-3 rounded font-bold text-xs mt-1 hover:opacity-90 transition-opacity motion-reduce:transition-none min-h-[44px]"
+                                    style={{ background: "var(--accent)", color: "var(--text)", border: "none", cursor: "pointer", fontFamily: "var(--font-mono)", letterSpacing: "0.06em", textTransform: "uppercase" }}
                                 >
-                                    Proceed to Checkout →
+                                    Checkout →
                                 </button>
                             </div>
                         )}
@@ -790,7 +846,7 @@ const HomePage = () => {
                 </aside>
             </main>
 
-            {/* ══ Mobile filter backdrop ══ */}
+            {/* Mobile filter backdrop */}
             {filtersOpen && (
                 <div
                     className="lg:hidden fixed inset-0 z-[400]"
@@ -800,33 +856,109 @@ const HomePage = () => {
                 />
             )}
 
-            {/* ══ Footer ══ */}
+            {/* ══════════════════════════════════════════
+                TRUST INDICATORS BAR
+            ══════════════════════════════════════════ */}
+            <section style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x" style={{ borderColor: "var(--border)" }}>
+                    {TRUST_PILLARS.map((p, i) => (
+                        <div
+                            key={i}
+                            className="py-8 px-6"
+                            style={{ borderRight: i < 3 ? "1px solid var(--border)" : "none" }}
+                        >
+                            <div style={{ fontFamily: "var(--font-mono)", fontSize: "20px", color: "var(--accent)", marginBottom: "10px" }}>{p.symbol}</div>
+                            <div style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text)", marginBottom: "6px" }}>{p.label}</div>
+                            <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-3)", lineHeight: 1.55, margin: 0 }}>{p.copy}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                TRUSTED SUPPLIERS
+            ══════════════════════════════════════════ */}
+            <section style={{ background: "var(--bg)", borderBottom: "1px solid var(--border)" }}>
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-12">
+                    <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", textAlign: "center", marginBottom: "28px" }}>
+                        TRUSTED SUPPLIERS
+                    </p>
+                    <div className="grid grid-cols-3 lg:grid-cols-6" style={{ gap: "1px", background: "var(--border)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", overflow: "hidden" }}>
+                        {SUPPLIERS.map((brand, i) => (
+                            <div key={i} style={{ background: "var(--surface)", padding: "22px 16px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <span style={{ fontFamily: "var(--font-display)", fontSize: "12px", fontWeight: 700, color: "var(--text-3)", letterSpacing: "0.01em", textTransform: "uppercase", textAlign: "center" }}>
+                                    {brand}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════
+                FOOTER
+            ══════════════════════════════════════════ */}
             <footer style={{ background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-[1440px] mx-auto py-6 px-4 sm:px-6 lg:px-10">
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* Brand */}
                     <div>
-                        <span className="text-sm font-bold" style={{ color: "var(--accent)", fontFamily: "var(--font-display)" }}>SolydShop</span>
-                        <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
-                            © 2024 SolydShop Industrial Procurement. All rights reserved.
+                        <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, color: "var(--accent)", letterSpacing: "-0.02em" }}>SolydShop</span>
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-3)", marginTop: "6px", lineHeight: 1.55, maxWidth: "30ch" }}>
+                            B2B industrial procurement for heavy machinery components and assemblies.
+                        </p>
+                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "var(--text-4)", marginTop: "14px", letterSpacing: "0.04em" }}>
+                            © {new Date().getFullYear()} SolydShop Industrial Procurement
                         </p>
                     </div>
-                    <div className="flex gap-5">
-                        {["Terms of Service", "Privacy Policy", "Technical Support", "Contact Sales"].map((link) => (
-                            <a
-                                key={link}
-                                href="#"
-                                className="text-xs transition-colors"
-                                style={{ color: "var(--text-3)" }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
-                            >
-                                {link}
-                            </a>
-                        ))}
+                    {/* Platform */}
+                    <div>
+                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "12px" }}>
+                            Platform
+                        </p>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            {[
+                                { label: "Catalog",           href: "#" },
+                                { label: "My Orders",         href: "/orders" },
+                                { label: "My Account",        href: "/account" },
+                                { label: "Seller Dashboard",  href: "/seller/dashboard" },
+                            ].map(({ label, href }) => (
+                                <Link
+                                    key={label}
+                                    to={href}
+                                    style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-3)", textDecoration: "none", transition: "color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
+                                >
+                                    {label}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                    {/* Legal */}
+                    <div>
+                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "12px" }}>
+                            Legal & Support
+                        </p>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            {["Terms of Service", "Privacy Policy", "Technical Support", "Contact Sales"].map((label) => (
+                                <a
+                                    key={label}
+                                    href="#"
+                                    style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-3)", textDecoration: "none", transition: "color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
+                                >
+                                    {label}
+                                </a>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </footer>
 
-            {/* ══ Quick View Modal ══ */}
+            {/* ══════════════════════════════════════════
+                QUICK VIEW MODAL
+            ══════════════════════════════════════════ */}
             {quickViewProduct && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-10 py-6"
@@ -847,50 +979,41 @@ const HomePage = () => {
                         <button
                             onClick={closeQuickView}
                             aria-label="Close Quick View"
-                            className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center rounded transition-opacity hover:opacity-70"
-                            style={{ background: "var(--surface-high)", color: "var(--text-2)", border: "1px solid var(--border)" }}
+                            className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center rounded"
+                            style={{ background: "var(--surface-high)", color: "var(--text-2)", border: "1px solid var(--border)", cursor: "pointer" }}
                         >
                             <HiX aria-hidden="true" size={12} />
                         </button>
 
                         {/* Image */}
-                        <div className="h-36 w-full overflow-hidden rounded-t" style={{ background: "var(--bg)" }}>
+                        <div className="h-36 w-full overflow-hidden rounded-t" style={{ background: "var(--surface-high)" }}>
                             {quickViewProduct.imageUrl ? (
                                 <img src={quickViewProduct.imageUrl} alt={quickViewProduct.productName} className="w-full h-full object-contain" />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-4xl" style={{ color: "var(--text-4)" }} aria-hidden="true">
-                                    &#128230;
-                                </div>
+                                <div className="w-full h-full flex items-center justify-center text-4xl" style={{ color: "var(--text-4)" }} aria-hidden="true">&#128230;</div>
                             )}
                         </div>
 
                         {/* Content */}
                         <div className="p-4 space-y-3">
-                            {/* Model + stock badges */}
                             <div className="flex items-center justify-between">
-                                <span
-                                    className="px-2 py-0.5 text-[10px] font-bold rounded-sm"
-                                    style={{ background: "var(--surface-mid)", color: "var(--text-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)" }}
-                                >
-                                    {quickViewProduct.modelNumber || quickViewProduct.categoryName || "PRODUCT"}
+                                <span className="px-2 py-0.5 text-[10px] font-bold rounded-sm" style={{ background: "var(--surface-mid)", color: "var(--text-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)" }}>
+                                    {quickViewProduct.modelNumber || "PRODUCT"}
                                 </span>
-                                <span
-                                    className="text-[10px] font-bold px-2 py-0.5 rounded-sm"
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm"
                                     style={quickViewProduct.quantity > 0
                                         ? { background: "var(--success-subtle)", color: "var(--success)", border: "1px solid var(--success)" }
-                                        : { background: "var(--error-subtle)", color: "var(--error)", border: "1px solid var(--error)" }
+                                        : { background: "var(--error-subtle)",   color: "var(--error)",   border: "1px solid var(--error)" }
                                     }
                                 >
                                     {quickViewProduct.quantity > 0 ? `In Stock (${quickViewProduct.quantity})` : "Out of Stock"}
                                 </span>
                             </div>
 
-                            {/* Name */}
                             <h2 id="qv-title" className="text-sm font-bold leading-snug" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>
                                 {quickViewProduct.productName}
                             </h2>
 
-                            {/* Part number */}
                             {quickViewProduct.partNumber && (
                                 <div>
                                     <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>Part No.</span>
@@ -900,15 +1023,10 @@ const HomePage = () => {
                                 </div>
                             )}
 
-                            {/* Description */}
-                            <p
-                                className="text-sm leading-relaxed max-h-24 overflow-y-auto overflow-x-hidden break-all"
-                                style={{ color: "var(--text-2)", scrollbarWidth: "thin", scrollbarColor: "var(--border) transparent" }}
-                            >
+                            <p className="text-sm leading-relaxed max-h-24 overflow-y-auto overflow-x-hidden break-all" style={{ color: "var(--text-2)", scrollbarWidth: "thin" }}>
                                 {quickViewProduct.description || "No description available."}
                             </p>
 
-                            {/* Price + Add */}
                             <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid var(--border)" }}>
                                 <div>
                                     <span className="block text-[10px] uppercase tracking-widest font-bold" style={{ color: "var(--text-3)" }}>Unit Price</span>
@@ -920,19 +1038,18 @@ const HomePage = () => {
                                     disabled={quickViewProduct.quantity === 0 || cartBusy}
                                     onClick={() => { handleAddToCart(quickViewProduct.productId); closeQuickView(); }}
                                     className="px-4 py-2 rounded text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity motion-reduce:transition-none disabled:opacity-40 min-h-[44px]"
-                                    style={{ background: "var(--accent)", color: "var(--text)", fontFamily: "var(--font-body)" }}
+                                    style={{ background: "var(--accent)", color: "var(--text)", border: "none", cursor: quickViewProduct.quantity === 0 ? "not-allowed" : "pointer" }}
                                 >
-                                    <FaShoppingCart aria-hidden="true" size={12} />
+                                    <FaShoppingCart aria-hidden="true" size={11} />
                                     {quickViewProduct.quantity === 0 ? "Out of Stock" : "Add to Cart"}
                                 </button>
                             </div>
 
-                            {/* View Full Details */}
                             <Link
                                 to={`/products/${quickViewProduct.productId}`}
                                 onClick={closeQuickView}
-                                className="block text-center text-xs font-bold py-2 rounded"
-                                style={{ color: "var(--text-2)", border: "1px solid var(--border)", textDecoration: "none", lineHeight: "2.5", minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
+                                className="block text-center text-xs font-bold py-2 rounded min-h-[44px] flex items-center justify-center"
+                                style={{ color: "var(--text-2)", border: "1px solid var(--border)", textDecoration: "none", transition: "border-color var(--duration-fast), color var(--duration-fast)" }}
                                 onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text)"; e.currentTarget.style.borderColor = "var(--border-strong)"; }}
                                 onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-2)"; e.currentTarget.style.borderColor = "var(--border)"; }}
                             >
