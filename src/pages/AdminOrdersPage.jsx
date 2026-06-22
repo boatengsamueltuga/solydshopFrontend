@@ -5,7 +5,6 @@ import { DataGrid } from "@mui/x-data-grid";
 import {
     Box,
     Button,
-    Chip,
     Divider,
     FormControl,
     IconButton,
@@ -37,14 +36,6 @@ const STATUS_STYLE = {
     SHIPPED:    { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
     DELIVERED:  { color: "var(--success)",  bg: "var(--success-subtle)"  },
     CANCELLED:  { color: "var(--error)",    bg: "var(--error-subtle)"    },
-};
-
-const MUI_STATUS_COLORS = {
-    PENDING:    "warning",
-    PROCESSING: "info",
-    SHIPPED:    "primary",
-    DELIVERED:  "success",
-    CANCELLED:  "error",
 };
 
 /* ── StatusBadge ── */
@@ -176,7 +167,7 @@ const AdminOrdersPage = () => {
             minWidth: isMobile ? 120 : 160,
             flex: 1,
             renderCell: (params) => (
-                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4, color: "var(--text)", fontSize: "13px" }}>
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)", fontSize: "13px", maxWidth: "100%", display: "block" }}>
                     {params.row.customerName}
                 </span>
             ),
@@ -307,7 +298,7 @@ const AdminOrdersPage = () => {
                     rows={filteredOrders}
                     columns={columns}
                     getRowId={(row) => row.orderId}
-                    getRowHeight={() => "auto"}
+                    rowHeight={56}
                     disableRowSelectionOnClick
                     loading={loading}
                     pageSizeOptions={[10, 25]}
@@ -323,7 +314,7 @@ const AdminOrdersPage = () => {
                 title={`Order #${selectedOrder?.orderId}`}
                 subtitle={selectedOrder ? `${selectedOrder.customerName} · ${selectedOrder.customerEmail}` : ""}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={1}>
+                    <Stack direction="row" justifyContent="flex-end" gap={2}>
                         <Button onClick={() => setIsSheetOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
                             Close
                         </Button>
@@ -396,15 +387,7 @@ const AdminOrdersPage = () => {
                             >
                                 {["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(s => (
                                     <MenuItem key={s} value={s}>
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                            <Chip
-                                                label={s}
-                                                size="small"
-                                                color={MUI_STATUS_COLORS[s] || "default"}
-                                                variant="outlined"
-                                                sx={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "0.7rem" }}
-                                            />
-                                        </Box>
+                                        <StatusBadge status={s} />
                                     </MenuItem>
                                 ))}
                             </Select>

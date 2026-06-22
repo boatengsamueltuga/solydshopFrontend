@@ -27,7 +27,7 @@ const PageBanner = ({ title, subtitle, icon, action, children }) => {
       {/* Title row: [icon + text] ... [action] */}
       <Stack
         direction="row"
-        alignItems="center"
+        alignItems="flex-start"
         justifyContent="space-between"
         flexWrap="wrap"
         gap={2}

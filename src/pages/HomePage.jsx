@@ -18,10 +18,6 @@ const getXsrfToken = () =>
 /* ── Static data ─────────────────────────────────────────────────────── */
 const HERO_GRID = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="#ccd5ae" stroke-width="0.5"/></svg>')}")`;
 
-const BEARING_BALLS = Array.from({ length: 12 }, (_, i) => ({
-    cx: Math.round(220 + 92 * Math.cos((i * 30 * Math.PI) / 180)),
-    cy: Math.round(195 + 92 * Math.sin((i * 30 * Math.PI) / 180)),
-}));
 
 const TRUST_PILLARS = [
     { symbol: "✓", label: "ISO 9001 CERTIFIED",   copy: "Every part meets international quality management standards." },
@@ -32,63 +28,226 @@ const TRUST_PILLARS = [
 
 const SUPPLIERS = ["Komatsu", "Caterpillar", "Hitachi", "Volvo CE", "Liebherr", "Doosan"];
 
-/* ── Ball bearing technical illustration ─────────────────────────────── */
-const BearingIllustration = () => (
-    <svg viewBox="0 0 440 370" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: "100%", maxHeight: "420px" }}>
-        <defs>
-            <pattern id="bp" width="22" height="22" patternUnits="userSpaceOnUse">
-                <path d="M 22 0 L 0 0 0 22" stroke="#ccd5ae" strokeWidth="0.4" fill="none"/>
-            </pattern>
-        </defs>
-        {/* Grid background */}
-        <rect width="440" height="370" fill="url(#bp)" opacity="0.6" rx="3"/>
-        {/* Centre lines */}
-        <line x1="220" y1="10"  x2="220" y2="356" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="8 4"/>
-        <line x1="10"  y1="195" x2="430" y2="195" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="8 4"/>
-        {/* Outer races */}
-        <circle cx="220" cy="195" r="130" stroke="#8a9d6a" strokeWidth="2.5"/>
-        <circle cx="220" cy="195" r="115" stroke="#8a9d6a" strokeWidth="1"/>
-        {/* Ball track guide */}
-        <circle cx="220" cy="195" r="92"  stroke="#8a9d6a" strokeWidth="0.6" strokeDasharray="3 3" opacity="0.35"/>
-        {/* Bearing balls */}
-        {BEARING_BALLS.map((b, i) => (
-            <circle key={i} cx={b.cx} cy={b.cy} r="11" stroke="#7a9055" strokeWidth="1.5" fill="#e9edc9"/>
-        ))}
-        {/* Inner races */}
-        <circle cx="220" cy="195" r="72" stroke="#8a9d6a" strokeWidth="1.5"/>
-        <circle cx="220" cy="195" r="60" stroke="#8a9d6a" strokeWidth="2"/>
-        {/* Hub */}
-        <circle cx="220" cy="195" r="34" fill="#e9edc9" stroke="#8a9d6a" strokeWidth="1.5"/>
-        <circle cx="220" cy="195" r="19" fill="#ccd5ae" stroke="#8a9d6a" strokeWidth="2"/>
-        {/* Centre bore */}
-        <circle cx="220" cy="195" r="9"  fill="#faedcd" stroke="#7a9055" strokeWidth="1.5"/>
-        {/* Outer Ø dimension (above circle — top at y=65) */}
-        <line x1="90"  y1="65"  x2="90"  y2="40"  stroke="#d4a373" strokeWidth="0.8"/>
-        <line x1="350" y1="65"  x2="350" y2="40"  stroke="#d4a373" strokeWidth="0.8"/>
-        <line x1="85"  y1="36"  x2="355" y2="36"  stroke="#d4a373" strokeWidth="0.8"/>
-        <line x1="85"  y1="31"  x2="85"  y2="41"  stroke="#d4a373" strokeWidth="1.5"/>
-        <line x1="355" y1="31"  x2="355" y2="41"  stroke="#d4a373" strokeWidth="1.5"/>
-        <text x="220" y="27" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="9" fill="#d4a373" fontWeight="600">Ø 260.0 mm</text>
-        {/* Bore dimension (right side) */}
-        <line x1="229" y1="195" x2="388" y2="195" stroke="#d4a373" strokeWidth="0.7" opacity="0.5"/>
-        <line x1="388" y1="177" x2="388" y2="213" stroke="#d4a373" strokeWidth="0.9"/>
-        <line x1="383" y1="177" x2="393" y2="177" stroke="#d4a373" strokeWidth="1.3"/>
-        <line x1="383" y1="213" x2="393" y2="213" stroke="#d4a373" strokeWidth="1.3"/>
-        <text x="415" y="193" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="9"   fill="#d4a373" fontWeight="600">Ø 18</text>
-        <text x="415" y="205" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#a0845c">mm</text>
-        {/* Ball callout */}
-        <line x1="220" y1="103" x2="270" y2="56" stroke="#8a9d6a" strokeWidth="0.8"/>
-        <rect x="268" y="42" width="92" height="30" rx="2" fill="#faedcd" stroke="#ccd5ae" strokeWidth="1"/>
-        <text x="314" y="55"  textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#a0845c" fontWeight="700">BALL BEARING</text>
-        <text x="314" y="66"  textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7" fill="#8a9d6a">BRG-260-B12</text>
-        {/* IN STOCK badge */}
-        <rect x="10" y="10" width="72" height="22" rx="11" fill="#d4ead4" stroke="#4a8a4a" strokeWidth="1"/>
-        <text x="46" y="25" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#2a5a2a" fontWeight="700">IN STOCK</text>
-        {/* Bottom spec line */}
-        <text x="12"  y="363" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#8a9d6a">MATERIAL: AISI 52100 BEARING STEEL · GRADE 10</text>
-        <text x="428" y="363" textAnchor="end" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#d4a373" fontWeight="600">SLY-BRG-2024</text>
-    </svg>
-);
+/* ── Two-part engineering illustration ───────────────────────────────── */
+const BearingIllustration = () => {
+    // Bearing balls — scaled bearing, center (148, 200)
+    const bCX = 148, bCY = 200;
+    const bearingBalls = Array.from({ length: 12 }, (_, i) => {
+        const a = (i * 30 * Math.PI) / 180;
+        return { cx: Math.round(bCX + 72 * Math.cos(a)), cy: Math.round(bCY + 72 * Math.sin(a)) };
+    });
+
+    // Spur gear path — M7 Z24 PA20°, center (415, 200)
+    const gCX = 415, gCY = 200;
+    const gearPath = (() => {
+        const n = 24, rR = 75, rT = 91;
+        const p = (2 * Math.PI) / n;
+        const ht = p * 0.27, htt = p * 0.18;
+        const xy = (r, a) => `${(gCX + r * Math.cos(a)).toFixed(1)},${(gCY + r * Math.sin(a)).toFixed(1)}`;
+        const segs = Array.from({ length: n }, (_, i) => {
+            const a = i * p - Math.PI / 2;
+            return { rb: a - ht, tl: a - htt, tr: a + htt, ra: a + ht };
+        });
+        let d = `M ${xy(rR, segs[0].rb)}`;
+        for (let i = 0; i < n; i++) {
+            if (i > 0) d += ` A ${rR},${rR} 0 0,1 ${xy(rR, segs[i].rb)}`;
+            d += ` L ${xy(rT, segs[i].tl)} A ${rT},${rT} 0 0,1 ${xy(rT, segs[i].tr)} L ${xy(rR, segs[i].ra)}`;
+        }
+        return d + ` A ${rR},${rR} 0 0,1 ${xy(rR, segs[0].rb)} Z`;
+    })();
+
+    return (
+        <svg viewBox="0 0 560 450" fill="none" xmlns="http://www.w3.org/2000/svg"
+             aria-hidden="true" style={{ width: "100%", maxHeight: "450px" }}>
+
+            <defs>
+                <pattern id="bgGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" stroke="#ccd5ae" strokeWidth="0.3" fill="none"/>
+                </pattern>
+                <pattern id="metalHatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="5" stroke="#7a9055" strokeWidth="0.7" opacity="0.4"/>
+                </pattern>
+                <radialGradient id="ballShine" cx="32%" cy="28%" r="68%">
+                    <stop offset="0%"   stopColor="#f8f4e8"/>
+                    <stop offset="55%"  stopColor="#ddd0a0"/>
+                    <stop offset="100%" stopColor="#a89060"/>
+                </radialGradient>
+            </defs>
+
+            {/* Background */}
+            <rect width="560" height="450" fill="#f5f0e0"/>
+            <rect width="560" height="450" fill="url(#bgGrid)" opacity="0.75"/>
+
+            {/* Outer drawing frame */}
+            <rect x="4"   y="4"  width="552" height="442" stroke="#8a9d6a" strokeWidth="2.5" fill="none"/>
+            {/* Left panel — bearing */}
+            <rect x="10"  y="10" width="267" height="375" stroke="#8a9d6a" strokeWidth="0.8" fill="none"/>
+            {/* Right panel — gear */}
+            <rect x="283" y="10" width="271" height="375" stroke="#8a9d6a" strokeWidth="0.8" fill="none"/>
+            {/* Title block separator */}
+            <line x1="4" y1="391" x2="556" y2="391" stroke="#8a9d6a" strokeWidth="1.5"/>
+
+            {/* ════════════════════════════════════
+                LEFT PANEL · DGBB (scale ~0.68×)
+                Center (148, 200)
+            ════════════════════════════════════ */}
+
+            {/* Center lines */}
+            <line x1="148" y1="13"  x2="148" y2="383" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="14 4 2 4"/>
+            <line x1="13"  y1="200" x2="275" y2="200" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="14 4 2 4"/>
+
+            {/* Outer race (r 82–94) */}
+            <circle cx={bCX} cy={bCY} r="94" fill="#ddd8b8" stroke="#7a9055" strokeWidth="2"/>
+            <circle cx={bCX} cy={bCY} r="94" fill="url(#metalHatch)"/>
+            <circle cx={bCX} cy={bCY} r="82" fill="#f5f0e0" stroke="#8a9d6a" strokeWidth="0.8"/>
+            <circle cx={bCX} cy={bCY} r="81" stroke="#8a9d6a" strokeWidth="0.4" strokeDasharray="2 2" opacity="0.4"/>
+
+            {/* Cage rings */}
+            <circle cx={bCX} cy={bCY} r="76" stroke="#b8a060" strokeWidth="1" strokeDasharray="5 3" opacity="0.65"/>
+            <circle cx={bCX} cy={bCY} r="68" stroke="#b8a060" strokeWidth="1" strokeDasharray="5 3" opacity="0.65"/>
+
+            {/* 12 balls */}
+            {bearingBalls.map((b, i) => (
+                <g key={i}>
+                    <circle cx={b.cx} cy={b.cy} r="9" fill="url(#ballShine)" stroke="#7a9055" strokeWidth="1.2"/>
+                    <circle cx={b.cx - 3} cy={b.cy - 3} r="2.5" fill="white" opacity="0.3"/>
+                </g>
+            ))}
+
+            {/* Inner race (r 28–63) */}
+            <circle cx={bCX} cy={bCY} r="63" fill="#ddd8b8" stroke="#7a9055" strokeWidth="1.5"/>
+            <circle cx={bCX} cy={bCY} r="63" fill="url(#metalHatch)"/>
+            <circle cx={bCX} cy={bCY} r="28" fill="#ede8d2" stroke="#8a9d6a" strokeWidth="1.5"/>
+
+            {/* Bore center mark */}
+            <line x1="140" y1="200" x2="156" y2="200" stroke="#8a9d6a" strokeWidth="1.3"/>
+            <line x1="148" y1="192" x2="148" y2="208" stroke="#8a9d6a" strokeWidth="1.3"/>
+
+            {/* OD Ø276 — top dimension */}
+            <line x1="54"  y1="106" x2="54"  y2="44" stroke="#d4a373" strokeWidth="0.9"/>
+            <line x1="242" y1="106" x2="242" y2="44" stroke="#d4a373" strokeWidth="0.9"/>
+            <line x1="47"  y1="40"  x2="249" y2="40" stroke="#d4a373" strokeWidth="0.9"/>
+            <polygon points="54,40  60,36  60,44"  fill="#d4a373"/>
+            <polygon points="242,40 236,36 236,44" fill="#d4a373"/>
+            <text x="148" y="34" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="9" fill="#d4a373" fontWeight="700">Ø 276.0 mm</text>
+
+            {/* Bore Ø82 — left dimension */}
+            <line x1="120" y1="200" x2="30"  y2="200" stroke="#d4a373" strokeWidth="0.7" opacity="0.4"/>
+            <line x1="34"  y1="172" x2="34"  y2="228" stroke="#d4a373" strokeWidth="0.9"/>
+            <polygon points="34,172 30,178 38,178" fill="#d4a373"/>
+            <polygon points="34,228 30,222 38,222" fill="#d4a373"/>
+            <text x="25" y="203" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#d4a373" fontWeight="700" transform="rotate(-90,25,203)">Ø 82 H7</text>
+
+            {/* Callouts: 1 outer race / 2 ball / 3 cage / 4 inner race */}
+            <line x1="224" y1="152" x2="247" y2="128" stroke="#8a9d6a" strokeWidth="0.9"/>
+            <circle cx="253" cy="122" r="8" fill="#e8e3cc" stroke="#8a9d6a" strokeWidth="1.2"/>
+            <text x="253" y="126" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#3a4a1a" fontWeight="700">1</text>
+
+            <line x1="218" y1="170" x2="244" y2="148" stroke="#8a9d6a" strokeWidth="0.9"/>
+            <circle cx="250" cy="142" r="8" fill="#e8e3cc" stroke="#8a9d6a" strokeWidth="1.2"/>
+            <text x="250" y="146" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#3a4a1a" fontWeight="700">2</text>
+
+            <line x1="220" y1="200" x2="247" y2="228" stroke="#8a9d6a" strokeWidth="0.9"/>
+            <circle cx="253" cy="234" r="8" fill="#e8e3cc" stroke="#8a9d6a" strokeWidth="1.2"/>
+            <text x="253" y="238" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#3a4a1a" fontWeight="700">3</text>
+
+            <line x1="186" y1="200" x2="247" y2="263" stroke="#8a9d6a" strokeWidth="0.9"/>
+            <circle cx="253" cy="269" r="8" fill="#e8e3cc" stroke="#8a9d6a" strokeWidth="1.2"/>
+            <text x="253" y="273" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8" fill="#3a4a1a" fontWeight="700">4</text>
+
+            {/* IN STOCK badge */}
+            <rect x="14" y="356" width="78" height="22" rx="11" fill="#d4ead4" stroke="#4a8a4a" strokeWidth="1.2"/>
+            <text x="53" y="371" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8.5" fill="#2a5a2a" fontWeight="700">IN STOCK</text>
+
+            {/* ════════════════════════════════════
+                RIGHT PANEL · SPUR GEAR M7 Z24 PA20°
+                Center (415, 200)
+            ════════════════════════════════════ */}
+
+            {/* Center lines */}
+            <line x1="415" y1="13"  x2="415" y2="383" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="14 4 2 4"/>
+            <line x1="286" y1="200" x2="552" y2="200" stroke="#bccf98" strokeWidth="0.9" strokeDasharray="14 4 2 4"/>
+
+            {/* Gear body (full disc with teeth) */}
+            <path d={gearPath} fill="#ddd8b8" stroke="#7a9055" strokeWidth="1.5"/>
+            <path d={gearPath} fill="url(#metalHatch)"/>
+
+            {/* Pitch circle — dashed orange */}
+            <circle cx={gCX} cy={gCY} r="84" stroke="#d4a373" strokeWidth="0.8" strokeDasharray="7 3" opacity="0.75"/>
+
+            {/* Hub boundary ring */}
+            <circle cx={gCX} cy={gCY} r="38" stroke="#8a9d6a" strokeWidth="1.2" fill="none"/>
+
+            {/* Bore */}
+            <circle cx={gCX} cy={gCY} r="21" fill="#ede8d2" stroke="#8a9d6a" strokeWidth="1.5"/>
+
+            {/* Keyway at 12 o'clock */}
+            <rect x="409" y="172" width="12" height="8" rx="1" fill="#ede8d2" stroke="#8a9d6a" strokeWidth="0.9"/>
+
+            {/* Bore center mark */}
+            <line x1="407" y1="200" x2="423" y2="200" stroke="#8a9d6a" strokeWidth="1.3"/>
+            <line x1="415" y1="192" x2="415" y2="208" stroke="#8a9d6a" strokeWidth="1.3"/>
+
+            {/* OD Ø182 — top dimension */}
+            <line x1="324" y1="109" x2="324" y2="44" stroke="#d4a373" strokeWidth="0.9"/>
+            <line x1="506" y1="109" x2="506" y2="44" stroke="#d4a373" strokeWidth="0.9"/>
+            <line x1="317" y1="40"  x2="513" y2="40" stroke="#d4a373" strokeWidth="0.9"/>
+            <polygon points="324,40 330,36 330,44"  fill="#d4a373"/>
+            <polygon points="506,40 500,36 500,44"  fill="#d4a373"/>
+            <text x="415" y="34" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="9" fill="#d4a373" fontWeight="700">Ø 182.0 mm</text>
+
+            {/* Bore Ø42 — right dimension */}
+            <line x1="436" y1="200" x2="534" y2="200" stroke="#d4a373" strokeWidth="0.7" opacity="0.4"/>
+            <line x1="530" y1="179" x2="530" y2="221" stroke="#d4a373" strokeWidth="0.9"/>
+            <polygon points="530,179 526,185 534,185" fill="#d4a373"/>
+            <polygon points="530,221 526,215 534,215" fill="#d4a373"/>
+            <text x="540" y="203" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#d4a373" fontWeight="700" transform="rotate(-90,540,203)">Ø 42 H7</text>
+
+            {/* PCD dashed leader */}
+            <line x1="415" y1="117" x2="456" y2="78" stroke="#d4a373" strokeWidth="0.7" strokeDasharray="3 2"/>
+            <text x="460" y="76" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#d4a373" fontWeight="700">PCD</text>
+            <text x="460" y="87" fontFamily="'IBM Plex Mono',monospace" fontSize="7"   fill="#a0845c">Ø 168 mm</text>
+
+            {/* Gear spec callout */}
+            <line x1="500" y1="160" x2="524" y2="140" stroke="#8a9d6a" strokeWidth="0.9"/>
+            <rect x="524" y="118" width="30" height="50" rx="2" fill="#f0ead0" stroke="#ccd5ae" strokeWidth="1"/>
+            <text x="539" y="131" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#7a6030" fontWeight="700">m = 7</text>
+            <text x="539" y="143" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#3a4a1a" fontWeight="700">z = 24</text>
+            <text x="539" y="155" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7.5" fill="#4a5a2a">PA20°</text>
+            <text x="539" y="164" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="6.5" fill="#8a9d6a">DIN3960</text>
+
+            {/* ══ TITLE BLOCK ══ */}
+            <rect x="4" y="391" width="552" height="55" fill="#ede8d0"/>
+            <line x1="220" y1="391" x2="220" y2="446" stroke="#8a9d6a" strokeWidth="0.8"/>
+            <line x1="400" y1="391" x2="400" y2="446" stroke="#8a9d6a" strokeWidth="0.8"/>
+            <line x1="460" y1="391" x2="460" y2="446" stroke="#8a9d6a" strokeWidth="0.8"/>
+            <line x1="220" y1="418" x2="556" y2="418" stroke="#8a9d6a" strokeWidth="0.5"/>
+
+            {/* Col 1: Bearing info */}
+            <text x="112" y="405" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8"   fill="#3a4a1a" fontWeight="700">DEEP GROOVE BALL BEARING</text>
+            <text x="112" y="416" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7"   fill="#6a7a4a">Ø276 × Ø82 × B48 · CLASS P6</text>
+            <text x="112" y="428" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="6.5" fill="#a0845c">SLY-DGBB-276/82-P6</text>
+            <text x="112" y="440" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="6"   fill="#8a9d6a">DIN 625 TYPE · AISI 52100 HRC 60</text>
+
+            {/* Col 2: Gear info */}
+            <text x="310" y="405" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="8"   fill="#3a4a1a" fontWeight="700">SPUR GEAR M7 Z24 PA20°</text>
+            <text x="310" y="416" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="7"   fill="#6a7a4a">OD Ø182 · BORE Ø42 H7 · PCD Ø168</text>
+            <text x="310" y="428" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="6.5" fill="#a0845c">SLY-GR-M7-Z24-PA20</text>
+            <text x="310" y="440" textAnchor="middle" fontFamily="'IBM Plex Mono',monospace" fontSize="6"   fill="#8a9d6a">DIN 3960 · 16MnCr5 CASE HARD.</text>
+
+            {/* Col 3: Scale */}
+            <text x="404" y="407" fontFamily="'IBM Plex Mono',monospace" fontSize="6.5" fill="#8a9d6a">SCALE</text>
+            <text x="404" y="417" fontFamily="'IBM Plex Mono',monospace" fontSize="11"  fill="#3a4a1a" fontWeight="700">1 : 2</text>
+            <text x="404" y="429" fontFamily="'IBM Plex Mono',monospace" fontSize="6.5" fill="#8a9d6a">UNIT: mm</text>
+
+            {/* Col 4: Attribution */}
+            <text x="465" y="407" fontFamily="'IBM Plex Mono',monospace" fontSize="6.5" fill="#8a9d6a">DRAWN BY</text>
+            <text x="465" y="418" fontFamily="'IBM Plex Mono',monospace" fontSize="9"   fill="#3a4a1a" fontWeight="700">SolydShop</text>
+            <text x="465" y="429" fontFamily="'IBM Plex Mono',monospace" fontSize="6.5" fill="#a0845c">ENG DEPT.</text>
+            <text x="465" y="440" fontFamily="'IBM Plex Mono',monospace" fontSize="6"   fill="#8a9d6a">REV B · 2026-06</text>
+        </svg>
+    );
+};
 
 /* ── Skeleton card ───────────────────────────────────────────────────── */
 const SkeletonCard = () => (
@@ -122,6 +281,7 @@ const HomePage = () => {
     const [pageNumber,       setPageNumber]       = useState(0);
     const [totalPages,       setTotalPages]       = useState(1);
     const [inStockOnly,      setInStockOnly]      = useState(false);
+    const [hasLoaded,        setHasLoaded]        = useState(false);
 
     const modalRef            = useRef(null);
     const quickViewTriggerRef = useRef(null);
@@ -151,11 +311,13 @@ const HomePage = () => {
             if (max < 100000) url += `maxPrice=${max}&`;
             if (inStock)      url += `inStock=true&`;
             const res = await api.get(url);
-            dispatch(fetchProductsSuccess(res.data.content));
+            dispatch(fetchProductsSuccess(res.data.content ?? []));
             setTotalPages(res.data.totalPages ?? 1);
         } catch (e) {
             dispatch(fetchProductsFailure(e.message));
             setProductError("Failed to load products. Check your connection and try again.");
+        } finally {
+            setHasLoaded(true);
         }
     };
 
@@ -288,16 +450,16 @@ const HomePage = () => {
                 HERO — warm sand + blueprint grid
             ══════════════════════════════════════════ */}
             <section style={{ background: "var(--surface)", backgroundImage: HERO_GRID, borderBottom: "1px solid var(--border)" }}>
-                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-10 lg:gap-16 items-center">
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-center">
 
                     {/* Left: headline + CTAs + stats */}
                     <div>
                         <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.25rem, 4vw, 3.25rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.05, color: "var(--text)", margin: 0, textWrap: "balance" }}>
-                            Your Solid Industrial<br className="hidden sm:block" /> Parts Portal.
+                            The Global Marketplace<br className="hidden sm:block" /> for Industrial Parts.
                         </h1>
 
                         <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", color: "var(--text-2)", marginTop: "20px", lineHeight: 1.65, maxWidth: "48ch" }}>
-                            Manage sourcing, verify OEM specs, and place orders — all in one secure platform for heavy machinery components.
+                            Buy and sell heavy machinery components worldwide. Verified sellers, OEM-grade parts, and fast international shipping — all on one platform.
                         </p>
 
                         <div className="flex flex-wrap gap-3" style={{ marginTop: "28px" }}>
@@ -307,25 +469,25 @@ const HomePage = () => {
                                 onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
                                 onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                             >
-                                Enter Catalog
+                                Browse Parts
                             </button>
                             <button
-                                onClick={() => navigate("/orders")}
+                                onClick={() => navigate("/seller/dashboard")}
                                 style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
                                 onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
                                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
                             >
-                                My Orders
+                                Start Selling
                             </button>
                         </div>
 
                         {/* Stats row */}
                         <div className="flex flex-wrap gap-6 mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                             {[
-                                { num: "24K+", label: "Parts Available" },
-                                { num: "500+", label: "OEM Brands"      },
-                                { num: "48h",  label: "Global Dispatch"  },
-                                { num: "ISO",  label: "9001 Certified"  },
+                                { num: "24K+",  label: "Parts Listed"      },
+                                { num: "150+",  label: "Countries Served"  },
+                                { num: "48h",   label: "Avg. Dispatch"     },
+                                { num: "ISO",   label: "9001 Verified"     },
                             ].map(({ num, label }) => (
                                 <div key={label}>
                                     <div style={{ fontFamily: "var(--font-mono)", fontSize: "20px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>{num}</div>
@@ -336,7 +498,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Right: industrial bearing illustration */}
-                    <div className="hidden lg:flex items-center justify-center" style={{ opacity: 0.9 }}>
+                    <div className="flex items-center justify-center" style={{ opacity: 0.9 }}>
                         <BearingIllustration />
                     </div>
                 </div>
@@ -593,7 +755,7 @@ const HomePage = () => {
                                 Procurement Catalog
                             </h2>
                             <div aria-live="polite" aria-atomic="true" style={{ fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-4)", marginTop: "2px" }}>
-                                {!loading && !productError && `${products.length} PARTS AVAILABLE`}
+                                {hasLoaded && !loading && !productError && `${(products ?? []).length} PARTS AVAILABLE`}
                             </div>
                         </div>
                         {hasAnyFilter && (
@@ -607,7 +769,7 @@ const HomePage = () => {
                         )}
                     </div>
 
-                    {loading ? (
+                    {loading || !hasLoaded ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
                         </div>
@@ -896,69 +1058,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* ══════════════════════════════════════════
-                FOOTER
-            ══════════════════════════════════════════ */}
-            <footer style={{ background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
-                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Brand */}
-                    <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
-                            <SolydLogo size={28} />
-                            <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, color: "var(--accent)", letterSpacing: "-0.02em" }}>SolydShop</span>
-                        </div>
-                        <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-3)", marginTop: "6px", lineHeight: 1.55, maxWidth: "30ch" }}>
-                            B2B industrial procurement for heavy machinery components and assemblies.
-                        </p>
-                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "var(--text-4)", marginTop: "14px", letterSpacing: "0.04em" }}>
-                            © {new Date().getFullYear()} SolydShop Industrial Procurement
-                        </p>
-                    </div>
-                    {/* Platform */}
-                    <div>
-                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "12px" }}>
-                            Platform
-                        </p>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                            {[
-                                { label: "Catalog",           href: "#" },
-                                { label: "My Orders",         href: "/orders" },
-                                { label: "My Account",        href: "/account" },
-                                { label: "Seller Dashboard",  href: "/seller/dashboard" },
-                            ].map(({ label, href }) => (
-                                <Link
-                                    key={label}
-                                    to={href}
-                                    style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-3)", textDecoration: "none", transition: "color var(--duration-fast)" }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
-                                >
-                                    {label}
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                    {/* Legal */}
-                    <div>
-                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "12px" }}>
-                            Legal & Support
-                        </p>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                            {["Terms of Service", "Privacy Policy", "Technical Support", "Contact Sales"].map((label) => (
-                                <a
-                                    key={label}
-                                    href="#"
-                                    style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-3)", textDecoration: "none", transition: "color var(--duration-fast)" }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
-                                >
-                                    {label}
-                                </a>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </footer>
 
             {/* ══════════════════════════════════════════
                 QUICK VIEW MODAL

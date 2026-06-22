@@ -34,9 +34,9 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 const ROLE_TABS = ["ALL", "USERS", "SELLERS", "ADMINS"];
 
 const ROLE_STYLE = {
-    ROLE_ADMIN:  { color: "var(--error)",   bg: "var(--error-subtle)"   },
-    ROLE_SELLER: { color: "var(--warning)", bg: "var(--warning-subtle)" },
-    ROLE_USER:   { color: "var(--info)",    bg: "var(--info-subtle)"    },
+    ROLE_ADMIN:  { color: "var(--accent-lo)", bg: "var(--accent-subtle)"  },
+    ROLE_SELLER: { color: "var(--warning)",   bg: "var(--warning-subtle)" },
+    ROLE_USER:   { color: "var(--info)",      bg: "var(--info-subtle)"    },
 };
 
 const RoleBadge = memo(({ role }) => {
@@ -183,7 +183,7 @@ const AdminUsersPage = () => {
             minWidth: isMobile ? 120 : 160,
             flex: 1,
             renderCell: (params) => (
-                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4, color: "var(--text)", fontSize: "13px" }}>
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)", fontSize: "13px", maxWidth: "100%", display: "block" }}>
                     {params.row.name}
                 </span>
             ),
@@ -212,7 +212,7 @@ const AdminUsersPage = () => {
             headerName: "Actions",
             width: isMobile ? 80 : 120,
             renderCell: (params) => (
-                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ height: "100%" }}>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
                     <Tooltip title="View user" arrow>
                         <IconButton
                             size="small"
@@ -321,7 +321,7 @@ const AdminUsersPage = () => {
                     rows={filteredUsers}
                     columns={columns}
                     getRowId={(row) => row.userId}
-                    getRowHeight={() => "auto"}
+                    rowHeight={56}
                     disableRowSelectionOnClick
                     loading={loading}
                     pageSizeOptions={[10, 25, 50]}
@@ -337,7 +337,7 @@ const AdminUsersPage = () => {
                 title={`User #${selectedUser?.userId}`}
                 subtitle={selectedUser?.email}
                 footer={
-                    <Stack direction="row" justifyContent="space-between" gap={1} flexWrap="wrap">
+                    <Stack direction="row" justifyContent="space-between" gap={2} flexWrap="wrap">
                         <Button
                             variant="contained"
                             color="error"
@@ -347,7 +347,7 @@ const AdminUsersPage = () => {
                         >
                             Delete User
                         </Button>
-                        <Stack direction="row" gap={1}>
+                        <Stack direction="row" gap={2}>
                             <Button onClick={() => setIsSheetOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
                                 Close
                             </Button>

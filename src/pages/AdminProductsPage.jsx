@@ -271,7 +271,7 @@ const AdminProductsPage = () => {
             minWidth: isMobile ? 140 : 220,
             flex: 1,
             renderCell: (params) => (
-                <span style={{ whiteSpace: "normal", wordBreak: "break-word", lineHeight: 1.4, color: "var(--text)", fontSize: "13px" }}>
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)", fontSize: "13px", maxWidth: "100%", display: "block" }}>
                     {params.row.productName}
                 </span>
             ),
@@ -331,7 +331,7 @@ const AdminProductsPage = () => {
             headerName: "Actions",
             width: isMobile ? 100 : 130,
             renderCell: (params) => (
-                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ height: "100%" }}>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
                     <Tooltip title="View" arrow>
                         <IconButton size="small" onClick={() => handleViewProduct(params.row)}
                             sx={{ color: "var(--info)", "&:hover": { background: "var(--info-subtle)" } }}>
@@ -442,7 +442,7 @@ const AdminProductsPage = () => {
                     columns={columns}
                     disableRowSelectionOnClick
                     getRowId={(row) => row.productId}
-                    getRowHeight={() => "auto"}
+                    rowHeight={56}
                     loading={loading}
                     pageSizeOptions={[10, 25, 50]}
                     initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
@@ -457,7 +457,7 @@ const AdminProductsPage = () => {
                 title="Product Details"
                 subtitle={selectedProduct?.productName}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={1}>
+                    <Stack direction="row" justifyContent="flex-end" gap={2}>
                         <Button onClick={() => setIsViewOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
                             Close
                         </Button>
@@ -476,7 +476,9 @@ const AdminProductsPage = () => {
                 {selectedProduct && (
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                         <Box sx={{
+                            width:          200,
                             height:         200,
+                            margin:         "0 auto",
                             background:     "var(--surface-high)",
                             border:         "1px solid var(--border)",
                             borderRadius:   "var(--r-md)",
@@ -484,6 +486,7 @@ const AdminProductsPage = () => {
                             alignItems:     "center",
                             justifyContent: "center",
                             overflow:       "hidden",
+                            flexShrink:     0,
                         }}>
                             <Box component="img" src={selectedProduct.imageUrl} alt={selectedProduct.productName}
                                 sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
@@ -547,7 +550,7 @@ const AdminProductsPage = () => {
                 subtitle={editingProductId ? `Editing product #${editingProductId}` : "Fill in all required fields"}
                 width={560}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={1}>
+                    <Stack direction="row" justifyContent="flex-end" gap={2}>
                         <Button onClick={() => { resetForm(); setIsFormOpen(false); }} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
                             Cancel
                         </Button>
@@ -660,7 +663,7 @@ const AdminProductsPage = () => {
                             overflow:       "hidden",
                         }}>
                             <Box component="img" src={productForm.imageUrl} alt="Preview"
-                                sx={{ maxHeight: 80, maxWidth: "100%", objectFit: "contain" }} />
+                                sx={{ maxHeight: 80, maxWidth: 120, objectFit: "contain" }} />
                         </Box>
                     )}
 

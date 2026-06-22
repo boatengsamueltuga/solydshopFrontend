@@ -113,6 +113,7 @@ const SheetPanel = ({ open, onClose, title, subtitle, children, footer, width = 
         sx={{
           flex:      1,
           overflowY: 'auto',
+          overflowX: 'hidden',
           padding:   'var(--space-6)',
         }}
       >

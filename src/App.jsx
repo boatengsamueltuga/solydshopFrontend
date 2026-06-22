@@ -43,6 +43,8 @@ const PageLoader = () => (
 import Navbar           from "./components/Navbar";
 import ProtectedRoute   from "./components/ProtectedRoute";
 import MobileBottomNav  from "./components/navigation/MobileBottomNav";
+import Footer           from "./components/Footer";
+import ScrollToTop      from "./components/ScrollToTop";
 
 import { restoreUser, setInitialized } from "./features/auth/authSlice";
 import api from "./api/api";
@@ -66,10 +68,19 @@ const AdminCategoriesPage  = lazy(() => import("./pages/AdminCategoriesPage"));
 const AdminOrdersPage      = lazy(() => import("./pages/AdminOrdersPage"));
 const AdminUsersPage       = lazy(() => import("./pages/AdminUsersPage"));
 const ProductDetailPage    = lazy(() => import("./pages/ProductDetailPage"));
+const AboutPage            = lazy(() => import("./pages/AboutPage"));
+const TermsPage            = lazy(() => import("./pages/TermsPage"));
+const PrivacyPage          = lazy(() => import("./pages/PrivacyPage"));
+const SupportPage          = lazy(() => import("./pages/SupportPage"));
+const ContactPage          = lazy(() => import("./pages/ContactPage"));
+
+const NO_FOOTER_PREFIXES = ["/admin", "/seller", "/login", "/register", "/forgot-password", "/reset-password"];
 
 function App() {
 
     const dispatch = useDispatch();
+    const { pathname } = useLocation();
+    const showFooter = !NO_FOOTER_PREFIXES.some(p => pathname.startsWith(p));
 
     useEffect(() => {
         const restoreSession = async () => {
@@ -89,6 +100,7 @@ function App() {
         <div className="app-root-body">
 
             <StripeFloatingHider />
+            <ScrollToTop />
 
             <Navbar />
 
@@ -124,10 +136,18 @@ function App() {
 
                     <Route path="/order-confirmation" element={<ProtectedRoute><OrderConfirmationPage /></ProtectedRoute>} />
 
+                    <Route path="/about"   element={<AboutPage />} />
+                    <Route path="/terms"   element={<TermsPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/support" element={<SupportPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+
                     <Route path="*" element={<NotFoundPage />} />
 
                 </Routes>
             </Suspense>
+
+            {showFooter && <Footer />}
 
             <MobileBottomNav />
 

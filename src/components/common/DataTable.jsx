@@ -61,7 +61,8 @@ const DataTable = ({
         backgroundColor: 'var(--surface)',
         border:          '1px solid var(--border)',
         borderRadius:    'var(--r-md)',
-        overflow:        'hidden',
+        overflowX:       'auto',
+        overflowY:       'hidden',
       }}
     >
       {/* Optional toolbar: search box, filter chips, etc. */}
@@ -84,7 +85,7 @@ const DataTable = ({
         getRowId={getRowId}
         loading={loading}
         autoHeight
-        getRowHeight={() => 'auto'}
+        rowHeight={56}
         disableRowSelectionOnClick
         pageSizeOptions={pageSizeOptions}
         initialState={{
