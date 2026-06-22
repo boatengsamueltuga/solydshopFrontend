@@ -124,8 +124,8 @@ const Navbar = () => {
                 style={{ background: C.bg, borderBottom: `1px solid ${C.border}` }}
             >
                 <div
-                    className="flex justify-between items-center w-full mx-auto h-20"
-                    style={{ maxWidth: "1440px", padding: "0 40px" }}
+                    className="flex justify-between items-center w-full mx-auto h-20 px-4 sm:px-6 md:px-10"
+                    style={{ maxWidth: "1440px" }}
                 >
                     {/* ── Left: Logo + Nav links ──────────────────── */}
                     <div className="flex items-center gap-8">
@@ -134,7 +134,7 @@ const Navbar = () => {
                             <span style={{ fontSize: "22px", fontWeight: 700, color: C.primary, fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
                                 SolydShop
                             </span>
-                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", color: C.textMuted, textTransform: "uppercase", border: `1px solid ${C.border}`, borderRadius: "3px", padding: "2px 6px", whiteSpace: "nowrap" }}>
+                            <span className="hidden sm:inline-block" style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", color: C.textMuted, textTransform: "uppercase", border: `1px solid ${C.border}`, borderRadius: "3px", padding: "2px 6px", whiteSpace: "nowrap" }}>
                                 PROCUREMENT PORTAL
                             </span>
                         </Link>
@@ -309,14 +309,104 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* ── Mobile: hamburger ───────────────────────── */}
-                    <button
-                        className="md:hidden p-2 rounded-lg transition-colors"
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer" }}
-                    >
-                        {menuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
-                    </button>
+                    {/* ── Mobile: utility strip + hamburger ────────── */}
+                    <div className="md:hidden flex items-center gap-0.5">
+
+                        {/* Theme toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                        >
+                            {isDark ? <HiSun size={20} /> : <HiMoon size={20} />}
+                        </button>
+
+                        {/* Cart with badge */}
+                        {isAuthenticated && (
+                            <button
+                                onClick={() => navigate("/cart")}
+                                aria-label={cartCount > 0 ? `Cart (${cartCount} items)` : "Cart"}
+                                style={{ position: "relative", color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                            >
+                                <FaShoppingCart size={20} />
+                                {cartCount > 0 && (
+                                    <span style={{
+                                        position:   "absolute",
+                                        top:        "-2px",
+                                        right:      "-2px",
+                                        minWidth:   "17px",
+                                        height:     "17px",
+                                        borderRadius: "9px",
+                                        background: C.primary,
+                                        color:      C.text,
+                                        fontSize:   "10px",
+                                        fontWeight: 700,
+                                        fontFamily: "Inter, sans-serif",
+                                        display:    "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        padding:    "0 4px",
+                                        border:     `1.5px solid ${C.bg}`,
+                                        lineHeight: 1,
+                                    }}>
+                                        {cartCount > 99 ? "99+" : cartCount}
+                                    </span>
+                                )}
+                            </button>
+                        )}
+
+                        {/* Avatar (authenticated) or login icon (guest) */}
+                        {isAuthenticated ? (
+                            <button
+                                onClick={() => setMenuOpen((v) => !v)}
+                                aria-label="Account menu"
+                                aria-expanded={menuOpen}
+                                style={{
+                                    width:        "32px",
+                                    height:       "32px",
+                                    borderRadius: "50%",
+                                    background:   roleColor,
+                                    color:        "#fff",
+                                    fontSize:     "12px",
+                                    fontWeight:   700,
+                                    fontFamily:   "Inter, sans-serif",
+                                    display:      "flex",
+                                    alignItems:   "center",
+                                    justifyContent: "center",
+                                    border:       "none",
+                                    cursor:       "pointer",
+                                    flexShrink:   0,
+                                    marginLeft:   "2px",
+                                }}
+                            >
+                                {initials}
+                            </button>
+                        ) : (
+                            <Link
+                                to="/login"
+                                aria-label="Login"
+                                style={{ color: C.textMuted, padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px" }}
+                            >
+                                <HiLogin size={20} />
+                            </Link>
+                        )}
+
+                        {/* Hamburger */}
+                        <button
+                            onClick={() => setMenuOpen((v) => !v)}
+                            aria-expanded={menuOpen}
+                            aria-label={menuOpen ? "Close menu" : "Open menu"}
+                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s", marginLeft: "2px" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                        >
+                            {menuOpen ? <HiX size={22} /> : <HiMenu size={22} />}
+                        </button>
+                    </div>
                 </div>
 
                 {/* ── Mobile dropdown ──────────────────────────────── */}

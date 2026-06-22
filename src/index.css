@@ -14,6 +14,11 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
     display: none !important;
 }
 
+/* ── SolydLogo dark mode — gear becomes caramel on navy navbar ───────────── */
+[data-theme="dark"] .solyd-logo .solyd-logo-gear {
+    fill: var(--accent);
+}
+
 /* ── Dark mode: hero grid override ──────────────────────────────────────── */
 /* The HERO_GRID SVG uses light sage lines; replace with navy-appropriate    */
 /* steel blue grid so it stays subtle against the dark navy surface.         */
@@ -303,6 +308,78 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
 [data-theme="dark"] body {
     background-color: var(--bg) !important;
     color:            var(--text) !important;
+}
+
+/* ── BearingIllustration dark mode ──────────────────────────────────────── */
+/* CSS presentation-attribute overrides: class (0,1,0) > attr (0,0,0)       */
+
+[data-theme="dark"] .solyd-bearing-svg .svg-bg-main {
+    fill: var(--surface);
+}
+[data-theme="dark"] .solyd-bearing-svg .svg-grid-line {
+    stroke: #3A506B;
+}
+[data-theme="dark"] .solyd-bearing-svg .svg-hatch-line {
+    stroke:  oklch(0.38 0.042 248);
+    opacity: 0.15;
+}
+[data-theme="dark"] .solyd-bearing-svg .svg-centerline {
+    stroke: oklch(0.40 0.052 248);
+}
+/* Metal races and gear body */
+[data-theme="dark"] .solyd-bearing-svg .svg-metal-fill {
+    fill:   oklch(0.28 0.042 248);
+    stroke: oklch(0.46 0.056 244);
+}
+/* Bore interiors and keyway */
+[data-theme="dark"] .solyd-bearing-svg .svg-bore-fill {
+    fill:   oklch(0.22 0.044 252);
+    stroke: oklch(0.46 0.056 244);
+}
+/* Structural lines (center marks, hub ring, callout leaders) */
+[data-theme="dark"] .solyd-bearing-svg .svg-struct-line {
+    stroke: oklch(0.46 0.056 244);
+}
+/* Ball strokes */
+[data-theme="dark"] .solyd-bearing-svg .svg-ball {
+    stroke: oklch(0.46 0.056 244);
+}
+/* Numbered callout circles */
+[data-theme="dark"] .solyd-bearing-svg .svg-callout-chip {
+    fill:   oklch(0.26 0.051 252);
+    stroke: oklch(0.46 0.056 244);
+}
+[data-theme="dark"] .solyd-bearing-svg .svg-callout-text {
+    fill: var(--text-2);
+}
+/* Gear spec data box */
+[data-theme="dark"] .solyd-bearing-svg .svg-spec-chip {
+    fill:   oklch(0.24 0.044 252);
+    stroke: oklch(0.38 0.050 244);
+}
+/* Title block */
+[data-theme="dark"] .solyd-bearing-svg .svg-title-bg {
+    fill: oklch(0.20 0.046 252);
+}
+[data-theme="dark"] .solyd-bearing-svg .svg-title-line {
+    stroke: oklch(0.38 0.050 244);
+}
+/* Title text roles */
+[data-theme="dark"] .solyd-bearing-svg .svg-text-primary   { fill: var(--text); }
+[data-theme="dark"] .solyd-bearing-svg .svg-text-secondary { fill: var(--text-2); }
+[data-theme="dark"] .solyd-bearing-svg .svg-text-accent    { fill: var(--accent); }
+[data-theme="dark"] .solyd-bearing-svg .svg-text-muted     { fill: var(--text-3); }
+
+/* Native select options — respected in Firefox; Chrome/Edge use OS defaults */
+[data-theme="dark"] select option {
+    background-color: var(--surface-high);
+    color:            var(--text);
+}
+
+/* Product catalog search/sort toolbar inputs */
+[data-theme="dark"] .solyd-catalog-toolbar input::placeholder {
+    color:   var(--text-4);
+    opacity: 1;
 }
 /* :root {
   --text: #6b6375;

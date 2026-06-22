@@ -293,52 +293,55 @@ export default function ProductDetailPage() {
                         overflow:     'hidden',
                     }}
                 >
-                    {/* Image box — placeholder always in DOM behind the img */}
+                    {/* Image box — white bg for clean product image presentation */}
                     <div
                         style={{
                             width:    '100%',
                             height:   '280px',
                             position: 'relative',
                             overflow: 'hidden',
-                            background: 'oklch(0.26 0.018 58)',
+                            background: '#ffffff',
                         }}
                     >
-                        {/* Placeholder icon: always visible, behind the product image */}
-                        <div
-                            style={{
-                                position:        'absolute',
-                                inset:           0,
-                                display:         'flex',
-                                flexDirection:   'column',
-                                alignItems:      'center',
-                                justifyContent:  'center',
-                                gap:             '10px',
-                                userSelect:      'none',
-                            }}
-                        >
-                            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.2 }}>
-                                <rect x="2" y="2" width="20" height="20" rx="2" stroke="white" strokeWidth="1.5"/>
-                                <circle cx="8.5" cy="8.5" r="2.5" stroke="white" strokeWidth="1.5"/>
-                                <path d="M2 15l5-5 4 4 3-3 8 7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            <span style={{ color: 'rgba(255,255,255,0.22)', fontSize: '11px', fontFamily: 'sans-serif', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                                No image
-                            </span>
-                        </div>
+                        {/* Placeholder icon — shown when no image URL */}
+                        {!selectedImg && (
+                            <div
+                                style={{
+                                    position:        'absolute',
+                                    inset:           0,
+                                    display:         'flex',
+                                    flexDirection:   'column',
+                                    alignItems:      'center',
+                                    justifyContent:  'center',
+                                    gap:             '10px',
+                                    userSelect:      'none',
+                                    background:      'var(--surface-high)',
+                                }}
+                            >
+                                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.25 }}>
+                                    <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                                    <circle cx="8.5" cy="8.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+                                    <path d="M2 15l5-5 4 4 3-3 8 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                <span style={{ color: 'var(--text-4)', fontSize: '11px', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                    No image
+                                </span>
+                            </div>
+                        )}
 
-                        {/* Product image: absolutely fills the box, covers placeholder */}
+                        {/* Product image on white background */}
                         {selectedImg && (
                             <img
                                 src={selectedImg}
                                 alt={product.productName}
                                 style={{
-                                    position:  'absolute',
-                                    inset:     '24px',
-                                    width:     'calc(100% - 48px)',
-                                    height:    'calc(100% - 48px)',
-                                    objectFit: 'contain',
-                                    display:   'block',
-                                    background: 'oklch(0.26 0.018 58)',
+                                    position:   'absolute',
+                                    inset:      '24px',
+                                    width:      'calc(100% - 48px)',
+                                    height:     'calc(100% - 48px)',
+                                    objectFit:  'contain',
+                                    display:    'block',
+                                    background: '#ffffff',
                                 }}
                                 onError={e => { e.currentTarget.style.display = 'none'; }}
                             />
@@ -692,19 +695,32 @@ export default function ProductDetailPage() {
                             >
                                 DESCRIPTION
                             </div>
-                            <p
+                            <div
                                 style={{
-                                    color: 'var(--text-2)',
-                                    fontSize: 'var(--text-base)',
-                                    lineHeight: 1.65,
-                                    margin: 0,
-                                    fontFamily: 'var(--font-body)',
-                                    overflowWrap: 'break-word',
-                                    wordBreak: 'break-word',
+                                    overflowX:     'auto',
+                                    overflowY:     'hidden',
+                                    scrollbarWidth: 'thin',
+                                    scrollbarColor: 'var(--border) transparent',
+                                    border:         '1px solid var(--border-subtle)',
+                                    borderRadius:   'var(--r-sm)',
+                                    background:     'var(--surface)',
+                                    padding:        '12px 16px',
                                 }}
                             >
-                                {product.description}
-                            </p>
+                                <p
+                                    style={{
+                                        color:      'var(--text-2)',
+                                        fontSize:   'var(--text-sm)',
+                                        lineHeight:  1.6,
+                                        margin:      0,
+                                        fontFamily: 'var(--font-body)',
+                                        whiteSpace: 'nowrap',
+                                        minWidth:   'max-content',
+                                    }}
+                                >
+                                    {product.description}
+                                </p>
+                            </div>
                         </div>
                     )}
 
