@@ -363,10 +363,10 @@ const CheckoutPage = () => {
         appearance: {
             theme: "night",
             variables: {
-                colorPrimary:    "#c87940",
-                colorBackground: "#3d3225",
-                colorText:       "#f0ede8",
-                colorDanger:     "#8b2020",
+                colorPrimary:    "#D4A373",
+                colorBackground: "#1C2541",
+                colorText:       "#F8FAFC",
+                colorDanger:     "#c0392b",
                 fontFamily:      "'IBM Plex Sans', system-ui, sans-serif",
                 borderRadius:    "4px",
             },

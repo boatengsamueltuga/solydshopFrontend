@@ -13,6 +13,297 @@ body:not(.solyd-in-checkout) [id*="link"][id*="stripe"],
 body:not(.solyd-in-checkout) [id^="stripe"] {
     display: none !important;
 }
+
+/* ── Dark mode: hero grid override ──────────────────────────────────────── */
+/* The HERO_GRID SVG uses light sage lines; replace with navy-appropriate    */
+/* steel blue grid so it stays subtle against the dark navy surface.         */
+[data-theme="dark"] .solyd-hero {
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><path d='M 32 0 L 0 0 0 32' fill='none' stroke='%233A506B' stroke-width='0.5'/></svg>") !important;
+}
+
+/* ── Smooth theme transitions ────────────────────────────────────────────── */
+/* Applied during toggle only (JS adds/removes the attribute) to avoid a     */
+/* flash-of-transition on first paint.                                        */
+[data-theme-transitioning],
+[data-theme-transitioning] *,
+[data-theme-transitioning] *::before,
+[data-theme-transitioning] *::after {
+    transition:
+        background-color var(--duration-mid) var(--ease-out-quart),
+        color            var(--duration-mid) var(--ease-out-quart),
+        border-color     var(--duration-mid) var(--ease-out-quart),
+        fill             var(--duration-mid) var(--ease-out-quart) !important;
+}
+
+/* ── MUI component dark mode overrides ───────────────────────────────────── */
+/* MUI theme.js is a static light theme; these win by higher specificity.    */
+
+/* Paper / generic surfaces */
+[data-theme="dark"] .MuiPaper-root {
+    background-color: var(--surface) !important;
+    background-image: none !important;
+    color:            var(--text) !important;
+}
+
+/* Dialog */
+[data-theme="dark"] .MuiDialog-paper {
+    background-color: var(--surface) !important;
+    border:           1px solid var(--border) !important;
+}
+[data-theme="dark"] .MuiDialogTitle-root {
+    color: var(--text) !important;
+}
+[data-theme="dark"] .MuiDialogContentText-root {
+    color: var(--text-2) !important;
+}
+
+/* Card */
+[data-theme="dark"] .MuiCard-root {
+    background-color: var(--surface-mid) !important;
+    border-color:     var(--border) !important;
+}
+
+/* Buttons */
+[data-theme="dark"] .MuiButton-outlined {
+    border-color: var(--border) !important;
+    color:        var(--text) !important;
+}
+[data-theme="dark"] .MuiButton-outlined:hover {
+    border-color:     var(--accent) !important;
+    background-color: var(--accent-subtle) !important;
+}
+[data-theme="dark"] .MuiButton-text {
+    color: var(--text-2) !important;
+}
+[data-theme="dark"] .MuiButton-text:hover {
+    background-color: var(--surface-hover) !important;
+}
+[data-theme="dark"] .MuiIconButton-root {
+    color: var(--text-3) !important;
+}
+[data-theme="dark"] .MuiIconButton-root:hover {
+    background-color: var(--surface-hover) !important;
+    color:            var(--text) !important;
+}
+
+/* TextField / OutlinedInput */
+[data-theme="dark"] .MuiOutlinedInput-root {
+    background-color: var(--surface-high) !important;
+    color:            var(--text) !important;
+}
+[data-theme="dark"] .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+    border-color: var(--border) !important;
+}
+[data-theme="dark"] .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: var(--border-mid) !important;
+}
+[data-theme="dark"] .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--accent) !important;
+}
+[data-theme="dark"] .MuiOutlinedInput-input {
+    color: var(--text) !important;
+}
+[data-theme="dark"] .MuiOutlinedInput-input::placeholder {
+    color:   var(--text-4) !important;
+    opacity: 1;
+}
+[data-theme="dark"] .MuiInputLabel-root {
+    color: var(--text-3) !important;
+}
+[data-theme="dark"] .MuiInputLabel-root.Mui-focused {
+    color: var(--accent) !important;
+}
+[data-theme="dark"] .MuiFormLabel-root {
+    color: var(--text-3) !important;
+}
+[data-theme="dark"] .MuiInputAdornment-root {
+    color: var(--text-3) !important;
+}
+
+/* Select / Dropdown */
+[data-theme="dark"] .MuiSelect-select {
+    color: var(--text) !important;
+}
+[data-theme="dark"] .MuiSelect-icon {
+    color: var(--text-3) !important;
+}
+[data-theme="dark"] .MuiMenu-paper,
+[data-theme="dark"] .MuiPopover-paper {
+    background-color: var(--surface) !important;
+    border:           1px solid var(--border) !important;
+}
+[data-theme="dark"] .MuiMenuItem-root {
+    color: var(--text) !important;
+}
+[data-theme="dark"] .MuiMenuItem-root:hover {
+    background-color: var(--surface-hover) !important;
+}
+[data-theme="dark"] .MuiMenuItem-root.Mui-selected {
+    background-color: var(--accent-subtle) !important;
+}
+[data-theme="dark"] .MuiMenuItem-root.Mui-selected:hover {
+    background-color: var(--accent-subtle) !important;
+}
+[data-theme="dark"] .MuiListSubheader-root {
+    background-color: var(--surface) !important;
+    color:            var(--text-3) !important;
+}
+
+/* Divider */
+[data-theme="dark"] .MuiDivider-root {
+    border-color: var(--border) !important;
+}
+
+/* Chip */
+[data-theme="dark"] .MuiChip-root {
+    background-color: var(--surface-high) !important;
+    color:            var(--text-2) !important;
+    border-color:     var(--border) !important;
+}
+[data-theme="dark"] .MuiChip-deleteIcon {
+    color: var(--text-3) !important;
+}
+
+/* Tooltip */
+[data-theme="dark"] .MuiTooltip-tooltip {
+    background-color: var(--surface-high) !important;
+    color:            var(--text) !important;
+    border:           1px solid var(--border-mid) !important;
+}
+[data-theme="dark"] .MuiTooltip-arrow {
+    color: var(--surface-high) !important;
+}
+
+/* Drawer (SheetPanel + AdminLayout mobile) */
+[data-theme="dark"] .MuiDrawer-paper {
+    background-color: var(--surface) !important;
+    background-image: none !important;
+}
+[data-theme="dark"] .MuiBackdrop-root {
+    background-color: oklch(0 0 0 / 0.65) !important;
+}
+
+/* Avatar */
+[data-theme="dark"] .MuiAvatar-root {
+    background-color: var(--accent-subtle) !important;
+    color:            var(--accent) !important;
+}
+
+/* DataGrid */
+[data-theme="dark"] .MuiDataGrid-root {
+    background-color: var(--surface) !important;
+    color:            var(--text) !important;
+    border-color:     var(--border) !important;
+}
+[data-theme="dark"] .MuiDataGrid-withBorderColor {
+    border-color: var(--border) !important;
+}
+[data-theme="dark"] .MuiDataGrid-columnHeaders {
+    background-color:    var(--surface-mid) !important;
+    border-bottom-color: var(--border) !important;
+}
+[data-theme="dark"] .MuiDataGrid-columnHeader {
+    color: var(--text-3) !important;
+}
+[data-theme="dark"] .MuiDataGrid-columnHeaderTitle {
+    color: var(--text-3) !important;
+}
+[data-theme="dark"] .MuiDataGrid-cell {
+    border-color: var(--border-subtle) !important;
+    color:        var(--text) !important;
+}
+[data-theme="dark"] .MuiDataGrid-row:hover,
+[data-theme="dark"] .MuiDataGrid-row.Mui-hovered {
+    background-color: var(--surface-hover) !important;
+}
+[data-theme="dark"] .MuiDataGrid-footerContainer {
+    border-top-color: var(--border) !important;
+    background-color: var(--surface-mid) !important;
+    color:            var(--text-2) !important;
+}
+[data-theme="dark"] .MuiDataGrid-overlay {
+    background-color: var(--surface) !important;
+}
+[data-theme="dark"] .MuiDataGrid-sortIcon,
+[data-theme="dark"] .MuiDataGrid-menuIconButton,
+[data-theme="dark"] .MuiDataGrid-columnSeparator {
+    color: var(--text-3) !important;
+}
+[data-theme="dark"] .MuiTablePagination-root {
+    color: var(--text-2) !important;
+}
+[data-theme="dark"] .MuiTablePagination-selectLabel,
+[data-theme="dark"] .MuiTablePagination-displayedRows {
+    color: var(--text-2) !important;
+}
+[data-theme="dark"] .MuiTablePagination-actions .MuiIconButton-root {
+    color: var(--text-2) !important;
+}
+[data-theme="dark"] .MuiTablePagination-actions .MuiIconButton-root.Mui-disabled {
+    color: var(--text-4) !important;
+}
+[data-theme="dark"] .MuiTablePagination-select {
+    color: var(--text) !important;
+}
+
+/* Stepper (CheckoutPage) */
+[data-theme="dark"] .MuiStepIcon-root {
+    color: var(--border-mid) !important;
+}
+[data-theme="dark"] .MuiStepIcon-root.Mui-active,
+[data-theme="dark"] .MuiStepIcon-root.Mui-completed {
+    color: var(--accent) !important;
+}
+[data-theme="dark"] .MuiStepLabel-label {
+    color: var(--text-2) !important;
+}
+[data-theme="dark"] .MuiStepLabel-label.Mui-active,
+[data-theme="dark"] .MuiStepLabel-label.Mui-completed {
+    color: var(--text) !important;
+}
+[data-theme="dark"] .MuiStepConnector-line {
+    border-color: var(--border) !important;
+}
+
+/* CircularProgress */
+[data-theme="dark"] .MuiCircularProgress-root {
+    color: var(--accent) !important;
+}
+
+/* Table (generic MUI Table — used in some admin pages) */
+[data-theme="dark"] .MuiTableCell-root {
+    border-color: var(--border) !important;
+    color:        var(--text) !important;
+}
+[data-theme="dark"] .MuiTableCell-head {
+    background-color: var(--surface-mid) !important;
+    color:            var(--text-3) !important;
+}
+[data-theme="dark"] .MuiTableRow-root:hover {
+    background-color: var(--surface-hover) !important;
+}
+
+/* Switch */
+[data-theme="dark"] .MuiSwitch-switchBase.Mui-checked {
+    color: var(--accent) !important;
+}
+[data-theme="dark"] .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+    background-color: var(--accent) !important;
+}
+[data-theme="dark"] .MuiSwitch-track {
+    background-color: var(--border-mid) !important;
+}
+
+/* Skeleton */
+[data-theme="dark"] .MuiSkeleton-root {
+    background-color: var(--surface-mid) !important;
+}
+
+/* CssBaseline / body */
+[data-theme="dark"] body {
+    background-color: var(--bg) !important;
+    color:            var(--text) !important;
+}
 /* :root {
   --text: #6b6375;
   --text-h: #08060d;

@@ -3,20 +3,20 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutSuccess } from "../features/auth/authSlice";
 import api from "../api/api";
-import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd } from "react-icons/hi";
+import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd, HiMoon, HiSun } from "react-icons/hi";
 import SolydLogo from "./SolydLogo";
 import { FaShoppingCart } from "react-icons/fa";
 
-// ── Design tokens ────────────────────────────────────────────
+// ── Design tokens (CSS vars — update with theme automatically) ───────────
 const C = {
-    bg:          "#fefae0",   /* --bg            */
-    border:      "#bccf98",   /* --border        */
-    primary:     "#d4a373",   /* --accent        */
-    text:        "#3a2010",   /* --text          */
-    textMuted:   "#8a6440",   /* --text-3        */
-    surfaceHigh: "#ccd5ae",   /* --surface-high  */
-    btnBg:       "#d4a373",   /* --accent        */
-    btnText:     "#3a2010",   /* dark text on caramel */
+    bg:          "var(--bg)",
+    border:      "var(--border)",
+    primary:     "var(--accent)",
+    text:        "var(--text)",
+    textMuted:   "var(--text-3)",
+    surfaceHigh: "var(--surface-high)",
+    btnBg:       "var(--accent)",
+    btnText:     "var(--text)",
 };
 
 const Navbar = () => {
@@ -27,7 +27,19 @@ const Navbar = () => {
     const [menuOpen,     setMenuOpen]     = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [cartCount,    setCartCount]    = useState(0);
+    const [isDark,       setIsDark]       = useState(
+        () => document.documentElement.getAttribute("data-theme") === "dark"
+    );
     const dropdownRef = useRef(null);
+
+    const toggleTheme = () => {
+        const next = isDark ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme-transitioning", "");
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("solydshop-theme", next);
+        setIsDark(!isDark);
+        setTimeout(() => document.documentElement.removeAttribute("data-theme-transitioning"), 300);
+    };
 
     const { isAuthenticated, user } = useSelector((s) => s.auth);
 
@@ -137,6 +149,17 @@ const Navbar = () => {
 
                     {/* ── Right: Cart + Account ───────────────────── */}
                     <div className="hidden md:flex items-center gap-3">
+
+                        {/* Theme toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "6px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = C.text}
+                            onMouseLeave={(e) => e.currentTarget.style.color = C.textMuted}
+                        >
+                            {isDark ? <HiSun size={20} /> : <HiMoon size={20} />}
+                        </button>
 
                         {/* Cart icon with badge */}
                         <button
@@ -338,6 +361,19 @@ const Navbar = () => {
                                 {l.label}
                             </Link>
                         ))}
+
+                        {/* Mobile theme toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            className="py-2.5 text-sm font-medium flex items-center gap-2.5 mt-1"
+                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: "10px 0" }}
+                        >
+                            {isDark
+                                ? <HiSun size={16} aria-hidden="true" style={{ flexShrink: 0, color: C.textMuted }} />
+                                : <HiMoon size={16} aria-hidden="true" style={{ flexShrink: 0, color: C.textMuted }} />
+                            }
+                            {isDark ? "Light Mode" : "Dark Mode"}
+                        </button>
 
                         {!isAuthenticated ? (
                             <div className="flex gap-3 mt-2">

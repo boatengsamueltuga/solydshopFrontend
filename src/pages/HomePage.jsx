@@ -449,7 +449,7 @@ const HomePage = () => {
             {/* ══════════════════════════════════════════
                 HERO — warm sand + blueprint grid
             ══════════════════════════════════════════ */}
-            <section style={{ background: "var(--surface)", backgroundImage: HERO_GRID, borderBottom: "1px solid var(--border)" }}>
+            <section className="solyd-hero" style={{ background: "var(--surface)", backgroundImage: HERO_GRID, borderBottom: "1px solid var(--border)" }}>
                 <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-center">
 
                     {/* Left: headline + CTAs + stats */}
