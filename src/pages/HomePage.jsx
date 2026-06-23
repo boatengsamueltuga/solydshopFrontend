@@ -879,7 +879,8 @@ const HomePage = () => {
                                     {/* ── Image zone ── */}
                                     <div
                                         className="relative overflow-hidden flex-shrink-0"
-                                        style={{ height: "128px", background: "var(--surface-high)", borderBottom: "1px solid var(--border)" }}
+                                        style={{ height: "168px", background: "var(--surface-high)", borderBottom: "1px solid var(--border)", cursor: "pointer" }}
+                                        onClick={(e) => openQuickView(e, product)}
                                     >
                                         {product.imageUrl ? (
                                             <img
@@ -898,7 +899,7 @@ const HomePage = () => {
                                             </div>
                                         )}
 
-                                        {/* Badge row — frosted dark so readable on any image */}
+                                        {/* Badge row */}
                                         <div className="absolute top-0 left-0 right-0 flex justify-between items-start z-10" style={{ padding: "6px" }}>
                                             <span style={{
                                                 fontFamily: "var(--font-mono)",
@@ -943,59 +944,6 @@ const HomePage = () => {
                                                 }}>OUT</span>
                                             )}
                                         </div>
-
-                                        {/* Inspect Part — desktop hover overlay */}
-                                        <div
-                                            className="absolute inset-0 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-[180ms] motion-reduce:transition-none z-20"
-                                            style={{ background: "oklch(0.08 0.025 252 / 0.72)" }}
-                                        >
-                                            <button
-                                                onClick={(e) => openQuickView(e, product)}
-                                                style={{
-                                                    background: "var(--accent)",
-                                                    color: "oklch(0.15 0.02 63)",
-                                                    border: "none",
-                                                    borderRadius: "var(--r-md)",
-                                                    fontFamily: "var(--font-mono)",
-                                                    fontSize: "10px",
-                                                    fontWeight: 700,
-                                                    letterSpacing: "0.08em",
-                                                    textTransform: "uppercase",
-                                                    padding: "9px 18px",
-                                                    cursor: "pointer",
-                                                    transition: "opacity var(--duration-fast)",
-                                                    minHeight: "34px",
-                                                }}
-                                                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
-                                                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-                                            >
-                                                Inspect Part
-                                            </button>
-                                        </div>
-
-                                        {/* Inspect Part — mobile pill */}
-                                        <div className="absolute bottom-1.5 left-0 right-0 flex justify-center md:hidden z-20">
-                                            <button
-                                                onClick={(e) => openQuickView(e, product)}
-                                                style={{
-                                                    background: "oklch(0.05 0.02 252 / 0.72)",
-                                                    backdropFilter: "blur(6px)",
-                                                    WebkitBackdropFilter: "blur(6px)",
-                                                    color: "rgba(255,255,255,0.92)",
-                                                    border: "1px solid oklch(1 0 0 / 0.14)",
-                                                    borderRadius: "var(--r-pill)",
-                                                    fontFamily: "var(--font-mono)",
-                                                    fontSize: "9px",
-                                                    fontWeight: 700,
-                                                    letterSpacing: "0.07em",
-                                                    textTransform: "uppercase",
-                                                    padding: "5px 14px",
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Inspect Part
-                                            </button>
-                                        </div>
                                     </div>
 
                                     {/* ── Info zone ── */}
@@ -1024,7 +972,7 @@ const HomePage = () => {
                                         {/* Part number — inline mono label */}
                                         {product.partNumber ? (
                                             <p style={{ margin: 0, fontFamily: "var(--font-mono)", fontSize: "10px", lineHeight: 1.3, color: "var(--text-4)" }}>
-                                                <span style={{ fontWeight: 700, letterSpacing: "0.06em", fontSize: "8.5px", textTransform: "uppercase" }}>PN&thinsp;</span>
+                                                <span style={{ fontWeight: 700, letterSpacing: "0.06em", fontSize: "8.5px", textTransform: "uppercase" }}>Part #&thinsp;</span>
                                                 <span style={{ color: "var(--text-3)", letterSpacing: "0.02em" }}>{product.partNumber}</span>
                                             </p>
                                         ) : (
@@ -1294,7 +1242,7 @@ const HomePage = () => {
                         onKeyDown={handleModalKeyDown}
                     >
                         {/* Image area */}
-                        <div className="relative flex-shrink-0" style={{ height: "150px", background: "var(--surface-high)" }}>
+                        <div className="relative flex-shrink-0" style={{ height: "150px", background: "#ffffff" }}>
                             {quickViewProduct.imageUrl ? (
                                 <img
                                     src={quickViewProduct.imageUrl}
@@ -1304,8 +1252,6 @@ const HomePage = () => {
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-4xl" style={{ color: "var(--text-4)" }} aria-hidden="true">&#128230;</div>
                             )}
-                            {/* Gradient fade */}
-                            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "48px", background: "linear-gradient(to bottom, transparent, var(--surface))", pointerEvents: "none" }} />
                             {/* Close button */}
                             <button
                                 onClick={closeQuickView}
@@ -1362,9 +1308,11 @@ const HomePage = () => {
                                 </h2>
 
                                 {/* Description */}
-                                <p className="line-clamp-3" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-2)", lineHeight: 1.6, margin: 0 }}>
-                                    {quickViewProduct.description || "No description available."}
-                                </p>
+                                <div style={{ maxHeight: "72px", overflowY: "auto", overflowX: "hidden", scrollbarWidth: "thin", scrollbarColor: "var(--border) transparent" }}>
+                                    <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-2)", lineHeight: 1.6, margin: 0, wordBreak: "break-word", overflowWrap: "break-word" }}>
+                                        {quickViewProduct.description || "No description available."}
+                                    </p>
+                                </div>
 
                                 {/* Price + Add to cart */}
                                 <div className="flex items-center justify-between pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
