@@ -47,6 +47,7 @@ import Footer           from "./components/Footer";
 import ScrollToTop      from "./components/ScrollToTop";
 
 import { restoreUser, setInitialized } from "./features/auth/authSlice";
+import { setWishlistItems } from "./features/wishlist/wishlistSlice";
 import api from "./api/api";
 
 const HomePage             = lazy(() => import("./pages/HomePage"));
@@ -73,6 +74,7 @@ const TermsPage            = lazy(() => import("./pages/TermsPage"));
 const PrivacyPage          = lazy(() => import("./pages/PrivacyPage"));
 const SupportPage          = lazy(() => import("./pages/SupportPage"));
 const ContactPage          = lazy(() => import("./pages/ContactPage"));
+const WishlistPage         = lazy(() => import("./pages/WishlistPage"));
 
 const NO_FOOTER_PREFIXES = ["/admin", "/seller", "/login", "/register", "/forgot-password", "/reset-password"];
 
@@ -87,6 +89,9 @@ function App() {
             try {
                 const response = await api.get("/auth/me");
                 dispatch(restoreUser(response.data));
+                api.get("/wishlist")
+                    .then((r) => dispatch(setWishlistItems(r.data)))
+                    .catch(() => {});
             } catch {
                 // no active session — expected for unauthenticated users
             } finally {
@@ -110,6 +115,8 @@ function App() {
                     <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
 
                     <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+
+                    <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
 
                     <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
 

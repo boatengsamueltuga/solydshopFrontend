@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutSuccess } from "../features/auth/authSlice";
+import { clearWishlist } from "../features/wishlist/wishlistSlice";
 import api from "../api/api";
 import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd, HiMoon, HiSun } from "react-icons/hi";
 import SolydLogo from "./SolydLogo";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaHeart } from "react-icons/fa";
 
 // ── Design tokens (CSS vars — update with theme automatically) ───────────
 const C = {
@@ -42,6 +43,7 @@ const Navbar = () => {
     };
 
     const { isAuthenticated, user } = useSelector((s) => s.auth);
+    const wishlistCount = useSelector((s) => s.wishlist.items.length);
 
     const isAdmin  = user?.roles?.includes("ROLE_ADMIN");
     const isSeller = user?.roles?.includes("ROLE_SELLER");
@@ -79,6 +81,7 @@ const Navbar = () => {
         try {
             await api.post("/auth/logout");
             dispatch(logoutSuccess());
+            dispatch(clearWishlist());
             navigate("/login");
         } catch {
             // best-effort — clear local state regardless
@@ -160,6 +163,24 @@ const Navbar = () => {
                         >
                             {isDark ? <HiSun size={20} /> : <HiMoon size={20} />}
                         </button>
+
+                        {/* Wishlist icon with badge */}
+                        {isAuthenticated && (
+                            <button
+                                onClick={() => navigate("/wishlist")}
+                                aria-label={wishlistCount > 0 ? `Wishlist (${wishlistCount} items)` : "Wishlist"}
+                                style={{ position: "relative", color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "6px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                                onMouseEnter={(e) => e.currentTarget.style.color = C.text}
+                                onMouseLeave={(e) => e.currentTarget.style.color = C.textMuted}
+                            >
+                                <FaHeart size={20} />
+                                {wishlistCount > 0 && (
+                                    <span style={{ position: "absolute", top: "-3px", right: "-4px", minWidth: "17px", height: "17px", borderRadius: "9px", background: "var(--error)", color: "#fff", fontSize: "10px", fontWeight: 700, fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: `1.5px solid ${C.bg}`, lineHeight: 1 }}>
+                                        {wishlistCount > 99 ? "99+" : wishlistCount}
+                                    </span>
+                                )}
+                            </button>
+                        )}
 
                         {/* Cart icon with badge */}
                         <button
@@ -323,6 +344,24 @@ const Navbar = () => {
                             {isDark ? <HiSun size={20} /> : <HiMoon size={20} />}
                         </button>
 
+                        {/* Wishlist with badge — mobile */}
+                        {isAuthenticated && (
+                            <button
+                                onClick={() => navigate("/wishlist")}
+                                aria-label={wishlistCount > 0 ? `Wishlist (${wishlistCount} items)` : "Wishlist"}
+                                style={{ position: "relative", color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                            >
+                                <FaHeart size={20} />
+                                {wishlistCount > 0 && (
+                                    <span style={{ position: "absolute", top: "-2px", right: "-2px", minWidth: "17px", height: "17px", borderRadius: "9px", background: "var(--error)", color: "#fff", fontSize: "10px", fontWeight: 700, fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: `1.5px solid ${C.bg}`, lineHeight: 1 }}>
+                                        {wishlistCount > 99 ? "99+" : wishlistCount}
+                                    </span>
+                                )}
+                            </button>
+                        )}
+
                         {/* Cart with badge */}
                         {isAuthenticated && (
                             <button
@@ -434,6 +473,7 @@ const Navbar = () => {
                         {/* Mobile links */}
                         {[
                             { to: "/",                   label: "Home",             Icon: HiHome,          show: true },
+                            { to: "/wishlist",           label: "Wishlist",         Icon: FaHeart,         show: isAuthenticated },
                             { to: "/cart",               label: "Cart",             Icon: FaShoppingCart,  show: isAuthenticated },
                             { to: "/orders",             label: "Orders",           Icon: HiClipboardList, show: isAuthenticated },
                             { to: "/account",            label: "My Account",       Icon: HiUser,          show: isAuthenticated },

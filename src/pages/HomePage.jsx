@@ -4,12 +4,17 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
 import { HiAdjustments, HiSearch, HiX } from "react-icons/hi";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaHeart, FaRegHeart, FaEye } from "react-icons/fa";
 import {
     fetchProductsStart,
     fetchProductsSuccess,
     fetchProductsFailure,
 } from "../features/product/productSlice";
+import {
+    optimisticAddItem,
+    optimisticRemoveItem,
+    setWishlistItems,
+} from "../features/wishlist/wishlistSlice";
 import SolydLogo from "../components/SolydLogo";
 
 const getXsrfToken = () =>
@@ -265,6 +270,8 @@ const HomePage = () => {
 
     const { products, loading } = useSelector((s) => s.product);
     const { user }              = useSelector((s) => s.auth);
+    const wishlistItems         = useSelector((s) => s.wishlist.items);
+    const wishlistedIds         = new Set(wishlistItems.map((i) => i.productId));
 
     const [keyword,          setKeyword]          = useState("");
     const [categoryId,       setCategoryId]       = useState("");
@@ -404,6 +411,44 @@ const HomePage = () => {
             await fetchCart();
         } catch { }
         finally { setCartBusy(false); }
+    };
+
+    const handleWishlistToggle = async (product) => {
+        if (!user) { toast.error("Please login to save items"); return; }
+        const isWishlisted = wishlistedIds.has(product.productId);
+
+        if (isWishlisted) {
+            dispatch(optimisticRemoveItem(product.productId));
+            toast("Removed from wishlist");
+            try {
+                const res = await api.delete(`/wishlist/items/${product.productId}`);
+                dispatch(setWishlistItems(res.data));
+            } catch {
+                dispatch(setWishlistItems(wishlistItems));
+                toast.error("Could not update wishlist");
+            }
+        } else {
+            dispatch(optimisticAddItem({
+                productId:    product.productId,
+                productName:  product.productName,
+                price:        product.price,
+                imageUrl:     product.imageUrl,
+                quantity:     product.quantity,
+                categoryName: product.categoryName ?? null,
+            }));
+            toast.success("Added to wishlist");
+            try {
+                const res = await api.post(
+                    `/wishlist/items/${product.productId}`,
+                    {},
+                    { headers: { "X-XSRF-TOKEN": getXsrfToken() } },
+                );
+                dispatch(setWishlistItems(res.data));
+            } catch {
+                dispatch(setWishlistItems(wishlistItems));
+                toast.error("Could not update wishlist");
+            }
+        }
     };
 
     const handleCategoryToggle = (id) =>
@@ -1003,35 +1048,88 @@ const HomePage = () => {
                                                     ${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                                                 </span>
                                             </div>
-                                            <button
-                                                disabled={product.quantity === 0 || cartBusy}
-                                                onClick={() => handleAddToCart(product.productId)}
-                                                className="w-full disabled:opacity-40"
-                                                style={{
-                                                    background: product.quantity === 0 ? "var(--surface-high)" : "var(--accent)",
-                                                    color: product.quantity === 0 ? "var(--text-3)" : "oklch(0.15 0.02 63)",
-                                                    border: "none",
-                                                    borderRadius: "var(--r-md)",
-                                                    fontFamily: "var(--font-mono)",
-                                                    fontSize: "10px",
-                                                    fontWeight: 700,
-                                                    letterSpacing: "0.06em",
-                                                    textTransform: "uppercase",
-                                                    padding: "8px 0",
-                                                    cursor: product.quantity === 0 ? "not-allowed" : "pointer",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    gap: "5px",
-                                                    minHeight: "32px",
-                                                    transition: "opacity var(--duration-fast)",
-                                                }}
-                                                onMouseEnter={(e) => { if (product.quantity > 0) e.currentTarget.style.opacity = "0.88"; }}
-                                                onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
-                                            >
-                                                <FaShoppingCart aria-hidden="true" size={9} />
-                                                {product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
-                                            </button>
+                                            <div style={{ display: "flex", gap: "5px" }}>
+                                                {/* Wishlist */}
+                                                <button
+                                                    onClick={() => handleWishlistToggle(product)}
+                                                    title={wishlistedIds.has(product.productId) ? "Remove from wishlist" : "Add to wishlist"}
+                                                    aria-label={wishlistedIds.has(product.productId) ? "Remove from wishlist" : "Add to wishlist"}
+                                                    style={{
+                                                        flex: 1,
+                                                        minHeight: "32px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        background: "var(--surface-mid)",
+                                                        border: `1px solid ${wishlistedIds.has(product.productId) ? "var(--error)" : "var(--border)"}`,
+                                                        borderRadius: "var(--r-md)",
+                                                        color: wishlistedIds.has(product.productId) ? "var(--error)" : "var(--text-3)",
+                                                        cursor: "pointer",
+                                                        transition: "border-color var(--duration-fast), color var(--duration-fast)",
+                                                    }}
+                                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--error)"; e.currentTarget.style.color = "var(--error)"; }}
+                                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = wishlistedIds.has(product.productId) ? "var(--error)" : "var(--border)"; e.currentTarget.style.color = wishlistedIds.has(product.productId) ? "var(--error)" : "var(--text-3)"; }}
+                                                >
+                                                    {wishlistedIds.has(product.productId) ? <FaHeart size={11} /> : <FaRegHeart size={11} />}
+                                                </button>
+
+                                                {/* Quick View */}
+                                                <button
+                                                    onClick={(e) => openQuickView(e, product)}
+                                                    title="Quick view"
+                                                    aria-label="Quick view"
+                                                    style={{
+                                                        flex: 1,
+                                                        minHeight: "32px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        background: "var(--surface-mid)",
+                                                        border: "1px solid var(--border)",
+                                                        borderRadius: "var(--r-md)",
+                                                        color: "var(--text-3)",
+                                                        cursor: "pointer",
+                                                        transition: "border-color var(--duration-fast), color var(--duration-fast)",
+                                                    }}
+                                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent-border)"; e.currentTarget.style.color = "var(--accent)"; }}
+                                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-3)"; }}
+                                                >
+                                                    <FaEye size={11} />
+                                                </button>
+
+                                                {/* Add to Cart */}
+                                                <button
+                                                    disabled={product.quantity === 0 || cartBusy}
+                                                    onClick={() => handleAddToCart(product.productId)}
+                                                    title={product.quantity === 0 ? "Out of stock" : "Add to cart"}
+                                                    aria-label="Add to cart"
+                                                    className="disabled:opacity-40"
+                                                    style={{
+                                                        flex: 2,
+                                                        minHeight: "32px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        gap: "5px",
+                                                        background: product.quantity === 0 ? "var(--surface-high)" : "var(--accent)",
+                                                        color: product.quantity === 0 ? "var(--text-3)" : "oklch(0.15 0.02 63)",
+                                                        border: "none",
+                                                        borderRadius: "var(--r-md)",
+                                                        fontFamily: "var(--font-mono)",
+                                                        fontSize: "10px",
+                                                        fontWeight: 700,
+                                                        letterSpacing: "0.06em",
+                                                        textTransform: "uppercase",
+                                                        cursor: product.quantity === 0 ? "not-allowed" : "pointer",
+                                                        transition: "opacity var(--duration-fast)",
+                                                    }}
+                                                    onMouseEnter={(e) => { if (product.quantity > 0) e.currentTarget.style.opacity = "0.88"; }}
+                                                    onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+                                                >
+                                                    <FaShoppingCart aria-hidden="true" size={9} />
+                                                    {product.quantity === 0 ? "Out" : "Add"}
+                                                </button>
+                                            </div>
                                         </div>
 
                                     </div>
