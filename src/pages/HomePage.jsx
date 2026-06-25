@@ -723,34 +723,8 @@ const HomePage = () => {
                     {/* Scrollable body */}
                     <div className="flex-grow overflow-y-auto p-4 space-y-5" style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) transparent" }}>
 
-                        {/* Search */}
-                        <div>
-                            <label htmlFor="product-search" style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
-                                Search Parts
-                            </label>
-                            <div style={{ position: "relative" }}>
-                                <HiSearch aria-hidden="true" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", pointerEvents: "none" }} size={13} />
-                                <input
-                                    id="product-search"
-                                    type="text"
-                                    placeholder="Part name, SKU, model..."
-                                    value={keyword}
-                                    onChange={(e) => setKeyword(e.target.value)}
-                                    className="w-full rounded focus:outline-none"
-                                    style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)", fontFamily: "var(--font-mono)", fontSize: "12px", padding: "8px 28px 8px 30px" }}
-                                    onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-                                    onBlur={(e)  => (e.target.style.borderColor = "var(--border)")}
-                                />
-                                {keyword && (
-                                    <button aria-label="Clear search" onClick={() => setKeyword("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex", alignItems: "center" }}>
-                                        <HiX aria-hidden="true" size={12} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
                         {/* Category */}
-                        <div style={{ paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+                        <div>
                             <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
                                 Category
                             </p>
