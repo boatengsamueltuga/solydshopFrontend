@@ -500,7 +500,47 @@ const HomePage = () => {
                 HERO — warm sand + blueprint grid
             ══════════════════════════════════════════ */}
             <section className="solyd-hero" style={{ background: "var(--surface)", backgroundImage: HERO_GRID, borderBottom: "1px solid var(--border)" }}>
-                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-center">
+                <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-14 lg:py-20 flex flex-col gap-10">
+
+                    {/* Hero search — full width at top */}
+                    <div className="flex items-center rounded overflow-hidden" style={{ background: "var(--surface-high)", border: "1px solid var(--border-strong)", maxWidth: "720px" }}>
+                        <div style={{ position: "relative", flex: 1, minWidth: 0 }}>
+                            <HiSearch
+                                aria-hidden="true"
+                                size={16}
+                                style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", pointerEvents: "none" }}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Search parts, SKU, model number…"
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === "Enter") catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+                                className="w-full focus:outline-none"
+                                style={{ background: "transparent", border: "none", color: "var(--text)", fontFamily: "var(--font-mono)", fontSize: "13px", padding: "13px 36px 13px 42px", height: "52px" }}
+                            />
+                            {keyword && (
+                                <button
+                                    aria-label="Clear search"
+                                    onClick={() => setKeyword("")}
+                                    style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex", alignItems: "center" }}
+                                >
+                                    <HiX aria-hidden="true" size={13} />
+                                </button>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                            style={{ background: "var(--accent)", color: "var(--text)", border: "none", padding: "0 24px", height: "52px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", flexShrink: 0, transition: "opacity var(--duration-fast)" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
+                            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                        >
+                            Search
+                        </button>
+                    </div>
+
+                    {/* Headline + illustration grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-center">
 
                     {/* Left: headline + CTAs + stats */}
                     <div>
@@ -558,6 +598,7 @@ const HomePage = () => {
                     {/* Right: industrial bearing illustration */}
                     <div className="flex items-center justify-center" style={{ opacity: 0.9 }}>
                         <BearingIllustration />
+                    </div>
                     </div>
                 </div>
             </section>
@@ -681,34 +722,8 @@ const HomePage = () => {
                     {/* Scrollable body */}
                     <div className="flex-grow overflow-y-auto p-4 space-y-5" style={{ scrollbarWidth: "thin", scrollbarColor: "var(--border) transparent" }}>
 
-                        {/* Search */}
-                        <div>
-                            <label htmlFor="product-search" style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
-                                Search Parts
-                            </label>
-                            <div style={{ position: "relative" }}>
-                                <HiSearch aria-hidden="true" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", pointerEvents: "none" }} size={13} />
-                                <input
-                                    id="product-search"
-                                    type="text"
-                                    placeholder="Part name, SKU, model..."
-                                    value={keyword}
-                                    onChange={(e) => setKeyword(e.target.value)}
-                                    className="w-full rounded focus:outline-none"
-                                    style={{ background: "var(--surface-high)", border: "1px solid var(--border)", color: "var(--text)", fontFamily: "var(--font-mono)", fontSize: "12px", padding: "8px 28px 8px 30px" }}
-                                    onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-                                    onBlur={(e)  => (e.target.style.borderColor = "var(--border)")}
-                                />
-                                {keyword && (
-                                    <button aria-label="Clear search" onClick={() => setKeyword("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex", alignItems: "center" }}>
-                                        <HiX aria-hidden="true" size={12} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
                         {/* Category */}
-                        <div style={{ paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+                        <div>
                             <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
                                 Category
                             </p>
