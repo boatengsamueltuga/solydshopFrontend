@@ -539,6 +539,48 @@ const HomePage = () => {
                             </button>
                         </div>
 
+                        {/* Hero search */}
+                        <div style={{ marginTop: "28px", maxWidth: "540px" }}>
+                            <div
+                                className="flex items-center rounded overflow-hidden"
+                                style={{ background: "var(--surface-high)", border: "1px solid var(--border-strong)" }}
+                            >
+                                <div style={{ position: "relative", flex: 1, minWidth: 0 }}>
+                                    <HiSearch
+                                        aria-hidden="true"
+                                        size={16}
+                                        style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", pointerEvents: "none" }}
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Search parts, SKU, model number…"
+                                        value={keyword}
+                                        onChange={(e) => setKeyword(e.target.value)}
+                                        onKeyDown={(e) => { if (e.key === "Enter") catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+                                        className="w-full focus:outline-none"
+                                        style={{ background: "transparent", border: "none", color: "var(--text)", fontFamily: "var(--font-mono)", fontSize: "13px", padding: "13px 36px 13px 42px", height: "48px" }}
+                                    />
+                                    {keyword && (
+                                        <button
+                                            aria-label="Clear search"
+                                            onClick={() => setKeyword("")}
+                                            style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex", alignItems: "center" }}
+                                        >
+                                            <HiX aria-hidden="true" size={13} />
+                                        </button>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                                    style={{ background: "var(--accent)", color: "var(--text)", border: "none", padding: "0 20px", height: "48px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", flexShrink: 0, transition: "opacity var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                                >
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Stats row */}
                         <div className="flex flex-wrap gap-6 mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                             {[
