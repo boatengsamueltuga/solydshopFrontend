@@ -5,6 +5,7 @@ import api from "../api/api";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { loginStart, loginSuccess, loginFailure } from "../features/auth/authSlice";
+import { setWishlistItems } from "../features/wishlist/wishlistSlice";
 import AuthLayout from "../components/layouts/AuthLayout";
 
 const INPUT = {
@@ -32,6 +33,9 @@ const LoginPage = () => {
             await api.post("/auth/login", formData);
             const userResponse = await api.get("/auth/me");
             dispatch(loginSuccess(userResponse.data));
+            api.get("/wishlist")
+                .then((r) => dispatch(setWishlistItems(r.data)))
+                .catch(() => {});
             toast.success("Login successful");
             setFormData({ email: "", password: "" });
         } catch (error) {
