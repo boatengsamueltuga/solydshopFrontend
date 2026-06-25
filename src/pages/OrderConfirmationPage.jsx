@@ -16,7 +16,7 @@ const OrderConfirmationPage = () => {
         if (!orderId || !user?.userId) return;
         const fetchOrder = async () => {
             try {
-                const res = await api.get(`/order/${user.userId}`);
+                const res = await api.get(`/order/my`);
                 const found = (res.data ?? []).find(o => String(o.orderId) === String(orderId));
                 setOrder(found ?? null);
             } catch {
