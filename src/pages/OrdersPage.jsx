@@ -10,18 +10,19 @@ const getXsrfToken = () =>
     document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
 
 const STATUS_STYLE = {
-    PENDING:    { color: "var(--warning)",  bg: "var(--warning-subtle)",  border: "var(--warning)" },
-    CONFIRMED:  { color: "var(--info)",     bg: "var(--info-subtle)",     border: "var(--info)"    },
-    PROCESSING: { color: "var(--info)",     bg: "var(--info-subtle)",     border: "var(--info)"    },
-    SHIPPED:    { color: "var(--accent)",   bg: "var(--accent-subtle)",   border: "var(--accent)"  },
-    DELIVERED:  { color: "var(--success)",  bg: "var(--success-subtle)",  border: "var(--success)" },
-    CANCELLED:  { color: "var(--error)",    bg: "var(--error-subtle)",    border: "var(--error)"   },
+    PAYMENT_PENDING: { color: "var(--warning)",  bg: "var(--warning-subtle)",  border: "var(--warning)" },
+    PAYMENT_FAILED:  { color: "var(--error)",    bg: "var(--error-subtle)",    border: "var(--error)"   },
+    PAID:            { color: "var(--success)",  bg: "var(--success-subtle)",  border: "var(--success)" },
+    PROCESSING:      { color: "var(--info)",     bg: "var(--info-subtle)",     border: "var(--info)"    },
+    SHIPPED:         { color: "var(--accent)",   bg: "var(--accent-subtle)",   border: "var(--accent)"  },
+    DELIVERED:       { color: "var(--success)",  bg: "var(--success-subtle)",  border: "var(--success)" },
+    CANCELLED:       { color: "var(--error)",    bg: "var(--error-subtle)",    border: "var(--error)"   },
 };
 
-const ORDER_STEPS = ["Order Placed", "Processing", "Shipped", "Delivered"];
+const ORDER_STEPS = ["Payment", "Processing", "Shipped", "Delivered"];
 
 const getActiveStep = (status) => {
-    const map = { PENDING: 0, CONFIRMED: 0, PROCESSING: 1, SHIPPED: 2, DELIVERED: 3 };
+    const map = { PAYMENT_PENDING: 0, PAID: 0, PROCESSING: 1, SHIPPED: 2, DELIVERED: 3 };
     return map[status] ?? 0;
 };
 
@@ -58,7 +59,7 @@ const OrdersPage = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const res = await api.get(`/order/${user.userId}`);
+                const res = await api.get("/order/my");
                 setOrders(res.data);
             } catch {
                 setError("Unable to load orders. Please try again.");
@@ -205,8 +206,8 @@ const OrdersPage = () => {
                                         </div>
                                     </div>
 
-                                    {/* ── Stepper (non-cancelled) ── */}
-                                    {order.status !== "CANCELLED" ? (
+                                    {/* ── Stepper (active orders only) ── */}
+                                    {order.status !== "CANCELLED" && order.status !== "PAYMENT_FAILED" ? (
                                         <div style={{ padding: "var(--space-5) var(--space-5) var(--space-4)", borderBottom: "1px solid var(--border)", background: "var(--surface-mid)" }}>
                                             <Stepper activeStep={getActiveStep(order.status)} alternativeLabel>
                                                 {ORDER_STEPS.map((label) => (
@@ -236,7 +237,7 @@ const OrdersPage = () => {
                                     ) : (
                                         <div style={{ padding: "var(--space-3) var(--space-5)", background: "var(--error-subtle)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
                                             <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--error)", fontWeight: 600 }}>
-                                                This order was cancelled.
+                                                {order.status === "PAYMENT_FAILED" ? "Payment failed for this order." : "This order was cancelled."}
                                             </span>
                                         </div>
                                     )}

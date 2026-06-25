@@ -69,7 +69,7 @@ const StepIndicator = ({ step }) => {
 | Inner payment form — rendered inside <Elements>
 |----------------------------------------------------------
 */
-const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) => {
+const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
     const stripe   = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -95,12 +95,14 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
         }
 
         try {
-            const intentRes = await api.post("/payment/create-payment-intent", {
-                amount:   Math.round(totalPrice * 100),
-                currency: "usd",
-            });
+            // Single server call: validates cart, reserves inventory, computes total, creates PI
+            const checkoutRes = await api.post(
+                "/payment/checkout",
+                { shippingAddress },
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
+            );
 
-            const clientSecret = intentRes.data.clientSecret;
+            const { clientSecret, orderId } = checkoutRes.data;
 
             const { error: confirmError } = await stripe.confirmPayment({
                 elements,
@@ -109,19 +111,14 @@ const CheckoutForm = ({ totalPrice, userId, shippingAddress, onEditAddress }) =>
             });
 
             if (confirmError) {
+                // Order is PAYMENT_PENDING — webhook will set PAYMENT_FAILED
                 setPaymentError(confirmError.message);
                 setPaying(false);
                 return;
             }
 
-            const orderRes = await api.post(
-                `/order/${userId}/checkout`,
-                { shippingAddress },
-                { headers: { "X-XSRF-TOKEN": getXsrfToken() } }
-            );
-
-            toast.success("Payment successful! Order placed.");
-            navigate(`/order-confirmation?orderId=${orderRes.data.orderId}`);
+            toast.success("Payment submitted! Your order is being processed.");
+            navigate(`/order-confirmation?orderId=${orderId}`);
 
         } catch {
             toast.error("Payment failed. Please try again.");
@@ -434,7 +431,6 @@ const CheckoutPage = () => {
                                 <Elements stripe={stripePromise} options={elementsOptions}>
                                     <CheckoutForm
                                         totalPrice={totalPrice}
-                                        userId={user.userId}
                                         shippingAddress={shippingAddress}
                                         onEditAddress={() => setStep("address")}
                                     />

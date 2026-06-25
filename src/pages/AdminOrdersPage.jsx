@@ -28,14 +28,19 @@ import PageBanner   from "../components/common/PageBanner";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 
 /* ── Constants ── */
-const ALL_STATUSES = ["ALL", "PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const ALL_STATUSES = ["ALL", "PAYMENT_PENDING", "PAYMENT_FAILED", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+
+// Statuses admin can set — payment transitions are automatic via Stripe webhook
+const ADMIN_SETTABLE = ["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
 
 const STATUS_STYLE = {
-    PENDING:    { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
-    PROCESSING: { color: "var(--info)",     bg: "var(--info-subtle)"     },
-    SHIPPED:    { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
-    DELIVERED:  { color: "var(--success)",  bg: "var(--success-subtle)"  },
-    CANCELLED:  { color: "var(--error)",    bg: "var(--error-subtle)"    },
+    PAYMENT_PENDING: { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
+    PAYMENT_FAILED:  { color: "var(--error)",    bg: "var(--error-subtle)"    },
+    PAID:            { color: "var(--success)",  bg: "var(--success-subtle)"  },
+    PROCESSING:      { color: "var(--info)",     bg: "var(--info-subtle)"     },
+    SHIPPED:         { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
+    DELIVERED:       { color: "var(--success)",  bg: "var(--success-subtle)"  },
+    CANCELLED:       { color: "var(--error)",    bg: "var(--error-subtle)"    },
 };
 
 /* ── StatusBadge ── */
@@ -135,8 +140,14 @@ const AdminOrdersPage = () => {
 
     const handleUpdateStatus = async () => {
         try {
-            await api.put(`/order/${selectedOrder.orderId}/status?status=${newStatus}`);
-            toast.success("Order status updated successfully.");
+            // Fix 5: PAID orders being cancelled must go through the refund endpoint
+            if (newStatus === "CANCELLED" && selectedOrder.status === "PAID") {
+                await api.post(`/payment/admin/refund-and-cancel/${selectedOrder.orderId}`);
+                toast.success("Order refunded and cancelled.");
+            } else {
+                await api.put(`/order/${selectedOrder.orderId}/status?status=${newStatus}`);
+                toast.success("Order status updated successfully.");
+            }
             fetchOrders();
             setSelectedOrder({ ...selectedOrder, status: newStatus });
         } catch {
@@ -385,7 +396,7 @@ const AdminOrdersPage = () => {
                                 onChange={(e) => setNewStatus(e.target.value)}
                                 MenuProps={{ PaperProps: { style: { maxHeight: 240 } } }}
                             >
-                                {["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(s => (
+                                {ADMIN_SETTABLE.map(s => (
                                     <MenuItem key={s} value={s}>
                                         <StatusBadge status={s} />
                                     </MenuItem>
