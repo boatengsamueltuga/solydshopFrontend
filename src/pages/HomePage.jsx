@@ -924,7 +924,7 @@ const HomePage = () => {
                                     {/* ── Image zone ── */}
                                     <div
                                         className="relative overflow-hidden flex-shrink-0"
-                                        style={{ height: "168px", background: "var(--surface-high)", borderBottom: "1px solid var(--border)", cursor: "pointer" }}
+                                        style={{ height: "168px", background: "#ffffff", borderBottom: "1px solid var(--border)", cursor: "pointer" }}
                                         onClick={(e) => openQuickView(e, product)}
                                     >
                                         {product.imageUrl ? (
@@ -933,7 +933,6 @@ const HomePage = () => {
                                                 alt={product.productName}
                                                 loading="lazy"
                                                 className="w-full h-full object-contain transition-transform duration-[220ms] motion-reduce:transition-none group-hover:scale-[1.04]"
-                                                style={{ padding: "10px" }}
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center" style={{ color: "var(--text-4)" }} aria-hidden="true">
