@@ -140,8 +140,14 @@ const AdminOrdersPage = () => {
 
     const handleUpdateStatus = async () => {
         try {
-            await api.put(`/order/${selectedOrder.orderId}/status?status=${newStatus}`);
-            toast.success("Order status updated successfully.");
+            // Fix 5: PAID orders being cancelled must go through the refund endpoint
+            if (newStatus === "CANCELLED" && selectedOrder.status === "PAID") {
+                await api.post(`/payment/admin/refund-and-cancel/${selectedOrder.orderId}`);
+                toast.success("Order refunded and cancelled.");
+            } else {
+                await api.put(`/order/${selectedOrder.orderId}/status?status=${newStatus}`);
+                toast.success("Order status updated successfully.");
+            }
             fetchOrders();
             setSelectedOrder({ ...selectedOrder, status: newStatus });
         } catch {
