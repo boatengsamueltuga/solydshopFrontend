@@ -504,6 +504,14 @@ const HomePage = () => {
 
                     {/* Left: headline + CTAs + stats */}
                     <div>
+                        {/* Eyebrow label */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
+                            <span className="animate-pulse" style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--accent)", flexShrink: 0 }} />
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--accent)" }}>
+                                Verified B2B Industrial Marketplace
+                            </span>
+                        </div>
+
                         <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.25rem, 4vw, 3.25rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.05, color: "var(--text)", margin: 0, textWrap: "balance" }}>
                             The Global Marketplace<br className="hidden sm:block" /> for Industrial Parts.
                         </h1>
