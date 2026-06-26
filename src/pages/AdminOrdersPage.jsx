@@ -95,7 +95,8 @@ const AdminOrdersPage = () => {
     const fetchOrders = useCallback(async () => {
         try {
             const res = await api.get("/order/admin");
-            setOrders(res.data);
+            const sorted = [...res.data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setOrders(sorted);
         } catch {
             toast.error("Failed to load orders");
         } finally {
