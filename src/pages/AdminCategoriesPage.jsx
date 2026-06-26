@@ -271,8 +271,8 @@ const AdminCategoriesPage = () => {
                         sx={{
                             textTransform: "none",
                             color: "var(--text-2)",
-                            borderColor: "var(--border)",
-                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                            border: "1px solid var(--border-mid)",
+                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
                         }}
                     >
                         Cancel
@@ -310,8 +310,8 @@ const AdminCategoriesPage = () => {
                         sx={{
                             textTransform: "none",
                             color: "var(--text-2)",
-                            borderColor: "var(--border)",
-                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                            border: "1px solid var(--border-mid)",
+                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
                         }}
                     >
                         Cancel
@@ -341,8 +341,8 @@ const AdminCategoriesPage = () => {
                         sx={{
                             textTransform: "none",
                             color: "var(--text-2)",
-                            borderColor: "var(--border)",
-                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                            border: "1px solid var(--border-mid)",
+                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
                         }}
                     >
                         Cancel

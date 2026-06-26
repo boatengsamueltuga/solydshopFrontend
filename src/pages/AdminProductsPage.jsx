@@ -331,7 +331,7 @@ const AdminProductsPage = () => {
             headerName: "Actions",
             width: isMobile ? 100 : 130,
             renderCell: (params) => (
-                <Stack direction="row" alignItems="center" spacing={0.5}>
+                <Stack direction="row" alignItems="center" spacing={1}>
                     <Tooltip title="View" arrow>
                         <IconButton size="small" onClick={() => handleViewProduct(params.row)}
                             sx={{ color: "var(--info)", "&:hover": { background: "var(--info-subtle)" } }}>
@@ -464,8 +464,8 @@ const AdminProductsPage = () => {
                             sx={{
                                 textTransform: "none",
                                 color: "var(--text-2)",
-                                borderColor: "var(--border)",
-                                "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                                border: "1px solid var(--border-mid)",
+                                "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
                             }}
                         >
                             Close
@@ -566,8 +566,8 @@ const AdminProductsPage = () => {
                             sx={{
                                 textTransform: "none",
                                 color: "var(--text-2)",
-                                borderColor: "var(--border)",
-                                "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                                border: "1px solid var(--border-mid)",
+                                "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
                             }}
                         >
                             Cancel
@@ -731,8 +731,8 @@ const AdminProductsPage = () => {
                         sx={{
                             textTransform: "none",
                             color: "var(--text-2)",
-                            borderColor: "var(--border)",
-                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                            border: "1px solid var(--border-mid)",
+                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
                         }}
                     >
                         Cancel
