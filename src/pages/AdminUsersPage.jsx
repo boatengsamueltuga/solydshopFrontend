@@ -212,7 +212,7 @@ const AdminUsersPage = () => {
             headerName: "Actions",
             width: isMobile ? 80 : 120,
             renderCell: (params) => (
-                <Stack direction="row" alignItems="center" spacing={0.5}>
+                <Stack direction="row" alignItems="center" spacing={1}>
                     <Tooltip title="View user" arrow>
                         <IconButton
                             size="small"
@@ -348,7 +348,16 @@ const AdminUsersPage = () => {
                             Delete User
                         </Button>
                         <Stack direction="row" gap={2}>
-                            <Button onClick={() => setIsSheetOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
+                            <Button
+                                onClick={() => setIsSheetOpen(false)}
+                                variant="outlined"
+                                sx={{
+                                    textTransform: "none",
+                                    color: "var(--text-2)",
+                                    border: "1px solid var(--border-mid)",
+                                    "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                                }}
+                            >
                                 Close
                             </Button>
                             <Button
