@@ -457,17 +457,11 @@ const AdminProductsPage = () => {
                 title="Product Details"
                 subtitle={selectedProduct?.productName}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={3}>
+                    <Stack direction="row" justifyContent="flex-end">
                         <Button
                             onClick={() => setIsViewOpen(false)}
                             variant="outlined"
-                            sx={{
-                                textTransform: "none",
-                                minWidth: 88,
-                                color: "var(--text-2)",
-                                border: "1px solid var(--border-mid)",
-                                "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                            }}
+                            sx={{ textTransform: "none", minWidth: 88 }}
                         >
                             Close
                         </Button>
@@ -476,7 +470,7 @@ const AdminProductsPage = () => {
                             color="warning"
                             startIcon={<EditIcon />}
                             onClick={() => { setIsViewOpen(false); handleEditProduct(selectedProduct); }}
-                            sx={{ textTransform: "none", fontWeight: 700 }}
+                            sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}
                         >
                             Edit Product
                         </Button>
@@ -560,17 +554,11 @@ const AdminProductsPage = () => {
                 subtitle={editingProductId ? `Editing product #${editingProductId}` : "Fill in all required fields"}
                 width={560}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={3}>
+                    <Stack direction="row" justifyContent="flex-end">
                         <Button
                             onClick={() => { resetForm(); setIsFormOpen(false); }}
                             variant="outlined"
-                            sx={{
-                                textTransform: "none",
-                                minWidth: 88,
-                                color: "var(--text-2)",
-                                border: "1px solid var(--border-mid)",
-                                "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                            }}
+                            sx={{ textTransform: "none", minWidth: 88 }}
                         >
                             Cancel
                         </Button>
@@ -579,7 +567,7 @@ const AdminProductsPage = () => {
                             variant="contained"
                             color={editingProductId ? "warning" : "primary"}
                             startIcon={editingProductId ? <EditIcon /> : <AddCircleOutlinedIcon />}
-                            sx={{ textTransform: "none", fontWeight: 700 }}
+                            sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}
                         >
                             {editingProductId ? "Update Product" : "Create Product"}
                         </Button>
@@ -653,7 +641,7 @@ const AdminProductsPage = () => {
 
                     <Box sx={{ gridColumn: "1 / -1" }}>
                         <input type="file" id="adminProductImgInput" hidden accept="image/*" onChange={handleImageUpload} />
-                        <Stack direction="row" alignItems="center" gap={2} flexWrap="wrap">
+                        <Stack direction="row" alignItems="center" flexWrap="wrap">
                             <Button
                                 variant="outlined"
                                 size="small"
@@ -665,7 +653,7 @@ const AdminProductsPage = () => {
                             </Button>
                             {productForm.imageUrl && (
                                 <Chip label="Image uploaded" size="small" variant="outlined"
-                                    sx={{ color: "var(--success)", borderColor: "var(--success)" }} />
+                                    sx={{ color: "var(--success)", borderColor: "var(--success)", ml: "16px" }} />
                             )}
                         </Stack>
                     </Box>
@@ -726,21 +714,15 @@ const AdminProductsPage = () => {
                         Are you sure you want to delete <strong>{productToDelete?.productName}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button
                         onClick={() => setDeleteConfirmOpen(false)}
                         variant="outlined"
-                        sx={{
-                            textTransform: "none",
-                            minWidth: 88,
-                            color: "var(--text-2)",
-                            border: "1px solid var(--border-mid)",
-                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                        }}
+                        sx={{ textTransform: "none", minWidth: 88 }}
                     >
                         Cancel
                     </Button>
-                    <Button onClick={confirmDelete} variant="contained" color="error" sx={{ textTransform: "none", fontWeight: 700 }}>Delete</Button>
+                    <Button onClick={confirmDelete} variant="contained" color="error" sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}>Delete</Button>
                 </DialogActions>
             </MuiDialog>
 
