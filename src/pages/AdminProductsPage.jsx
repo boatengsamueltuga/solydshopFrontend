@@ -458,7 +458,16 @@ const AdminProductsPage = () => {
                 subtitle={selectedProduct?.productName}
                 footer={
                     <Stack direction="row" justifyContent="flex-end" gap={2}>
-                        <Button onClick={() => setIsViewOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
+                        <Button
+                            onClick={() => setIsViewOpen(false)}
+                            variant="outlined"
+                            sx={{
+                                textTransform: "none",
+                                color: "var(--text-2)",
+                                borderColor: "var(--border)",
+                                "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                            }}
+                        >
                             Close
                         </Button>
                         <Button
@@ -551,7 +560,16 @@ const AdminProductsPage = () => {
                 width={560}
                 footer={
                     <Stack direction="row" justifyContent="flex-end" gap={2}>
-                        <Button onClick={() => { resetForm(); setIsFormOpen(false); }} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
+                        <Button
+                            onClick={() => { resetForm(); setIsFormOpen(false); }}
+                            variant="outlined"
+                            sx={{
+                                textTransform: "none",
+                                color: "var(--text-2)",
+                                borderColor: "var(--border)",
+                                "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                            }}
+                        >
                             Cancel
                         </Button>
                         <Button
@@ -706,8 +724,19 @@ const AdminProductsPage = () => {
                         Are you sure you want to delete <strong>{productToDelete?.productName}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-                    <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>Cancel</Button>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
+                    <Button
+                        onClick={() => setDeleteConfirmOpen(false)}
+                        variant="outlined"
+                        sx={{
+                            textTransform: "none",
+                            color: "var(--text-2)",
+                            borderColor: "var(--border)",
+                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                        }}
+                    >
+                        Cancel
+                    </Button>
                     <Button onClick={confirmDelete} variant="contained" color="error" sx={{ textTransform: "none", fontWeight: 700 }}>Delete</Button>
                 </DialogActions>
             </MuiDialog>

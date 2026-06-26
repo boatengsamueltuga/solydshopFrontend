@@ -264,8 +264,17 @@ const AdminCategoriesPage = () => {
                         onKeyDown={(e) => e.key === "Enter" && handleCreateCategory()}
                     />
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-                    <Button onClick={() => { setCategoryName(""); setIsCreateOpen(false); }} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
+                    <Button
+                        onClick={() => { setCategoryName(""); setIsCreateOpen(false); }}
+                        variant="outlined"
+                        sx={{
+                            textTransform: "none",
+                            color: "var(--text-2)",
+                            borderColor: "var(--border)",
+                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                        }}
+                    >
                         Cancel
                     </Button>
                     <Button onClick={handleCreateCategory} variant="contained" color="primary" sx={{ textTransform: "none", fontWeight: 700 }}>
@@ -294,12 +303,16 @@ const AdminCategoriesPage = () => {
                         onKeyDown={(e) => e.key === "Enter" && handleUpdateCategory()}
                     />
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
                     <Button
                         onClick={() => { setSelectedCatId(null); setEditCategoryName(""); setIsEditOpen(false); }}
                         variant="outlined"
-                        color="inherit"
-                        sx={{ textTransform: "none" }}
+                        sx={{
+                            textTransform: "none",
+                            color: "var(--text-2)",
+                            borderColor: "var(--border)",
+                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                        }}
                     >
                         Cancel
                     </Button>
@@ -321,8 +334,19 @@ const AdminCategoriesPage = () => {
                         Are you sure you want to delete <strong>{categoryToDelete?.categoryName}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-                    <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>Cancel</Button>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
+                    <Button
+                        onClick={() => setDeleteConfirmOpen(false)}
+                        variant="outlined"
+                        sx={{
+                            textTransform: "none",
+                            color: "var(--text-2)",
+                            borderColor: "var(--border)",
+                            "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                        }}
+                    >
+                        Cancel
+                    </Button>
                     <Button onClick={confirmDelete} variant="contained" color="error" sx={{ textTransform: "none", fontWeight: 700 }}>Delete</Button>
                 </DialogActions>
             </MuiDialog>

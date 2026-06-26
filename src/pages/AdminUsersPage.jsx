@@ -348,7 +348,16 @@ const AdminUsersPage = () => {
                             Delete User
                         </Button>
                         <Stack direction="row" gap={2}>
-                            <Button onClick={() => setIsSheetOpen(false)} variant="outlined" color="inherit" sx={{ textTransform: "none" }}>
+                            <Button
+                                onClick={() => setIsSheetOpen(false)}
+                                variant="outlined"
+                                sx={{
+                                    textTransform: "none",
+                                    color: "var(--text-2)",
+                                    borderColor: "var(--border)",
+                                    "&:hover": { borderColor: "var(--border-mid)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
+                                }}
+                            >
                                 Close
                             </Button>
                             <Button
