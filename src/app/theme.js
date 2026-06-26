@@ -157,6 +157,22 @@ export const solydTheme = createTheme({
           borderRadius:  '4px',
           letterSpacing: '0.01em',
         },
+        outlined: {
+          /* Light mode: full-opacity caramel border — more visible than default 50% */
+          '--variant-outlinedBorder': '#d4a373',
+          '--variant-outlinedColor':  'oklch(0.38 0.045 55)',
+
+          /* Dark mode: slate-400 border (#94A3B8) — 5.5:1 contrast on navy */
+          '[data-theme="dark"] &': {
+            '--variant-outlinedBorder': '#94A3B8',
+            '--variant-outlinedColor':  '#CBD5E1',
+          },
+          '[data-theme="dark"] &:hover': {
+            '--variant-outlinedBorder': '#D4A373',
+            '--variant-outlinedBg':     'rgba(212, 163, 115, 0.12)',
+            '--variant-outlinedColor':  '#F8FAFC',
+          },
+        },
       },
     },
 
