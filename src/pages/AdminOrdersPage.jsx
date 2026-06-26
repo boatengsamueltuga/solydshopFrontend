@@ -325,16 +325,11 @@ const AdminOrdersPage = () => {
                 title={`Order #${selectedOrder?.orderId}`}
                 subtitle={selectedOrder ? `${selectedOrder.customerName} · ${selectedOrder.customerEmail}` : ""}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={2}>
+                    <Stack direction="row" justifyContent="flex-end">
                         <Button
                             onClick={() => setIsSheetOpen(false)}
                             variant="outlined"
-                            sx={{
-                                textTransform: "none",
-                                color: "var(--text-2)",
-                                border: "1px solid var(--border-mid)",
-                                "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                            }}
+                            sx={{ textTransform: "none", minWidth: 88 }}
                         >
                             Close
                         </Button>
@@ -343,7 +338,7 @@ const AdminOrdersPage = () => {
                             variant="contained"
                             color="success"
                             startIcon={<SyncIcon />}
-                            sx={{ textTransform: "none", fontWeight: 700 }}
+                            sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}
                         >
                             Update Status
                         </Button>

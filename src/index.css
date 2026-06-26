@@ -68,15 +68,7 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
     border-color:     var(--border) !important;
 }
 
-/* Buttons */
-[data-theme="dark"] .MuiButton-outlined {
-    border-color: var(--border) !important;
-    color:        var(--text) !important;
-}
-[data-theme="dark"] .MuiButton-outlined:hover {
-    border-color:     var(--accent) !important;
-    background-color: var(--accent-subtle) !important;
-}
+/* Buttons — outlined dark mode handled via theme.js MuiButton.styleOverrides.outlined */
 [data-theme="dark"] .MuiButton-text {
     color: var(--text-2) !important;
 }

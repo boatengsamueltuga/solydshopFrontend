@@ -27,13 +27,11 @@ const PageBanner = ({ title, subtitle, icon, action, children }) => {
       {/* Title row: [icon + text] ... [action] */}
       <Stack
         direction="row"
-        alignItems="flex-start"
-        justifyContent="space-between"
+        alignItems="center"
         flexWrap="wrap"
-        gap={2}
         sx={{ mb: children ? 3 : 0 }}
       >
-        <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flex: 1, minWidth: 0 }}>
 
           {/* Icon container */}
           {icon && (
@@ -56,7 +54,7 @@ const PageBanner = ({ title, subtitle, icon, action, children }) => {
           )}
 
           {/* Title + subtitle */}
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Typography
               component="h1"
               sx={{
@@ -88,7 +86,7 @@ const PageBanner = ({ title, subtitle, icon, action, children }) => {
         </Stack>
 
         {/* Optional right-side action (e.g. Create button) */}
-        {action && <Box sx={{ flexShrink: 0 }}>{action}</Box>}
+        {action && <Box sx={{ flexShrink: 0, ml: '24px' }}>{action}</Box>}
       </Stack>
 
       {/* Optional extra content below (stat pills, filters, etc.) */}
