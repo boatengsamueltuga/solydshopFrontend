@@ -70,12 +70,13 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
 
 /* Buttons */
 [data-theme="dark"] .MuiButton-outlined {
-    border-color: var(--border) !important;
+    border-color: var(--text-4) !important;
     color:        var(--text) !important;
 }
 [data-theme="dark"] .MuiButton-outlined:hover {
     border-color:     var(--accent) !important;
     background-color: var(--accent-subtle) !important;
+    color:            var(--text) !important;
 }
 [data-theme="dark"] .MuiButton-text {
     color: var(--text-2) !important;
