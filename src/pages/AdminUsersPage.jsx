@@ -337,40 +337,35 @@ const AdminUsersPage = () => {
                 title={`User #${selectedUser?.userId}`}
                 subtitle={selectedUser?.email}
                 footer={
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
-                        <Button
-                            variant="contained"
-                            color="error"
-                            startIcon={<DeleteIcon />}
-                            onClick={() => handleDeleteUser(selectedUser?.userId)}
-                            sx={{ textTransform: "none", fontWeight: 700 }}
-                        >
-                            Delete User
-                        </Button>
-                        <Stack direction="row" gap={3}>
+                    <Stack direction="column" spacing={2}>
+                        <Stack direction="row" justifyContent="flex-end">
                             <Button
-                                onClick={() => setIsSheetOpen(false)}
-                                variant="outlined"
-                                sx={{
-                                    textTransform: "none",
-                                    minWidth: 88,
-                                    color: "var(--text-2)",
-                                    border: "1px solid var(--border-mid)",
-                                    "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                                }}
+                                variant="contained"
+                                color="error"
+                                startIcon={<DeleteIcon />}
+                                onClick={() => handleDeleteUser(selectedUser?.userId)}
+                                sx={{ textTransform: "none", fontWeight: 700 }}
                             >
-                                Close
+                                Delete User
                             </Button>
                             <Button
                                 onClick={handleUpdateRole}
                                 variant="contained"
                                 color="primary"
                                 startIcon={<ManageAccountsIcon />}
-                                sx={{ textTransform: "none", fontWeight: 700 }}
+                                sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}
                             >
                                 Update Role
                             </Button>
                         </Stack>
+                        <Button
+                            onClick={() => setIsSheetOpen(false)}
+                            variant="outlined"
+                            fullWidth
+                            sx={{ textTransform: "none" }}
+                        >
+                            Close
+                        </Button>
                     </Stack>
                 }
             >

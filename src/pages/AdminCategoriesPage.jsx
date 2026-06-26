@@ -253,7 +253,7 @@ const AdminCategoriesPage = () => {
                 PaperProps={{ sx: { borderRadius: 3 } }}
             >
                 <MuiDialogTitle sx={{ fontWeight: "bold", pb: 1 }}>Create Category</MuiDialogTitle>
-                <DialogContent sx={{ pt: 2 }}>
+                <DialogContent sx={{ pt: '28px !important', pb: 1 }}>
                     <TextField
                         label="Category Name"
                         fullWidth
@@ -264,21 +264,15 @@ const AdminCategoriesPage = () => {
                         onKeyDown={(e) => e.key === "Enter" && handleCreateCategory()}
                     />
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button
                         onClick={() => { setCategoryName(""); setIsCreateOpen(false); }}
                         variant="outlined"
-                        sx={{
-                            textTransform: "none",
-                            minWidth: 88,
-                            color: "var(--text-2)",
-                            border: "1px solid var(--border-mid)",
-                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                        }}
+                        sx={{ textTransform: "none", minWidth: 88 }}
                     >
                         Cancel
                     </Button>
-                    <Button onClick={handleCreateCategory} variant="contained" color="primary" sx={{ textTransform: "none", fontWeight: 700 }}>
+                    <Button onClick={handleCreateCategory} variant="contained" color="primary" sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}>
                         Create
                     </Button>
                 </DialogActions>
@@ -293,7 +287,7 @@ const AdminCategoriesPage = () => {
                 PaperProps={{ sx: { borderRadius: 3 } }}
             >
                 <MuiDialogTitle sx={{ fontWeight: "bold", pb: 1 }}>Edit Category</MuiDialogTitle>
-                <DialogContent sx={{ pt: 2 }}>
+                <DialogContent sx={{ pt: '28px !important', pb: 1 }}>
                     <TextField
                         label="Category Name"
                         fullWidth
@@ -304,21 +298,15 @@ const AdminCategoriesPage = () => {
                         onKeyDown={(e) => e.key === "Enter" && handleUpdateCategory()}
                     />
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button
                         onClick={() => { setSelectedCatId(null); setEditCategoryName(""); setIsEditOpen(false); }}
                         variant="outlined"
-                        sx={{
-                            textTransform: "none",
-                            minWidth: 88,
-                            color: "var(--text-2)",
-                            border: "1px solid var(--border-mid)",
-                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                        }}
+                        sx={{ textTransform: "none", minWidth: 88 }}
                     >
                         Cancel
                     </Button>
-                    <Button onClick={handleUpdateCategory} variant="contained" color="warning" sx={{ textTransform: "none", fontWeight: 700 }}>
+                    <Button onClick={handleUpdateCategory} variant="contained" color="warning" sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}>
                         Update
                     </Button>
                 </DialogActions>
@@ -336,21 +324,15 @@ const AdminCategoriesPage = () => {
                         Are you sure you want to delete <strong>{categoryToDelete?.categoryName}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button
                         onClick={() => setDeleteConfirmOpen(false)}
                         variant="outlined"
-                        sx={{
-                            textTransform: "none",
-                            minWidth: 88,
-                            color: "var(--text-2)",
-                            border: "1px solid var(--border-mid)",
-                            "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
-                        }}
+                        sx={{ textTransform: "none", minWidth: 88 }}
                     >
                         Cancel
                     </Button>
-                    <Button onClick={confirmDelete} variant="contained" color="error" sx={{ textTransform: "none", fontWeight: 700 }}>Delete</Button>
+                    <Button onClick={confirmDelete} variant="contained" color="error" sx={{ textTransform: "none", fontWeight: 700, ml: "32px" }}>Delete</Button>
                 </DialogActions>
             </MuiDialog>
 

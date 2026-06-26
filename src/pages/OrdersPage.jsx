@@ -60,7 +60,8 @@ const OrdersPage = () => {
         const fetchOrders = async () => {
             try {
                 const res = await api.get("/order/my");
-                setOrders(res.data);
+                const sorted = [...res.data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setOrders(sorted);
             } catch {
                 setError("Unable to load orders. Please try again.");
             } finally {
