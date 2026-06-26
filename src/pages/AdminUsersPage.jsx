@@ -337,7 +337,7 @@ const AdminUsersPage = () => {
                 title={`User #${selectedUser?.userId}`}
                 subtitle={selectedUser?.email}
                 footer={
-                    <Stack direction="row" justifyContent="space-between" gap={2} flexWrap="wrap">
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
                         <Button
                             variant="contained"
                             color="error"
@@ -347,12 +347,13 @@ const AdminUsersPage = () => {
                         >
                             Delete User
                         </Button>
-                        <Stack direction="row" gap={2}>
+                        <Stack direction="row" gap={3}>
                             <Button
                                 onClick={() => setIsSheetOpen(false)}
                                 variant="outlined"
                                 sx={{
                                     textTransform: "none",
+                                    minWidth: 88,
                                     color: "var(--text-2)",
                                     border: "1px solid var(--border-mid)",
                                     "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },

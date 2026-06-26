@@ -325,12 +325,13 @@ const AdminOrdersPage = () => {
                 title={`Order #${selectedOrder?.orderId}`}
                 subtitle={selectedOrder ? `${selectedOrder.customerName} · ${selectedOrder.customerEmail}` : ""}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={2}>
+                    <Stack direction="row" justifyContent="flex-end" gap={3}>
                         <Button
                             onClick={() => setIsSheetOpen(false)}
                             variant="outlined"
                             sx={{
                                 textTransform: "none",
+                                minWidth: 88,
                                 color: "var(--text-2)",
                                 border: "1px solid var(--border-mid)",
                                 "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },

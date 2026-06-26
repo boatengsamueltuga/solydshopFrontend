@@ -264,12 +264,13 @@ const AdminCategoriesPage = () => {
                         onKeyDown={(e) => e.key === "Enter" && handleCreateCategory()}
                     />
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
                     <Button
                         onClick={() => { setCategoryName(""); setIsCreateOpen(false); }}
                         variant="outlined"
                         sx={{
                             textTransform: "none",
+                            minWidth: 88,
                             color: "var(--text-2)",
                             border: "1px solid var(--border-mid)",
                             "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
@@ -303,12 +304,13 @@ const AdminCategoriesPage = () => {
                         onKeyDown={(e) => e.key === "Enter" && handleUpdateCategory()}
                     />
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
                     <Button
                         onClick={() => { setSelectedCatId(null); setEditCategoryName(""); setIsEditOpen(false); }}
                         variant="outlined"
                         sx={{
                             textTransform: "none",
+                            minWidth: 88,
                             color: "var(--text-2)",
                             border: "1px solid var(--border-mid)",
                             "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
@@ -334,12 +336,13 @@ const AdminCategoriesPage = () => {
                         Are you sure you want to delete <strong>{categoryToDelete?.categoryName}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
                     <Button
                         onClick={() => setDeleteConfirmOpen(false)}
                         variant="outlined"
                         sx={{
                             textTransform: "none",
+                            minWidth: 88,
                             color: "var(--text-2)",
                             border: "1px solid var(--border-mid)",
                             "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },

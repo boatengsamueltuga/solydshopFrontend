@@ -457,12 +457,13 @@ const AdminProductsPage = () => {
                 title="Product Details"
                 subtitle={selectedProduct?.productName}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={2}>
+                    <Stack direction="row" justifyContent="flex-end" gap={3}>
                         <Button
                             onClick={() => setIsViewOpen(false)}
                             variant="outlined"
                             sx={{
                                 textTransform: "none",
+                                minWidth: 88,
                                 color: "var(--text-2)",
                                 border: "1px solid var(--border-mid)",
                                 "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
@@ -559,12 +560,13 @@ const AdminProductsPage = () => {
                 subtitle={editingProductId ? `Editing product #${editingProductId}` : "Fill in all required fields"}
                 width={560}
                 footer={
-                    <Stack direction="row" justifyContent="flex-end" gap={2}>
+                    <Stack direction="row" justifyContent="flex-end" gap={3}>
                         <Button
                             onClick={() => { resetForm(); setIsFormOpen(false); }}
                             variant="outlined"
                             sx={{
                                 textTransform: "none",
+                                minWidth: 88,
                                 color: "var(--text-2)",
                                 border: "1px solid var(--border-mid)",
                                 "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
@@ -724,12 +726,13 @@ const AdminProductsPage = () => {
                         Are you sure you want to delete <strong>{productToDelete?.productName}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2, gap: 2 }}>
+                <DialogActions sx={{ px: 3, pb: 2, gap: 3 }}>
                     <Button
                         onClick={() => setDeleteConfirmOpen(false)}
                         variant="outlined"
                         sx={{
                             textTransform: "none",
+                            minWidth: 88,
                             color: "var(--text-2)",
                             border: "1px solid var(--border-mid)",
                             "&:hover": { border: "1px solid var(--border-strong)", backgroundColor: "var(--surface-hover)", color: "var(--text)" },
