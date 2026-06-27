@@ -697,8 +697,9 @@ export default function ProductDetailPage() {
                             </div>
                             <div
                                 style={{
-                                    overflowX:     'auto',
-                                    overflowY:     'hidden',
+                                    overflowX:     'hidden',
+                                    overflowY:     'auto',
+                                    maxHeight:     '160px',
                                     scrollbarWidth: 'thin',
                                     scrollbarColor: 'var(--border) transparent',
                                     border:         '1px solid var(--border-subtle)',
@@ -709,13 +710,14 @@ export default function ProductDetailPage() {
                             >
                                 <p
                                     style={{
-                                        color:      'var(--text-2)',
-                                        fontSize:   'var(--text-sm)',
-                                        lineHeight:  1.6,
-                                        margin:      0,
-                                        fontFamily: 'var(--font-body)',
-                                        whiteSpace: 'nowrap',
-                                        minWidth:   'max-content',
+                                        color:          'var(--text-2)',
+                                        fontSize:       'var(--text-sm)',
+                                        lineHeight:      1.6,
+                                        margin:          0,
+                                        fontFamily:     'var(--font-body)',
+                                        whiteSpace:     'pre-wrap',
+                                        wordBreak:      'break-word',
+                                        overflowWrap:   'break-word',
                                     }}
                                 >
                                     {product.description}
