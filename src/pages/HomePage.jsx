@@ -589,6 +589,16 @@ const HomePage = () => {
                                     Seller Dashboard
                                 </button>
                             )}
+                            {user && !user?.roles?.includes("ROLE_ADMIN") && !user?.roles?.includes("ROLE_SELLER") && (
+                                <button
+                                    onClick={() => navigate("/orders")}
+                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                >
+                                    My Orders
+                                </button>
+                            )}
                         </div>
 
                         {/* Stats row */}
