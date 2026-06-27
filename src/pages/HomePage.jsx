@@ -569,25 +569,23 @@ const HomePage = () => {
                             >
                                 Browse Parts
                             </button>
-                            {user?.roles?.includes("ROLE_ADMIN") ? (
-                                <button
-                                    onClick={() => navigate("/admin/dashboard")}
-                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
-                                >
-                                    Admin Dashboard
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => navigate("/seller/dashboard")}
-                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
-                                >
-                                    Start Selling
-                                </button>
-                            )}
+                            {(() => {
+                                const roles = user?.roles ?? [];
+                                let label, path;
+                                if (roles.includes("ROLE_ADMIN"))       { label = "Admin Dashboard";  path = "/admin/dashboard";  }
+                                else if (roles.includes("ROLE_SELLER")) { label = "Seller Dashboard"; path = "/seller/dashboard"; }
+                                else                                    { label = "My Orders";        path = "/orders";           }
+                                return (
+                                    <button
+                                        onClick={() => navigate(path)}
+                                        style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                    >
+                                        {label}
+                                    </button>
+                                );
+                            })()}
                         </div>
 
                         {/* Stats row */}

@@ -100,6 +100,12 @@ const SellerDashboardPage = () => {
     const inStockCount  = products.filter(p => p.quantity > 0).length;
     const catalogValue  = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
 
+    const formatCompact = (n) => {
+        if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+        if (n >= 1_000)     return `$${(n / 1_000).toFixed(1)}K`;
+        return `$${n.toLocaleString("en-US")}`;
+    };
+
     /* ── DataTable columns ── */
     const columns = useMemo(() => [
         {
@@ -230,8 +236,8 @@ const SellerDashboardPage = () => {
                 />
                 <StatCard
                     label="Catalog Value"
-                    value={`$${catalogValue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
-                    sub="price × qty"
+                    value={formatCompact(catalogValue)}
+                    sub={`$${catalogValue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} · price × qty`}
                     loading={loading}
                 />
             </div>
