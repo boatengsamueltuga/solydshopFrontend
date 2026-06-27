@@ -3,6 +3,8 @@ import {
     fetchNotifications,
     markNotificationRead,
     markAllNotificationsRead,
+    deleteNotification,
+    deleteAllNotifications,
 } from '../actions/notificationActions';
 
 const notificationSlice = createSlice({
@@ -34,6 +36,19 @@ const notificationSlice = createSlice({
 
             .addCase(markAllNotificationsRead.fulfilled, (state) => {
                 state.items.forEach(n => { n.read = true; });
+                state.unreadCount = 0;
+            })
+
+            .addCase(deleteNotification.fulfilled, (state, action) => {
+                const idx = state.items.findIndex(i => i.id === action.payload);
+                if (idx !== -1) {
+                    if (!state.items[idx].read) state.unreadCount = Math.max(0, state.unreadCount - 1);
+                    state.items.splice(idx, 1);
+                }
+            })
+
+            .addCase(deleteAllNotifications.fulfilled, (state) => {
+                state.items       = [];
                 state.unreadCount = 0;
             });
     },

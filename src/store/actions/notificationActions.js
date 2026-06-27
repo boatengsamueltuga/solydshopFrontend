@@ -35,3 +35,26 @@ export const markAllNotificationsRead = createAsyncThunk(
         }
     }
 );
+
+export const deleteNotification = createAsyncThunk(
+    'notifications/deleteOne',
+    async (id, { rejectWithValue }) => {
+        try {
+            await api.delete(`/notifications/${id}`);
+            return id;
+        } catch {
+            return rejectWithValue(null);
+        }
+    }
+);
+
+export const deleteAllNotifications = createAsyncThunk(
+    'notifications/deleteAll',
+    async (_, { rejectWithValue }) => {
+        try {
+            await api.delete('/notifications/all');
+        } catch {
+            return rejectWithValue(null);
+        }
+    }
+);

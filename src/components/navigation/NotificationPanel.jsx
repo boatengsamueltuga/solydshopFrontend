@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { HiBell, HiX, HiCheckCircle, HiShoppingBag } from 'react-icons/hi';
+import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash } from 'react-icons/hi';
 import { closePanel } from '../../store/reducers/notificationReducer';
 import {
     fetchNotifications,
     markNotificationRead,
     markAllNotificationsRead,
+    deleteNotification,
+    deleteAllNotifications,
 } from '../../store/actions/notificationActions';
 
 const TYPE_ICON = {
@@ -100,19 +102,38 @@ const NotificationPanel = () => {
                         <button
                             onClick={() => dispatch(markAllNotificationsRead())}
                             style={{
-                                background:  'none',
-                                border:      'none',
-                                color:       'var(--text-3)',
-                                fontSize:    '11px',
-                                cursor:      'pointer',
-                                fontFamily:  'var(--font-body)',
-                                padding:     '2px 6px',
+                                background:   'none',
+                                border:       'none',
+                                color:        'var(--text-3)',
+                                fontSize:     '11px',
+                                cursor:       'pointer',
+                                fontFamily:   'var(--font-body)',
+                                padding:      '2px 6px',
                                 borderRadius: 'var(--r-sm)',
                             }}
                             onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent)'; e.currentTarget.style.background = 'var(--accent-subtle)'; }}
                             onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.background = 'none'; }}
                         >
                             Mark all read
+                        </button>
+                    )}
+                    {items.length > 0 && (
+                        <button
+                            onClick={() => dispatch(deleteAllNotifications())}
+                            style={{
+                                background:   'none',
+                                border:       'none',
+                                color:        'var(--text-3)',
+                                fontSize:     '11px',
+                                cursor:       'pointer',
+                                fontFamily:   'var(--font-body)',
+                                padding:      '2px 6px',
+                                borderRadius: 'var(--r-sm)',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.color = 'var(--error)'; e.currentTarget.style.background = 'var(--error-subtle)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.background = 'none'; }}
+                        >
+                            Clear all
                         </button>
                     )}
                     <button
@@ -209,16 +230,35 @@ const NotificationPanel = () => {
                                     {formatTime(n.createdAt)}
                                 </p>
                             </div>
-                            {!n.read && (
-                                <div style={{
-                                    flexShrink:      0,
-                                    width:           '7px',
-                                    height:          '7px',
-                                    borderRadius:    '50%',
-                                    backgroundColor: 'var(--accent)',
-                                    alignSelf:       'center',
-                                }} />
-                            )}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                                {!n.read && (
+                                    <div style={{
+                                        width:           '7px',
+                                        height:          '7px',
+                                        borderRadius:    '50%',
+                                        backgroundColor: 'var(--accent)',
+                                    }} />
+                                )}
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); dispatch(deleteNotification(n.id)); }}
+                                    style={{
+                                        background:   'none',
+                                        border:       'none',
+                                        cursor:       'pointer',
+                                        color:        'var(--text-4)',
+                                        padding:      '2px',
+                                        display:      'flex',
+                                        alignItems:   'center',
+                                        borderRadius: 'var(--r-sm)',
+                                        fontSize:     '13px',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.color = 'var(--error)'; e.currentTarget.style.background = 'var(--error-subtle)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-4)'; e.currentTarget.style.background = 'none'; }}
+                                    title="Delete"
+                                >
+                                    <HiTrash />
+                                </button>
+                            </div>
                         </div>
                     ))
                 )}
