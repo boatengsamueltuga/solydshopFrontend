@@ -569,14 +569,25 @@ const HomePage = () => {
                             >
                                 Browse Parts
                             </button>
-                            <button
-                                onClick={() => navigate("/seller/dashboard")}
-                                style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
-                                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
-                                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
-                            >
-                                Start Selling
-                            </button>
+                            {user?.roles?.includes("ROLE_ADMIN") ? (
+                                <button
+                                    onClick={() => navigate("/admin/dashboard")}
+                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                >
+                                    Admin Dashboard
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => navigate("/seller/dashboard")}
+                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                >
+                                    Start Selling
+                                </button>
+                            )}
                         </div>
 
                         {/* Stats row */}
