@@ -405,16 +405,20 @@ const AdminProductsPage = () => {
                                 <SearchIcon sx={{ color: "var(--text-3)", fontSize: 18 }} />
                             </InputAdornment>
                         ),
-                        endAdornment: (
-                            <InputAdornment position="end" sx={{ visibility: search ? "visible" : "hidden" }}>
-                                <IconButton size="small" onClick={() => setSearch("")} edge="end">
-                                    <ClearIcon sx={{ fontSize: 16 }} />
-                                </IconButton>
-                            </InputAdornment>
-                        ),
                     }}
                     sx={{ minWidth: 280, flex: 1, maxWidth: 480 }}
                 />
+                {search && (
+                    <Tooltip title="Clear search" arrow>
+                        <IconButton
+                            size="small"
+                            onClick={() => setSearch("")}
+                            sx={{ color: "var(--text-3)", "&:hover": { color: "var(--error)", background: "var(--error-subtle)" } }}
+                        >
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                )}
                 <Tooltip title="Refresh" arrow>
                     <IconButton
                         onClick={() => { setLoading(true); fetchProducts(); fetchCategories(); }}
