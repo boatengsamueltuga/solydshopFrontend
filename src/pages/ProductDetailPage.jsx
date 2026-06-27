@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import api from '../api/api';
+import { incrementCartCount } from '../features/cart/cartSlice';
 import './ProductDetailPage.css';
 
 /* ── XSRF helper (mirrors the pattern used in HomePage.jsx) ─── */
@@ -87,6 +88,7 @@ function SpecRow({ label, value, mono, last }) {
 export default function ProductDetailPage() {
     const { id } = useParams();
     const { isAuthenticated, user } = useSelector(s => s.auth);
+    const dispatch = useDispatch();
 
     const [product,      setProduct]      = useState(null);
     const [loading,      setLoading]      = useState(true);
@@ -126,6 +128,7 @@ export default function ProductDetailPage() {
                 { productId: product.productId, quantity: qty },
                 { headers: { 'X-XSRF-TOKEN': getXsrfToken() } },
             );
+            dispatch(incrementCartCount());
             toast.success(`${product.productName} added to cart.`);
         } catch {
             toast.error('Failed to add to cart. Please try again.');
