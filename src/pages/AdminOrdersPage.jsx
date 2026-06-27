@@ -8,16 +8,21 @@ import {
     Divider,
     FormControl,
     IconButton,
+    InputAdornment,
     InputLabel,
     MenuItem,
     Select,
     Stack,
+    TextField,
     Tooltip,
     Typography,
 } from "@mui/material";
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import SyncIcon      from "@mui/icons-material/Sync";
+import SyncIcon       from "@mui/icons-material/Sync";
+import SearchIcon     from "@mui/icons-material/Search";
+import ClearIcon      from "@mui/icons-material/Clear";
+import RefreshIcon    from "@mui/icons-material/Refresh";
 
 import api          from "../api/api";
 import toast        from "react-hot-toast";
@@ -73,6 +78,7 @@ const AdminOrdersPage = () => {
     const [isSheetOpen,   setIsSheetOpen]   = useState(false);
     const [newStatus,     setNewStatus]     = useState("");
     const [activeTab,     setActiveTab]     = useState("ALL");
+    const [search,        setSearch]        = useState("");
 
     const [isMobile,  setIsMobile]  = useState(window.innerWidth < 600);
     const [isCompact, setIsCompact] = useState(window.innerWidth < 1100);
@@ -123,9 +129,17 @@ const AdminOrdersPage = () => {
     }, [orders]);
 
     const filteredOrders = useMemo(() => {
-        if (activeTab === "ALL") return orders;
-        return orders.filter(o => o.status === activeTab);
-    }, [orders, activeTab]);
+        let result = activeTab === "ALL" ? orders : orders.filter(o => o.status === activeTab);
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            result = result.filter(o =>
+                String(o.orderId).includes(q) ||
+                o.customerName?.toLowerCase().includes(q) ||
+                o.customerEmail?.toLowerCase().includes(q)
+            );
+        }
+        return result;
+    }, [orders, activeTab, search]);
 
     /*
     |----------------------------------------------------------
@@ -297,6 +311,43 @@ const AdminOrdersPage = () => {
                         </button>
                     );
                 })}
+            </div>
+
+            {/* ── Search ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>
+                <TextField
+                    size="small"
+                    placeholder="Search by order ID, customer name or email…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon sx={{ color: "var(--text-3)", fontSize: 18 }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{ minWidth: 280, flex: 1, maxWidth: 480 }}
+                />
+                {search && (
+                    <Tooltip title="Clear search" arrow>
+                        <IconButton
+                            size="small"
+                            onClick={() => setSearch("")}
+                            sx={{ color: "var(--text-3)", "&:hover": { color: "var(--error)", background: "var(--error-subtle)" } }}
+                        >
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                )}
+                <Tooltip title="Refresh" arrow>
+                    <IconButton
+                        onClick={() => { setLoading(true); fetchOrders(); }}
+                        sx={{ color: "var(--text-3)", "&:hover": { color: "var(--accent)", background: "var(--accent-subtle)" } }}
+                    >
+                        <RefreshIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
             </div>
 
             {/* ── DataGrid ── */}

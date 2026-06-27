@@ -30,6 +30,8 @@ import DeleteIcon            from "@mui/icons-material/Delete";
 import CloudUploadIcon       from "@mui/icons-material/CloudUpload";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import SearchIcon            from "@mui/icons-material/Search";
+import ClearIcon             from "@mui/icons-material/Clear";
+import RefreshIcon           from "@mui/icons-material/Refresh";
 
 import api          from "../api/api";
 import toast        from "react-hot-toast";
@@ -388,7 +390,7 @@ const AdminProductsPage = () => {
             <div style={{
                 display:      "flex",
                 alignItems:   "center",
-                gap:          "var(--space-4)",
+                gap:          "var(--space-3)",
                 marginBottom: "var(--space-4)",
                 flexWrap:     "wrap",
             }}>
@@ -406,6 +408,25 @@ const AdminProductsPage = () => {
                     }}
                     sx={{ minWidth: 280, flex: 1, maxWidth: 480 }}
                 />
+                {search && (
+                    <Tooltip title="Clear search" arrow>
+                        <IconButton
+                            size="small"
+                            onClick={() => setSearch("")}
+                            sx={{ color: "var(--text-3)", "&:hover": { color: "var(--error)", background: "var(--error-subtle)" } }}
+                        >
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                )}
+                <Tooltip title="Refresh" arrow>
+                    <IconButton
+                        onClick={() => { setLoading(true); fetchProducts(); fetchCategories(); }}
+                        sx={{ color: "var(--text-3)", "&:hover": { color: "var(--accent)", background: "var(--accent-subtle)" } }}
+                    >
+                        <RefreshIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
             </div>
 
             {/* ── Stats row ── */}

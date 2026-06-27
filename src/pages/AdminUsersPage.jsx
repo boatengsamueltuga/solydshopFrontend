@@ -9,10 +9,12 @@ import {
     Divider,
     FormControl,
     IconButton,
+    InputAdornment,
     InputLabel,
     MenuItem,
     Select,
     Stack,
+    TextField,
     Tooltip,
     Typography,
 } from "@mui/material";
@@ -20,6 +22,9 @@ import {
 import VisibilityIcon     from "@mui/icons-material/Visibility";
 import DeleteIcon         from "@mui/icons-material/Delete";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import SearchIcon         from "@mui/icons-material/Search";
+import ClearIcon          from "@mui/icons-material/Clear";
+import RefreshIcon        from "@mui/icons-material/Refresh";
 
 import api           from "../api/api";
 import toast         from "react-hot-toast";
@@ -68,6 +73,7 @@ const AdminUsersPage = () => {
     const [isSheetOpen,  setIsSheetOpen]  = useState(false);
     const [newRole,      setNewRole]      = useState("");
     const [activeTab,    setActiveTab]    = useState("ALL");
+    const [search,       setSearch]       = useState("");
 
     const [isMobile,  setIsMobile]  = useState(window.innerWidth < 600);
     const [isCompact, setIsCompact] = useState(window.innerWidth < 1100);
@@ -116,13 +122,22 @@ const AdminUsersPage = () => {
     }), [users]);
 
     const filteredUsers = useMemo(() => {
+        let result;
         switch (activeTab) {
-            case "USERS":   return users.filter(u => u.roles?.includes("ROLE_USER") && !u.roles?.includes("ROLE_ADMIN") && !u.roles?.includes("ROLE_SELLER"));
-            case "SELLERS": return users.filter(u => u.roles?.includes("ROLE_SELLER"));
-            case "ADMINS":  return users.filter(u => u.roles?.includes("ROLE_ADMIN"));
-            default:        return users;
+            case "USERS":   result = users.filter(u => u.roles?.includes("ROLE_USER") && !u.roles?.includes("ROLE_ADMIN") && !u.roles?.includes("ROLE_SELLER")); break;
+            case "SELLERS": result = users.filter(u => u.roles?.includes("ROLE_SELLER")); break;
+            case "ADMINS":  result = users.filter(u => u.roles?.includes("ROLE_ADMIN")); break;
+            default:        result = users;
         }
-    }, [users, activeTab]);
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            result = result.filter(u =>
+                u.name?.toLowerCase().includes(q) ||
+                u.email?.toLowerCase().includes(q)
+            );
+        }
+        return result;
+    }, [users, activeTab, search]);
 
     /*
     |----------------------------------------------------------
@@ -308,6 +323,43 @@ const AdminUsersPage = () => {
                         </button>
                     );
                 })}
+            </div>
+
+            {/* ── Search ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>
+                <TextField
+                    size="small"
+                    placeholder="Search by name or email…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon sx={{ color: "var(--text-3)", fontSize: 18 }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{ minWidth: 280, flex: 1, maxWidth: 480 }}
+                />
+                {search && (
+                    <Tooltip title="Clear search" arrow>
+                        <IconButton
+                            size="small"
+                            onClick={() => setSearch("")}
+                            sx={{ color: "var(--text-3)", "&:hover": { color: "var(--error)", background: "var(--error-subtle)" } }}
+                        >
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                )}
+                <Tooltip title="Refresh" arrow>
+                    <IconButton
+                        onClick={() => { setLoading(true); fetchUsers(); }}
+                        sx={{ color: "var(--text-3)", "&:hover": { color: "var(--accent)", background: "var(--accent-subtle)" } }}
+                    >
+                        <RefreshIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
             </div>
 
             {/* ── DataGrid ── */}
