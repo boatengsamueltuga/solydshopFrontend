@@ -15,6 +15,7 @@ import {
     optimisticRemoveItem,
     setWishlistItems,
 } from "../features/wishlist/wishlistSlice";
+import { setCartCount } from "../features/cart/cartSlice";
 import SolydLogo from "../components/SolydLogo";
 
 const getXsrfToken = () =>
@@ -331,6 +332,8 @@ const HomePage = () => {
         try {
             const res = await api.get(`/cart/${user.userId}`);
             setCart(res.data);
+            const items = res.data?.items ?? [];
+            dispatch(setCartCount(items.reduce((s, i) => s + i.quantity, 0)));
         } catch { }
     };
 
