@@ -7,11 +7,16 @@ import toast from "react-hot-toast";
 import SellerLayout from "../components/layouts/SellerLayout";
 import DataTable from "../components/common/DataTable";
 
-import Chip from "@mui/material/Chip";
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
-import EditOutlinedIcon  from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
+import Chip            from "@mui/material/Chip";
+import Tooltip         from "@mui/material/Tooltip";
+import IconButton      from "@mui/material/IconButton";
+import TextField       from "@mui/material/TextField";
+import InputAdornment  from "@mui/material/InputAdornment";
+import EditOutlinedIcon   from "@mui/icons-material/EditOutlined";
+import DeleteOutlineIcon  from "@mui/icons-material/DeleteOutlined";
+import SearchIcon         from "@mui/icons-material/Search";
+import ClearIcon          from "@mui/icons-material/Clear";
+import RefreshIcon        from "@mui/icons-material/Refresh";
 
 import { HiCube } from "react-icons/hi";
 
@@ -46,6 +51,7 @@ const SellerDashboardPage = () => {
     const [products,  setProducts]  = useState([]);
     const [loading,   setLoading]   = useState(true);
     const [deleting,  setDeleting]  = useState(false);
+    const [search,    setSearch]    = useState("");
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -78,9 +84,27 @@ const SellerDashboardPage = () => {
         }
     }, [fetchProducts]);
 
+    /* ── Search filter ── */
+    const filteredProducts = useMemo(() => {
+        if (!search.trim()) return products;
+        const q = search.toLowerCase();
+        return products.filter(p =>
+            p.productName?.toLowerCase().includes(q)  ||
+            p.categoryName?.toLowerCase().includes(q) ||
+            p.modelNumber?.toLowerCase().includes(q)  ||
+            p.partNumber?.toLowerCase().includes(q)
+        );
+    }, [products, search]);
+
     /* ── Computed stats ── */
     const inStockCount  = products.filter(p => p.quantity > 0).length;
     const catalogValue  = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+
+    const formatCompact = (n) => {
+        if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+        if (n >= 1_000)     return `$${(n / 1_000).toFixed(1)}K`;
+        return `$${n.toLocaleString("en-US")}`;
+    };
 
     /* ── DataTable columns ── */
     const columns = useMemo(() => [
@@ -212,8 +236,8 @@ const SellerDashboardPage = () => {
                 />
                 <StatCard
                     label="Catalog Value"
-                    value={`$${catalogValue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
-                    sub="price × qty"
+                    value={formatCompact(catalogValue)}
+                    sub={`$${catalogValue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} · price × qty`}
                     loading={loading}
                 />
             </div>
@@ -246,9 +270,46 @@ const SellerDashboardPage = () => {
                 </button>
             </div>
 
+            {/* ── Search ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>
+                <TextField
+                    size="small"
+                    placeholder="Search by name, category, model or part number…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon sx={{ color: "var(--text-3)", fontSize: 18 }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{ minWidth: 280, flex: 1, maxWidth: 480 }}
+                />
+                {search && (
+                    <Tooltip title="Clear search" arrow>
+                        <IconButton
+                            size="small"
+                            onClick={() => setSearch("")}
+                            sx={{ color: "var(--text-3)", "&:hover": { color: "var(--error)", background: "var(--error-subtle)" } }}
+                        >
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                )}
+                <Tooltip title="Refresh" arrow>
+                    <IconButton
+                        onClick={() => { setLoading(true); fetchProducts(); }}
+                        sx={{ color: "var(--text-3)", "&:hover": { color: "var(--accent)", background: "var(--accent-subtle)" } }}
+                    >
+                        <RefreshIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            </div>
+
             {/* ── DataTable ── */}
             <DataTable
-                rows={products}
+                rows={filteredProducts}
                 columns={columns}
                 getRowId={row => row.productId}
                 loading={loading}
