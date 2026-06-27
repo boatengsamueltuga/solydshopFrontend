@@ -326,13 +326,13 @@ const AdminOrdersPage = () => {
                                 <SearchIcon sx={{ color: "var(--text-3)", fontSize: 18 }} />
                             </InputAdornment>
                         ),
-                        endAdornment: search ? (
-                            <InputAdornment position="end">
+                        endAdornment: (
+                            <InputAdornment position="end" sx={{ visibility: search ? "visible" : "hidden" }}>
                                 <IconButton size="small" onClick={() => setSearch("")} edge="end">
                                     <ClearIcon sx={{ fontSize: 16 }} />
                                 </IconButton>
                             </InputAdornment>
-                        ) : null,
+                        ),
                     }}
                     sx={{ minWidth: 280, flex: 1, maxWidth: 480 }}
                 />
