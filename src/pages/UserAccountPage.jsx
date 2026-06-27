@@ -83,7 +83,7 @@ const UserAccountPage = () => {
         if (!user?.userId) { setLoading(false); return; }
         const fetch = async () => {
             try {
-                const res = await api.get(`/order/${user.userId}`);
+                const res = await api.get("/order/my");
                 setOrders(res.data ?? []);
             } catch {
                 /* non-critical */
