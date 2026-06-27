@@ -1,6 +1,8 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { HiMenu, HiBell, HiHome } from 'react-icons/hi';
+import { togglePanel } from '../../store/reducers/notificationReducer';
+import NotificationPanel from './NotificationPanel';
 
 /* ── Inline styles ─────────────────────────────────────────────────────── */
 
@@ -33,18 +35,17 @@ const S = {
     color:           'var(--text-3)',
     cursor:          'pointer',
     flexShrink:      0,
-    /* visible on mobile only — controlled by parent via CSS or prop */
   },
 
   title: {
-    fontSize:     '0.9375rem',
-    fontWeight:   600,
-    fontFamily:   'var(--font-display)',
-    color:        'var(--text)',
+    fontSize:      '0.9375rem',
+    fontWeight:    600,
+    fontFamily:    'var(--font-display)',
+    color:         'var(--text)',
     letterSpacing: '-0.01em',
-    whiteSpace:   'nowrap',
-    overflow:     'hidden',
-    textOverflow: 'ellipsis',
+    whiteSpace:    'nowrap',
+    overflow:      'hidden',
+    textOverflow:  'ellipsis',
   },
 
   right: {
@@ -89,31 +90,13 @@ const S = {
 
 /* ── TopBar ────────────────────────────────────────────────────────────── */
 
-/**
- * TopBar — fixed-height (56px) top bar for admin and seller layouts.
- *
- * Props:
- *   title        — string; page title shown on the left side.
- *                  Defaults to 'SolydShop'.
- *   onMenuClick  — optional callback; fires when the hamburger button is
- *                  clicked (mobile sidebar toggle). When undefined the button
- *                  is still rendered for layout consistency.
- *
- * Placeholders (wired in future phases):
- *   - Notification bell icon (visible, no handler yet)
- *   - User avatar (initials from Redux auth state)
- *   - User dropdown menu (future P3+)
- *
- * Consumed by AdminLayout and SellerLayout via the topbar prop:
- *   <AdminLayout topbar={<TopBar title="Dashboard" />}>
- */
 const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
-  const { user } = useSelector((s) => s.auth);
+  const dispatch  = useDispatch();
   const navigate  = useNavigate();
+  const { user }  = useSelector((s) => s.auth);
+  const { unreadCount, panelOpen } = useSelector((s) => s.notifications);
 
-  const initials   = user?.email?.[0]?.toUpperCase() ?? 'U';
-  const isAdmin    = user?.roles?.includes('ROLE_ADMIN');
-  const bellTarget = isAdmin ? '/admin/orders' : '/seller/dashboard';
+  const initials = user?.email?.[0]?.toUpperCase() ?? 'U';
 
   return (
     <div style={S.bar} role="banner">
@@ -156,15 +139,15 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
         <span style={S.title}>{title}</span>
       </div>
 
-      {/* Right: notifications (placeholder) + user avatar */}
-      <div style={S.right}>
+      {/* Right: notifications + user avatar */}
+      <div style={{ ...S.right, position: 'relative' }}>
 
         {/* Notification bell */}
         <button
           style={S.iconBtn}
           aria-label="Notifications"
-          title={isAdmin ? 'View orders' : 'View dashboard'}
-          onClick={() => navigate(bellTarget)}
+          title="Notifications"
+          onClick={() => dispatch(togglePanel())}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
             e.currentTarget.style.color = 'var(--text)';
@@ -176,20 +159,46 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
         >
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <HiBell size={18} />
-            <span style={{
-              position:        'absolute',
-              top:             '-2px',
-              right:           '-3px',
-              width:           '6px',
-              height:          '6px',
-              borderRadius:    '50%',
-              backgroundColor: 'var(--accent)',
-              border:          '1.5px solid var(--surface)',
-            }} />
+            {unreadCount > 0 ? (
+              <span style={{
+                position:        'absolute',
+                top:             '-5px',
+                right:           '-6px',
+                minWidth:        '16px',
+                height:          '16px',
+                borderRadius:    '999px',
+                backgroundColor: 'var(--accent)',
+                border:          '1.5px solid var(--surface)',
+                color:           'var(--text)',
+                fontSize:        '9px',
+                fontWeight:      700,
+                fontFamily:      'var(--font-mono)',
+                display:         'flex',
+                alignItems:      'center',
+                justifyContent:  'center',
+                padding:         '0 3px',
+              }}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            ) : (
+              <span style={{
+                position:        'absolute',
+                top:             '-2px',
+                right:           '-3px',
+                width:           '6px',
+                height:          '6px',
+                borderRadius:    '50%',
+                backgroundColor: 'var(--accent)',
+                border:          '1.5px solid var(--surface)',
+              }} />
+            )}
           </div>
         </button>
 
-        {/* User avatar — initials, no dropdown yet */}
+        {/* Notification panel dropdown */}
+        {panelOpen && <NotificationPanel />}
+
+        {/* User avatar */}
         <div
           style={S.avatar}
           title={user?.email ?? ''}
