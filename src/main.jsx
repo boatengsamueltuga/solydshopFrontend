@@ -17,8 +17,6 @@ import ErrorBoundary from './components/ErrorBoundary'
 import './index.css'
 
 import { store } from './app/store'
-
-window.history.scrollRestoration = 'manual';
 import { solydTheme } from './app/theme'
 
 ReactDOM.createRoot(document.getElementById('root')).render(

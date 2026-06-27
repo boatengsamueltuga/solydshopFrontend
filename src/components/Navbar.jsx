@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutSuccess } from "../features/auth/authSlice";
 import { clearWishlist } from "../features/wishlist/wishlistSlice";
-import { setCartCount, resetCartCount } from "../features/cart/cartSlice";
 import api from "../api/api";
 import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd, HiMoon, HiSun } from "react-icons/hi";
 import SolydLogo from "./SolydLogo";
@@ -28,6 +27,7 @@ const Navbar = () => {
 
     const [menuOpen,     setMenuOpen]     = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [cartCount,    setCartCount]    = useState(0);
     const [isDark,       setIsDark]       = useState(
         () => document.documentElement.getAttribute("data-theme") === "dark"
     );
@@ -44,7 +44,6 @@ const Navbar = () => {
 
     const { isAuthenticated, user } = useSelector((s) => s.auth);
     const wishlistCount = useSelector((s) => s.wishlist.items.length);
-    const cartCount     = useSelector((s) => s.cart.count);
 
     const isAdmin  = user?.roles?.includes("ROLE_ADMIN");
     const isSeller = user?.roles?.includes("ROLE_SELLER");
@@ -54,16 +53,16 @@ const Navbar = () => {
     const isActive = (path) => location.pathname === path;
     const initials  = user?.email?.[0]?.toUpperCase() ?? "U";
 
-    // Sync cart count from server on login/logout
+    // Fetch cart count on mount and on each navigation
     useEffect(() => {
-        if (!isAuthenticated || !user?.userId) { dispatch(resetCartCount()); return; }
+        if (!isAuthenticated || !user?.userId) { setCartCount(0); return; }
         api.get(`/cart/${user.userId}`)
             .then(res => {
                 const items = res.data?.items ?? [];
-                dispatch(setCartCount(items.reduce((s, i) => s + i.quantity, 0)));
+                setCartCount(items.reduce((s, i) => s + i.quantity, 0));
             })
             .catch(() => {});
-    }, [isAuthenticated, user?.userId]);
+    }, [isAuthenticated, user?.userId, location.pathname]);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -83,7 +82,6 @@ const Navbar = () => {
             await api.post("/auth/logout");
             dispatch(logoutSuccess());
             dispatch(clearWishlist());
-            dispatch(resetCartCount());
             navigate("/login");
         } catch {
             // best-effort — clear local state regardless

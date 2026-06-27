@@ -4,7 +4,6 @@ import api from "../api/api";
 import toast from "react-hot-toast";
 import { FaRegHeart, FaShoppingCart, FaTrash } from "react-icons/fa";
 import { optimisticRemoveItem, setWishlistItems } from "../features/wishlist/wishlistSlice";
-import { incrementCartCount } from "../features/cart/cartSlice";
 
 const getXsrfToken = () =>
     document.cookie.split("; ").find((r) => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -36,7 +35,6 @@ export default function WishlistPage() {
                 { productId, quantity: 1 },
                 { headers: { "X-XSRF-TOKEN": getXsrfToken() } },
             );
-            dispatch(incrementCartCount());
             toast.success("Added to cart");
         } catch {
             toast.error("Could not add to cart");

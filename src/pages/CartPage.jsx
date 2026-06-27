@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
-import { setCartCount } from "../features/cart/cartSlice";
 import toast from "react-hot-toast";
 import { IconButton, Tooltip } from "@mui/material";
 import AddIcon           from "@mui/icons-material/Add";
@@ -18,7 +17,6 @@ const CartPage = () => {
 
     const { user } = useSelector((state) => state.auth);
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const getXsrfToken = () =>
         document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -27,8 +25,6 @@ const CartPage = () => {
         try {
             const res = await api.get(`/cart/${user.userId}`);
             setCart(res.data);
-            const items = res.data?.items ?? [];
-            dispatch(setCartCount(items.reduce((s, i) => s + i.quantity, 0)));
         } catch (e) {
         } finally {
             setLoading(false);
