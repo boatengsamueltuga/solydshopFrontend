@@ -708,7 +708,7 @@ const AdminProductsPage = () => {
                                 if (e.target.value.length <= 1000)
                                     setProductForm({ ...productForm, description: e.target.value });
                             }}
-                            inputProps={{ maxLength: 1000 }}
+                            inputProps={{ maxLength: 1000, style: { overflowX: "hidden", wordBreak: "break-word", whiteSpace: "pre-wrap" } }}
                         />
                         <Typography variant="caption" sx={{
                             display:   "block",

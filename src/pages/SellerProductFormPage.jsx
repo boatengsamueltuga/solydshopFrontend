@@ -337,7 +337,7 @@ const SellerProductFormPage = () => {
                             multiline rows={3}
                             fullWidth size="small"
                             disabled={saving}
-                            inputProps={{ maxLength: 1000 }}
+                            inputProps={{ maxLength: 1000, style: { overflowX: "hidden", wordBreak: "break-word", whiteSpace: "pre-wrap" } }}
                             helperText={`${formData.description.length} / 1000`}
                             FormHelperTextProps={{
                                 sx: {
