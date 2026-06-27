@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
-import { HiMenu, HiBell } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
+import { HiMenu, HiBell, HiHome } from 'react-icons/hi';
 
 /* ── Inline styles ─────────────────────────────────────────────────────── */
 
@@ -108,13 +109,16 @@ const S = {
  */
 const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
   const { user } = useSelector((s) => s.auth);
+  const navigate  = useNavigate();
 
-  const initials = user?.email?.[0]?.toUpperCase() ?? 'U';
+  const initials   = user?.email?.[0]?.toUpperCase() ?? 'U';
+  const isAdmin    = user?.roles?.includes('ROLE_ADMIN');
+  const bellTarget = isAdmin ? '/admin/orders' : '/seller/dashboard';
 
   return (
     <div style={S.bar} role="banner">
 
-      {/* Left: hamburger + page title */}
+      {/* Left: hamburger + home + page title */}
       <div style={S.left}>
         <button
           style={S.menuBtn}
@@ -132,17 +136,35 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
           <HiMenu size={20} />
         </button>
 
+        <button
+          style={S.iconBtn}
+          onClick={() => navigate('/')}
+          aria-label="Go to home"
+          title="Home"
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+            e.currentTarget.style.color = 'var(--text)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = 'var(--text-3)';
+          }}
+        >
+          <HiHome size={18} />
+        </button>
+
         <span style={S.title}>{title}</span>
       </div>
 
       {/* Right: notifications (placeholder) + user avatar */}
       <div style={S.right}>
 
-        {/* Notification bell — styled placeholder */}
+        {/* Notification bell */}
         <button
           style={S.iconBtn}
           aria-label="Notifications"
-          title="Notifications (coming soon)"
+          title={isAdmin ? 'View orders' : 'View dashboard'}
+          onClick={() => navigate(bellTarget)}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
             e.currentTarget.style.color = 'var(--text)';
