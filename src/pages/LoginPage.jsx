@@ -39,7 +39,9 @@ const LoginPage = () => {
             toast.success("Login successful");
             setFormData({ email: "", password: "" });
         } catch (error) {
-            dispatch(loginFailure(error.response?.data || "Login failed"));
+            const msg = error.response?.data?.message || error.response?.data || "Invalid email or password.";
+            dispatch(loginFailure(msg));
+            toast.error(typeof msg === "string" ? msg : "Invalid email or password.");
         }
     };
 
