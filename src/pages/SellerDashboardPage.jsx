@@ -91,10 +91,11 @@ const SellerDashboardPage = () => {
     const navigate           = useNavigate();
     const location           = useLocation();
     const highlightProductId = location.state?.highlightProductId ?? null;
-    const [products,  setProducts]  = useState([]);
-    const [loading,   setLoading]   = useState(true);
-    const [deleting,  setDeleting]  = useState(false);
-    const [search,    setSearch]    = useState("");
+    const [products,        setProducts]        = useState([]);
+    const [loading,         setLoading]         = useState(true);
+    const [deleting,        setDeleting]        = useState(false);
+    const [search,          setSearch]          = useState("");
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -110,6 +111,20 @@ const SellerDashboardPage = () => {
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
+
+    /* scroll to highlighted product once data loads */
+    useEffect(() => {
+        if (!highlightProductId || loading || filteredProducts.length === 0) return;
+        const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
+        if (idx === -1) return;
+        const targetPage = Math.floor(idx / paginationModel.pageSize);
+        setPaginationModel(m => ({ ...m, page: targetPage }));
+        const timer = setTimeout(() => {
+            const el = document.querySelector(`[data-id="${highlightProductId}"]`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 350);
+        return () => clearTimeout(timer);
+    }, [highlightProductId, loading, filteredProducts.length]);
 
     const handleDelete = useCallback(async (product) => {
         if (!window.confirm(`Delete "${product.productName}"?`)) return;
@@ -424,7 +439,8 @@ const SellerDashboardPage = () => {
                 columns={columns}
                 getRowId={row => row.productId}
                 loading={loading}
-                pageSize={10}
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
                 getRowHeight={({ model }) =>
                     model.status === "REJECTED" && model.rejectionReason ? 76 : 56
                 }

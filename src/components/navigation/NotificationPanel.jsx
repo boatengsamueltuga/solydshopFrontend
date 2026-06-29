@@ -237,32 +237,26 @@ const NotificationPanel = () => {
                                 {TYPE_ICON[n.type] ?? <HiBell />}
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{
-                                    fontFamily:   'var(--font-display)',
-                                    fontWeight:   n.read ? 500 : 700,
-                                    fontSize:     '13px',
-                                    color:        'var(--text)',
-                                    margin:       '0 0 2px',
-                                    overflow:     'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace:   'nowrap',
-                                }}>
-                                    {n.title}
-                                </p>
-                                <Tooltip title={n.message} placement="bottom-start" enterDelay={400} arrow>
-                                <p style={{
-                                    fontFamily:   'var(--font-body)',
-                                    fontSize:     '12px',
-                                    color:        'var(--text-2)',
-                                    margin:       '0 0 4px',
-                                    overflow:     'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace:   'nowrap',
-                                    cursor:       'default',
-                                }}>
-                                    {n.message}
-                                </p>
-                                </Tooltip>
+                                {n.title.length > 32
+                                    ? <Tooltip title={n.title} placement="bottom-start" enterDelay={300} arrow>
+                                        <p style={{ fontFamily: 'var(--font-display)', fontWeight: n.read ? 500 : 700, fontSize: '13px', color: 'var(--text)', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'help' }}>
+                                            {n.title}
+                                        </p>
+                                      </Tooltip>
+                                    : <p style={{ fontFamily: 'var(--font-display)', fontWeight: n.read ? 500 : 700, fontSize: '13px', color: 'var(--text)', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {n.title}
+                                      </p>
+                                }
+                                {n.message.length > 50
+                                    ? <Tooltip title={n.message} placement="bottom-start" enterDelay={300} arrow>
+                                        <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--text-2)', margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'help' }}>
+                                            {n.message}
+                                        </p>
+                                      </Tooltip>
+                                    : <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--text-2)', margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        {n.message}
+                                      </p>
+                                }
                                 {getNavTarget(n) && (
                                     <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: iconColor, margin: 0, display: 'flex', alignItems: 'center', gap: '3px' }}>
                                         <HiArrowRight size={10} /> Click to view

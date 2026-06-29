@@ -54,6 +54,8 @@ const DataTable = ({
   emptyMessage = 'No records found',
   toolbar,
   sx: sxProp,
+  paginationModel,
+  onPaginationModelChange,
   ...rest
 }) => {
   return (
@@ -89,10 +91,10 @@ const DataTable = ({
         rowHeight={56}
         disableRowSelectionOnClick
         pageSizeOptions={pageSizeOptions}
-        initialState={{
-          pagination: { paginationModel: { pageSize } },
-          ...rest.initialState,
-        }}
+        {...(paginationModel
+          ? { paginationModel, onPaginationModelChange }
+          : { initialState: { pagination: { paginationModel: { pageSize } }, ...rest.initialState } }
+        )}
         slots={{
           noRowsOverlay:    EmptyOverlay,
           noResultsOverlay: EmptyOverlay,

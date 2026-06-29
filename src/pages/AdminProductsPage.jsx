@@ -141,8 +141,9 @@ const AdminProductsPage = () => {
 
     const location            = useLocation();
     const highlightProductId  = location.state?.highlightProductId ?? null;
-    const [statusFilter, setStatusFilter] = useState(location.state?.autoFilter ?? "ALL");
-    const [search,       setSearch]       = useState("");
+    const [statusFilter,     setStatusFilter]     = useState(location.state?.autoFilter ?? "ALL");
+    const [search,           setSearch]           = useState("");
+    const [paginationModel,  setPaginationModel]  = useState({ page: 0, pageSize: 25 });
 
     const [isFormOpen,        setIsFormOpen]        = useState(false);
     const [editingProductId,  setEditingProductId]  = useState(null);
@@ -203,6 +204,20 @@ const AdminProductsPage = () => {
         fetchProducts();
         fetchCategories();
     }, []);
+
+    /* scroll to highlighted product once data loads */
+    useEffect(() => {
+        if (!highlightProductId || loading || filteredProducts.length === 0) return;
+        const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
+        if (idx === -1) return;
+        const targetPage = Math.floor(idx / paginationModel.pageSize);
+        setPaginationModel(m => ({ ...m, page: targetPage }));
+        const timer = setTimeout(() => {
+            const el = document.querySelector(`[data-id="${highlightProductId}"]`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 350);
+        return () => clearTimeout(timer);
+    }, [highlightProductId, loading, filteredProducts.length]);
 
     /*
     |----------------------------------------------------------
@@ -556,7 +571,8 @@ const AdminProductsPage = () => {
                     rowHeight={56}
                     loading={loading}
                     pageSizeOptions={[10, 25, 50]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
                     style={{ height: isMobile ? 450 : 620, width: "100%", border: "none" }}
                     getRowClassName={(params) =>
                         params.id === highlightProductId ? "highlighted-row" : ""
