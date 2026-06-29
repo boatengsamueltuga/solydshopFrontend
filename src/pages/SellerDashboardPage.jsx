@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import SellerLayout from "../components/layouts/SellerLayout";
 import DataTable from "../components/common/DataTable";
+import { useGridApiRef } from "@mui/x-data-grid";
 
 import Chip            from "@mui/material/Chip";
 import Tooltip         from "@mui/material/Tooltip";
@@ -96,6 +97,7 @@ const SellerDashboardPage = () => {
     const [deleting,        setDeleting]        = useState(false);
     const [search,          setSearch]          = useState("");
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const gridApiRef = useGridApiRef();
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -152,6 +154,7 @@ const SellerDashboardPage = () => {
         let timerId;
         let attempts = 0;
         const tryScroll = () => {
+            try { gridApiRef.current.scrollToIndexes({ rowIndex: idx }); } catch {}
             const el = document.querySelector(`[data-id="${highlightProductId}"]`);
             if (el) {
                 el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -444,6 +447,7 @@ const SellerDashboardPage = () => {
 
             {/* ── DataTable ── */}
             <DataTable
+                apiRef={gridApiRef}
                 rows={filteredProducts}
                 columns={columns}
                 getRowId={row => row.productId}
