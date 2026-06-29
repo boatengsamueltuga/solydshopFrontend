@@ -12,13 +12,63 @@ import Tooltip         from "@mui/material/Tooltip";
 import IconButton      from "@mui/material/IconButton";
 import TextField       from "@mui/material/TextField";
 import InputAdornment  from "@mui/material/InputAdornment";
-import EditOutlinedIcon   from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon  from "@mui/icons-material/DeleteOutlined";
-import SearchIcon         from "@mui/icons-material/Search";
-import ClearIcon          from "@mui/icons-material/Clear";
-import RefreshIcon        from "@mui/icons-material/Refresh";
+import EditOutlinedIcon    from "@mui/icons-material/EditOutlined";
+import DeleteOutlineIcon   from "@mui/icons-material/DeleteOutlined";
+import SearchIcon          from "@mui/icons-material/Search";
+import ClearIcon           from "@mui/icons-material/Clear";
+import RefreshIcon         from "@mui/icons-material/Refresh";
+import InfoOutlinedIcon    from "@mui/icons-material/InfoOutlined";
+import WarningAmberIcon    from "@mui/icons-material/WarningAmber";
 
 import { HiCube } from "react-icons/hi";
+
+/* ── Status chip config ── */
+const STATUS_CONFIG = {
+    PENDING_REVIEW: { label: "Pending Review", color: "warning" },
+    ACTIVE:         { label: "Active",          color: "success" },
+    REJECTED:       { label: "Rejected",        color: "error"   },
+    SUSPENDED:      { label: "Suspended",       color: "default" },
+    ARCHIVED:       { label: "Archived",        color: "default" },
+};
+
+const StatusChip = memo(({ status, rejectionReason }) => {
+    const cfg = STATUS_CONFIG[status] || { label: status, color: "default" };
+    const chip = (
+        <Chip
+            label={cfg.label}
+            color={cfg.color}
+            size="small"
+            variant="outlined"
+            icon={status === "REJECTED" ? <InfoOutlinedIcon style={{ fontSize: 13 }} /> : undefined}
+            sx={{
+                fontFamily: "var(--font-mono)", fontSize: "0.68rem", fontWeight: 700, height: 20,
+                cursor: status === "REJECTED" ? "help" : "default",
+            }}
+        />
+    );
+    if (status === "REJECTED" && rejectionReason) {
+        return (
+            <Tooltip title={`Rejected: ${rejectionReason}`} arrow placement="top">
+                {chip}
+            </Tooltip>
+        );
+    }
+    if (status === "PENDING_REVIEW") {
+        return (
+            <Tooltip title="Your product is awaiting admin review" arrow placement="top">
+                {chip}
+            </Tooltip>
+        );
+    }
+    if (status === "SUSPENDED") {
+        return (
+            <Tooltip title="This product was suspended by an admin and is not visible to buyers" arrow placement="top">
+                {chip}
+            </Tooltip>
+        );
+    }
+    return chip;
+});
 
 const getXsrfToken = () =>
     document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -97,8 +147,12 @@ const SellerDashboardPage = () => {
     }, [products, search]);
 
     /* ── Computed stats ── */
-    const inStockCount  = products.filter(p => p.quantity > 0).length;
-    const catalogValue  = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+    const inStockCount    = products.filter(p => p.quantity > 0).length;
+    const pendingCount    = products.filter(p => p.status === "PENDING_REVIEW").length;
+    const rejectedCount   = products.filter(p => p.status === "REJECTED").length;
+    const activeCount     = products.filter(p => p.status === "ACTIVE").length;
+    const catalogValue    = products.filter(p => p.status === "ACTIVE")
+                                    .reduce((sum, p) => sum + (p.price * p.quantity), 0);
 
     const formatCompact = (n) => {
         if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
@@ -167,6 +221,14 @@ const SellerDashboardPage = () => {
                 : <span style={{ color: "var(--text-4)", fontSize: "12px" }}>—</span>,
         },
         {
+            field:    "status",
+            headerName: "Status",
+            width:    140,
+            renderCell: ({ row }) => (
+                <StatusChip status={row.status} rejectionReason={row.rejectionReason} />
+            ),
+        },
+        {
             field:    "price",
             headerName: "Price",
             width:    110,
@@ -191,43 +253,81 @@ const SellerDashboardPage = () => {
             headerName: "Actions",
             width:    90,
             sortable: false,
-            renderCell: ({ row }) => (
-                <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-                    <Tooltip title="Edit" arrow>
-                        <IconButton
-                            size="small"
-                            onClick={() => navigate(`/seller/products/${row.productId}/edit`, { state: { product: row } })}
-                            sx={{ color: "var(--accent)", borderRadius: "var(--r-sm)", "&:hover": { background: "var(--accent-subtle)" } }}
-                        >
-                            <EditOutlinedIcon sx={{ fontSize: 15 }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete" arrow>
-                        <IconButton
-                            size="small"
-                            onClick={() => handleDelete(row)}
-                            disabled={deleting}
-                            sx={{ color: "var(--error)", borderRadius: "var(--r-sm)", "&:hover": { background: "var(--error-subtle)" } }}
-                        >
-                            <DeleteOutlineIcon sx={{ fontSize: 15 }} />
-                        </IconButton>
-                    </Tooltip>
-                </div>
-            ),
+            renderCell: ({ row }) => {
+                const locked = row.status === "SUSPENDED" || row.status === "ARCHIVED";
+                const editTitle = locked
+                    ? `This product is ${row.status.toLowerCase()} and cannot be edited`
+                    : row.status === "REJECTED"
+                    ? "Edit and resubmit for review"
+                    : "Edit";
+                return (
+                    <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                        <Tooltip title={editTitle} arrow>
+                            <span>
+                                <IconButton
+                                    size="small"
+                                    disabled={locked}
+                                    onClick={() => navigate(`/seller/products/${row.productId}/edit`, { state: { product: row } })}
+                                    sx={{ color: locked ? "var(--text-4)" : "var(--accent)", borderRadius: "var(--r-sm)", "&:hover": { background: "var(--accent-subtle)" } }}
+                                >
+                                    <EditOutlinedIcon sx={{ fontSize: 15 }} />
+                                </IconButton>
+                            </span>
+                        </Tooltip>
+                        <Tooltip title="Delete" arrow>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleDelete(row)}
+                                disabled={deleting}
+                                sx={{ color: "var(--error)", borderRadius: "var(--r-sm)", "&:hover": { background: "var(--error-subtle)" } }}
+                            >
+                                <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                );
+            },
         },
     ], [navigate, handleDelete, deleting]);
 
     return (
         <SellerLayout title="Seller Dashboard">
 
+            {/* ── Rejected products alert banner ── */}
+            {!loading && rejectedCount > 0 && (
+                <div style={{
+                    display: "flex", alignItems: "flex-start", gap: "var(--space-3)",
+                    padding: "var(--space-3) var(--space-4)",
+                    background: "var(--error-subtle)", border: "1px solid var(--error)",
+                    borderRadius: "var(--r-md)", marginBottom: "var(--space-5)",
+                }}>
+                    <WarningAmberIcon sx={{ color: "var(--error)", fontSize: 18, flexShrink: 0, mt: "1px" }} />
+                    <div>
+                        <p style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: "13px", color: "var(--error)", margin: 0 }}>
+                            {rejectedCount} product{rejectedCount > 1 ? "s" : ""} rejected
+                        </p>
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-2)", margin: "2px 0 0" }}>
+                            Hover the Rejected badge to see the reason. Edit the product to fix the issue and resubmit for review.
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* ── Stats row ── */}
             <div style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
                 gap: "var(--space-4)",
                 marginBottom: "var(--space-8)",
             }}>
                 <StatCard label="Total Products" value={products.length} loading={loading} />
+                <StatCard label="Active"          value={activeCount}    loading={loading} />
+                <StatCard
+                    label="Pending Review"
+                    value={pendingCount}
+                    sub={pendingCount > 0 ? "awaiting admin approval" : "none pending"}
+                    loading={loading}
+                />
                 <StatCard
                     label="In Stock"
                     value={inStockCount}
@@ -235,9 +335,9 @@ const SellerDashboardPage = () => {
                     loading={loading}
                 />
                 <StatCard
-                    label="Catalog Value"
+                    label="Active Value"
                     value={formatCompact(catalogValue)}
-                    sub={`$${catalogValue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} · price × qty`}
+                    sub="active products · price × qty"
                     loading={loading}
                 />
             </div>
