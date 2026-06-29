@@ -40,25 +40,29 @@ import AdminLayout from "../components/layouts/AdminLayout";
 import SheetPanel  from "../components/common/SheetPanel";
 import PageBanner  from "../components/common/PageBanner";
 
-/* ── Status chip config ── */
-const STATUS_CONFIG = {
-    PENDING_REVIEW: { label: "Pending Review", color: "warning" },
-    ACTIVE:         { label: "Active",          color: "success" },
-    REJECTED:       { label: "Rejected",        color: "error"   },
-    SUSPENDED:      { label: "Suspended",       color: "default" },
-    ARCHIVED:       { label: "Archived",        color: "default" },
+/* ── Status badge styles ── */
+const STATUS_STYLE = {
+    PENDING_REVIEW: { label: "Pending Review", color: "#d97706", bg: "rgba(217,119,6,0.12)",   border: "rgba(217,119,6,0.35)"   },
+    ACTIVE:         { label: "Active",          color: "#059669", bg: "rgba(5,150,105,0.12)",   border: "rgba(5,150,105,0.35)"   },
+    REJECTED:       { label: "Rejected",        color: "#dc2626", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.35)"   },
+    SUSPENDED:      { label: "Suspended",       color: "#7c3aed", bg: "rgba(124,58,237,0.12)",  border: "rgba(124,58,237,0.35)"  },
+    ARCHIVED:       { label: "Archived",        color: "#71717a", bg: "rgba(113,113,122,0.1)",  border: "rgba(113,113,122,0.3)"  },
 };
 
-const StatusChip = memo(({ status }) => {
-    const cfg = STATUS_CONFIG[status] || { label: status, color: "default" };
+const StatusBadge = memo(({ status }) => {
+    const s = STATUS_STYLE[status] || { label: status, color: "#71717a", bg: "rgba(113,113,122,0.1)", border: "rgba(113,113,122,0.3)" };
     return (
-        <Chip
-            label={cfg.label}
-            color={cfg.color}
-            size="small"
-            variant="outlined"
-            sx={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", fontWeight: 700, height: 20 }}
-        />
+        <span style={{
+            display: "inline-flex", alignItems: "center", gap: "5px",
+            padding: "3px 9px 3px 7px", borderRadius: "20px",
+            background: s.bg, border: `1px solid ${s.border}`,
+            color: s.color, fontFamily: "var(--font-mono)",
+            fontSize: "11px", fontWeight: 700, letterSpacing: "0.03em",
+            whiteSpace: "nowrap", flexShrink: 0,
+        }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
+            {s.label}
+        </span>
     );
 });
 
@@ -74,13 +78,7 @@ const MonoTag = memo(({ value }) =>
     ));
 
 /* ── All status options — admin can set any product to any status ── */
-const ALL_STATUS_OPTIONS = [
-    { value: "ACTIVE",         label: "Active",         color: "var(--success)" },
-    { value: "PENDING_REVIEW", label: "Pending Review", color: "var(--warning)" },
-    { value: "REJECTED",       label: "Rejected",       color: "var(--error)"   },
-    { value: "SUSPENDED",      label: "Suspended",      color: "var(--text-2)"  },
-    { value: "ARCHIVED",       label: "Archived",       color: "var(--text-3)"  },
-];
+const ALL_STATUS_OPTIONS = Object.entries(STATUS_STYLE).map(([value, s]) => ({ value, ...s }));
 
 const AdminStatusSelect = memo(({ product, onReject, onRefresh }) => {
     const [loading, setLoading] = useState(false);
@@ -95,8 +93,8 @@ const AdminStatusSelect = memo(({ product, onReject, onRefresh }) => {
         setLoading(true);
         try {
             await api.post(`/admin/products/${product.productId}/force-status`, { status: newStatus });
-            const label = ALL_STATUS_OPTIONS.find(o => o.value === newStatus)?.label || newStatus;
-            toast.success(`"${product.productName}" set to ${label}`);
+            const label = STATUS_STYLE[newStatus]?.label || newStatus;
+            toast.success(`"${product.productName}" → ${label}`);
             onRefresh();
         } catch {
             toast.error("Failed to update product status.");
@@ -111,11 +109,11 @@ const AdminStatusSelect = memo(({ product, onReject, onRefresh }) => {
             onChange={handleChange}
             disabled={loading}
             size="small"
-            renderValue={() => <StatusChip status={product.status} />}
+            renderValue={() => <StatusBadge status={product.status} />}
             sx={{
-                height: 26,
+                height: 28,
                 "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                "& .MuiSelect-select": { padding: "0 20px 0 0 !important", display: "flex", alignItems: "center" },
+                "& .MuiSelect-select": { padding: "0 22px 0 0 !important", display: "flex", alignItems: "center" },
                 "& .MuiSelect-icon": { right: 0 },
             }}
         >
@@ -124,13 +122,12 @@ const AdminStatusSelect = memo(({ product, onReject, onRefresh }) => {
                     key={opt.value}
                     value={opt.value}
                     disabled={opt.value === product.status}
-                    sx={{
-                        fontSize: "13px",
-                        fontWeight: opt.value === product.status ? 700 : 500,
-                        color: opt.value === product.status ? "var(--text-3)" : opt.color,
-                    }}
+                    sx={{ gap: 1.5, opacity: opt.value === product.status ? 0.5 : 1 }}
                 >
-                    {opt.label}{opt.value === product.status ? " ✓" : opt.value === "REJECTED" ? "…" : ""}
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: opt.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: "13px", fontWeight: 500, color: opt.value === product.status ? "var(--text-3)" : opt.color }}>
+                        {opt.label}{opt.value === product.status ? "  ✓" : opt.value === "REJECTED" ? "…" : ""}
+                    </span>
                 </MenuItem>
             ))}
         </Select>
@@ -590,7 +587,7 @@ const AdminProductsPage = () => {
                             <Typography variant="h4" fontWeight="bold" sx={{ color: "var(--success)", fontFamily: "var(--font-mono)" }}>
                                 ${Number(selectedProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                             </Typography>
-                            <StatusChip status={selectedProduct.status} />
+                            <StatusBadge status={selectedProduct.status} />
                             {selectedProduct.categoryName && (
                                 <Chip label={selectedProduct.categoryName} size="small" variant="outlined"
                                     sx={{ color: "var(--accent)", borderColor: "var(--accent-border)" }} />

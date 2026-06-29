@@ -17,57 +17,45 @@ import DeleteOutlineIcon   from "@mui/icons-material/DeleteOutlined";
 import SearchIcon          from "@mui/icons-material/Search";
 import ClearIcon           from "@mui/icons-material/Clear";
 import RefreshIcon         from "@mui/icons-material/Refresh";
-import InfoOutlinedIcon    from "@mui/icons-material/InfoOutlined";
 import WarningAmberIcon    from "@mui/icons-material/WarningAmber";
 
 import { HiCube } from "react-icons/hi";
 
-/* ── Status chip config ── */
-const STATUS_CONFIG = {
-    PENDING_REVIEW: { label: "Pending Review", color: "warning" },
-    ACTIVE:         { label: "Active",          color: "success" },
-    REJECTED:       { label: "Rejected",        color: "error"   },
-    SUSPENDED:      { label: "Suspended",       color: "default" },
-    ARCHIVED:       { label: "Archived",        color: "default" },
+/* ── Status badge styles (shared with admin) ── */
+const STATUS_STYLE = {
+    PENDING_REVIEW: { label: "Pending Review", color: "#d97706", bg: "rgba(217,119,6,0.12)",   border: "rgba(217,119,6,0.35)"   },
+    ACTIVE:         { label: "Active",          color: "#059669", bg: "rgba(5,150,105,0.12)",   border: "rgba(5,150,105,0.35)"   },
+    REJECTED:       { label: "Rejected",        color: "#dc2626", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.35)"   },
+    SUSPENDED:      { label: "Suspended",       color: "#7c3aed", bg: "rgba(124,58,237,0.12)",  border: "rgba(124,58,237,0.35)"  },
+    ARCHIVED:       { label: "Archived",        color: "#71717a", bg: "rgba(113,113,122,0.1)",  border: "rgba(113,113,122,0.3)"  },
 };
 
-const StatusChip = memo(({ status, rejectionReason }) => {
-    const cfg = STATUS_CONFIG[status] || { label: status, color: "default" };
-    const chip = (
-        <Chip
-            label={cfg.label}
-            color={cfg.color}
-            size="small"
-            variant="outlined"
-            icon={status === "REJECTED" ? <InfoOutlinedIcon style={{ fontSize: 13 }} /> : undefined}
-            sx={{
-                fontFamily: "var(--font-mono)", fontSize: "0.68rem", fontWeight: 700, height: 20,
-                cursor: status === "REJECTED" ? "help" : "default",
-            }}
-        />
+const STATUS_TOOLTIP = {
+    PENDING_REVIEW: "Awaiting admin review — not yet visible to buyers",
+    ACTIVE:         "Live and visible to buyers",
+    SUSPENDED:      "Suspended by an admin — not visible to buyers",
+    ARCHIVED:       "Archived — no longer available",
+};
+
+const StatusBadge = memo(({ status }) => {
+    const s = STATUS_STYLE[status] || { label: status, color: "#71717a", bg: "rgba(113,113,122,0.1)", border: "rgba(113,113,122,0.3)" };
+    const badge = (
+        <span style={{
+            display: "inline-flex", alignItems: "center", gap: "5px",
+            padding: "3px 9px 3px 7px", borderRadius: "20px",
+            background: s.bg, border: `1px solid ${s.border}`,
+            color: s.color, fontFamily: "var(--font-mono)",
+            fontSize: "11px", fontWeight: 700, letterSpacing: "0.03em",
+            whiteSpace: "nowrap", cursor: STATUS_TOOLTIP[status] ? "help" : "default",
+        }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
+            {s.label}
+        </span>
     );
-    if (status === "REJECTED" && rejectionReason) {
-        return (
-            <Tooltip title={`Rejected: ${rejectionReason}`} arrow placement="top">
-                {chip}
-            </Tooltip>
-        );
+    if (STATUS_TOOLTIP[status]) {
+        return <Tooltip title={STATUS_TOOLTIP[status]} arrow placement="top">{badge}</Tooltip>;
     }
-    if (status === "PENDING_REVIEW") {
-        return (
-            <Tooltip title="Your product is awaiting admin review" arrow placement="top">
-                {chip}
-            </Tooltip>
-        );
-    }
-    if (status === "SUSPENDED") {
-        return (
-            <Tooltip title="This product was suspended by an admin and is not visible to buyers" arrow placement="top">
-                {chip}
-            </Tooltip>
-        );
-    }
-    return chip;
+    return badge;
 });
 
 const getXsrfToken = () =>
@@ -223,9 +211,22 @@ const SellerDashboardPage = () => {
         {
             field:    "status",
             headerName: "Status",
-            width:    140,
+            width:    200,
             renderCell: ({ row }) => (
-                <StatusChip status={row.status} rejectionReason={row.rejectionReason} />
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: "4px", padding: "6px 0", minWidth: 0 }}>
+                    <StatusBadge status={row.status} />
+                    {row.status === "REJECTED" && row.rejectionReason && (
+                        <span style={{
+                            fontSize: "11px", color: "#dc2626",
+                            fontFamily: "var(--font-body)", lineHeight: 1.35,
+                            overflow: "hidden", display: "-webkit-box",
+                            WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                            wordBreak: "break-word",
+                        }}>
+                            {row.rejectionReason}
+                        </span>
+                    )}
+                </div>
             ),
         },
         {
@@ -414,6 +415,9 @@ const SellerDashboardPage = () => {
                 getRowId={row => row.productId}
                 loading={loading}
                 pageSize={10}
+                getRowHeight={({ model }) =>
+                    model.status === "REJECTED" && model.rejectionReason ? 76 : 56
+                }
                 emptyMessage="No products listed yet. Click 'Add Product' to get started."
             />
 
