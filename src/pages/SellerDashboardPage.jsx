@@ -26,7 +26,7 @@ const STATUS_STYLE = {
     PENDING_REVIEW: { label: "Pending Review", color: "#d97706", bg: "rgba(217,119,6,0.12)",   border: "rgba(217,119,6,0.35)"   },
     ACTIVE:         { label: "Active",          color: "#059669", bg: "rgba(5,150,105,0.12)",   border: "rgba(5,150,105,0.35)"   },
     REJECTED:       { label: "Rejected",        color: "#dc2626", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.35)"   },
-    SUSPENDED:      { label: "Suspended",       color: "#7c3aed", bg: "rgba(124,58,237,0.12)",  border: "rgba(124,58,237,0.35)"  },
+    SUSPENDED:      { label: "Suspended",       color: "#60a5fa", bg: "rgba(96,165,250,0.12)",  border: "rgba(96,165,250,0.35)"  },
     ARCHIVED:       { label: "Archived",        color: "#71717a", bg: "rgba(113,113,122,0.1)",  border: "rgba(113,113,122,0.3)"  },
 };
 
@@ -46,7 +46,8 @@ const StatusBadge = memo(({ status }) => {
             background: s.bg, border: `1px solid ${s.border}`,
             color: s.color, fontFamily: "var(--font-mono)",
             fontSize: "11px", fontWeight: 700, letterSpacing: "0.03em",
-            whiteSpace: "nowrap", cursor: STATUS_TOOLTIP[status] ? "help" : "default",
+            whiteSpace: "nowrap", width: "fit-content", alignSelf: "flex-start",
+            cursor: STATUS_TOOLTIP[status] ? "help" : "default",
         }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
             {s.label}
@@ -213,7 +214,7 @@ const SellerDashboardPage = () => {
             headerName: "Status",
             width:    200,
             renderCell: ({ row }) => (
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: "4px", padding: "6px 0", minWidth: 0 }}>
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", gap: "4px", padding: "6px 0", minWidth: 0 }}>
                     <StatusBadge status={row.status} />
                     {row.status === "REJECTED" && row.rejectionReason && (
                         <span style={{

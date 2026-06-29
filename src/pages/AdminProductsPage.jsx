@@ -45,7 +45,7 @@ const STATUS_STYLE = {
     PENDING_REVIEW: { label: "Pending Review", color: "#d97706", bg: "rgba(217,119,6,0.12)",   border: "rgba(217,119,6,0.35)"   },
     ACTIVE:         { label: "Active",          color: "#059669", bg: "rgba(5,150,105,0.12)",   border: "rgba(5,150,105,0.35)"   },
     REJECTED:       { label: "Rejected",        color: "#dc2626", bg: "rgba(220,38,38,0.12)",   border: "rgba(220,38,38,0.35)"   },
-    SUSPENDED:      { label: "Suspended",       color: "#7c3aed", bg: "rgba(124,58,237,0.12)",  border: "rgba(124,58,237,0.35)"  },
+    SUSPENDED:      { label: "Suspended",       color: "#60a5fa", bg: "rgba(96,165,250,0.12)",  border: "rgba(96,165,250,0.35)"  },
     ARCHIVED:       { label: "Archived",        color: "#71717a", bg: "rgba(113,113,122,0.1)",  border: "rgba(113,113,122,0.3)"  },
 };
 
@@ -58,7 +58,7 @@ const StatusBadge = memo(({ status }) => {
             background: s.bg, border: `1px solid ${s.border}`,
             color: s.color, fontFamily: "var(--font-mono)",
             fontSize: "11px", fontWeight: 700, letterSpacing: "0.03em",
-            whiteSpace: "nowrap", flexShrink: 0,
+            whiteSpace: "nowrap", width: "fit-content", alignSelf: "center",
         }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
             {s.label}
@@ -111,7 +111,7 @@ const AdminStatusSelect = memo(({ product, onReject, onRefresh }) => {
             size="small"
             renderValue={() => <StatusBadge status={product.status} />}
             sx={{
-                height: 28,
+                height: 28, width: "fit-content",
                 "& .MuiOutlinedInput-notchedOutline": { border: "none" },
                 "& .MuiSelect-select": { padding: "0 22px 0 0 !important", display: "flex", alignItems: "center" },
                 "& .MuiSelect-icon": { right: 0 },
