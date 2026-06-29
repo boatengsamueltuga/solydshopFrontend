@@ -342,7 +342,7 @@ const AdminProductsPage = () => {
         }
         setActionLoading(true);
         try {
-            await api.post(`/admin/products/${productToReject.productId}/reject`, { reason: rejectReason });
+            await api.post(`/admin/products/${productToReject.productId}/force-status`, { status: "REJECTED", rejectionReason: rejectReason });
             toast.success(`"${productToReject.productName}" rejected. Seller has been notified.`);
             fetchProducts();
         } catch {
