@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import api from "../api/api";
 import toast from "react-hot-toast";
@@ -88,7 +88,9 @@ const StatCard = memo(({ label, value, sub, loading }) => (
 
 const SellerDashboardPage = () => {
 
-    const navigate = useNavigate();
+    const navigate  = useNavigate();
+    const location  = useLocation();
+    const [highlightProductId, setHighlightProductId] = useState(location.state?.highlightProductId ?? null);
     const [products,  setProducts]  = useState([]);
     const [loading,   setLoading]   = useState(true);
     const [deleting,  setDeleting]  = useState(false);
@@ -426,6 +428,16 @@ const SellerDashboardPage = () => {
                 getRowHeight={({ model }) =>
                     model.status === "REJECTED" && model.rejectionReason ? 76 : 56
                 }
+                getRowClassName={(params) =>
+                    params.id === highlightProductId ? "highlighted-row" : ""
+                }
+                sx={{
+                    "& .highlighted-row": {
+                        background: "rgba(220,38,38,0.1) !important",
+                        outline: "2px solid rgba(220,38,38,0.35)",
+                        outlineOffset: "-2px",
+                    },
+                }}
                 emptyMessage="No products listed yet. Click 'Add Product' to get started."
             />
 

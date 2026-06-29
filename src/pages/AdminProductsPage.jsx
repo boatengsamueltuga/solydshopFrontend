@@ -140,8 +140,9 @@ const AdminProductsPage = () => {
     const [loading,    setLoading]    = useState(true);
 
     const location = useLocation();
-    const [statusFilter, setStatusFilter] = useState(location.state?.autoFilter ?? "ALL");
-    const [search,       setSearch]       = useState("");
+    const [statusFilter,       setStatusFilter]       = useState(location.state?.autoFilter ?? "ALL");
+    const [search,             setSearch]             = useState("");
+    const [highlightProductId, setHighlightProductId] = useState(location.state?.highlightProductId ?? null);
 
     const [isFormOpen,        setIsFormOpen]        = useState(false);
     const [editingProductId,  setEditingProductId]  = useState(null);
@@ -557,6 +558,16 @@ const AdminProductsPage = () => {
                     pageSizeOptions={[10, 25, 50]}
                     initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
                     style={{ height: isMobile ? 450 : 620, width: "100%", border: "none" }}
+                    getRowClassName={(params) =>
+                        params.id === highlightProductId ? "highlighted-row" : ""
+                    }
+                    sx={{
+                        "& .highlighted-row": {
+                            background: "rgba(217,119,6,0.12) !important",
+                            outline: "2px solid rgba(217,119,6,0.4)",
+                            outlineOffset: "-2px",
+                        },
+                    }}
                 />
             </div>
 

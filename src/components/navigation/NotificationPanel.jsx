@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause } from 'react-icons/hi';
+import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiArrowRight } from 'react-icons/hi';
+import Tooltip from '@mui/material/Tooltip';
 import { closePanel } from '../../store/reducers/notificationReducer';
 import {
     fetchNotifications,
@@ -29,13 +30,19 @@ const TYPE_COLOR = {
     PRODUCT_ARCHIVED:  'var(--text-3)',
 };
 
-/* where to navigate when clicking a notification */
-const TYPE_LINK = {
-    PRODUCT_REVIEW:    { path: '/admin/products',   state: { autoFilter: 'PENDING_REVIEW' } },
-    PRODUCT_APPROVED:  { path: '/seller/dashboard', state: null },
-    PRODUCT_REJECTED:  { path: '/seller/dashboard', state: null },
-    PRODUCT_SUSPENDED: { path: '/seller/dashboard', state: null },
-    PRODUCT_ARCHIVED:  { path: '/seller/dashboard', state: null },
+/* build navigation target from a notification */
+const getNavTarget = (n) => {
+    switch (n.type) {
+        case 'PRODUCT_REVIEW':
+            return { path: '/admin/products',   state: { autoFilter: 'PENDING_REVIEW', highlightProductId: n.resourceId } };
+        case 'PRODUCT_APPROVED':
+        case 'PRODUCT_REJECTED':
+        case 'PRODUCT_SUSPENDED':
+        case 'PRODUCT_ARCHIVED':
+            return { path: '/seller/dashboard', state: { highlightProductId: n.resourceId } };
+        default:
+            return null;
+    }
 };
 
 const formatTime = (iso) => {
@@ -72,10 +79,10 @@ const NotificationPanel = () => {
 
     const handleClick = (n) => {
         if (!n.read) dispatch(markNotificationRead(n.id));
-        const dest = TYPE_LINK[n.type];
+        const dest = getNavTarget(n);
         if (dest) {
             dispatch(closePanel());
-            navigate(dest.path, dest.state ? { state: dest.state } : {});
+            navigate(dest.path, { state: dest.state });
         }
     };
 
@@ -196,7 +203,7 @@ const NotificationPanel = () => {
                 ) : (
                     items.map((n) => {
                         const iconColor  = TYPE_COLOR[n.type] ?? 'var(--accent)';
-                        const clickable  = Boolean(TYPE_LINK[n.type]) || !n.read;
+                        const clickable  = Boolean(getNavTarget(n)) || !n.read;
                         return (
                         <div
                             key={n.id}
@@ -242,6 +249,7 @@ const NotificationPanel = () => {
                                 }}>
                                     {n.title}
                                 </p>
+                                <Tooltip title={n.message} placement="bottom-start" enterDelay={400} arrow>
                                 <p style={{
                                     fontFamily:   'var(--font-body)',
                                     fontSize:     '12px',
@@ -250,9 +258,16 @@ const NotificationPanel = () => {
                                     overflow:     'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace:   'nowrap',
+                                    cursor:       'default',
                                 }}>
                                     {n.message}
                                 </p>
+                                </Tooltip>
+                                {getNavTarget(n) && (
+                                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: iconColor, margin: 0, display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                        <HiArrowRight size={10} /> Click to view
+                                    </p>
+                                )}
                                 <p style={{
                                     fontFamily: 'var(--font-mono)',
                                     fontSize:   '11px',
