@@ -142,29 +142,33 @@ const SellerDashboardPage = () => {
         );
     }, [products, search]);
 
-    /* scroll to highlighted product once data loads */
+    /* jump to the right page first, then scroll once we're on it */
     useEffect(() => {
         if (!highlightProductId || loading || filteredProducts.length === 0) return;
-        const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
+        const idx = filteredProducts.findIndex(
+            p => String(p.productId) === String(highlightProductId)
+        );
         if (idx === -1) return;
 
         const targetPage = Math.floor(idx / paginationModel.pageSize);
-        setPaginationModel(m => ({ ...m, page: targetPage }));
+        if (targetPage !== paginationModel.page) {
+            setPaginationModel(m => ({ ...m, page: targetPage }));
+            return; // dep paginationModel.page will change → effect re-fires
+        }
 
-        let timerId;
-        let attempts = 0;
-        const tryScroll = () => {
-            try { gridApiRef.current.scrollToIndexes({ rowIndex: idx }); } catch {}
-            const el = document.querySelector(`[data-id="${highlightProductId}"]`);
-            if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "center" });
-            } else if (++attempts < 8) {
-                timerId = setTimeout(tryScroll, 200);
-            }
-        };
-        timerId = setTimeout(tryScroll, 300);
-        return () => clearTimeout(timerId);
-    }, [highlightProductId, loading, filteredProducts.length]);
+        // Already on the right page — scroll after the next paint
+        let raf1, raf2;
+        raf1 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(() => {
+                const el =
+                    document.querySelector(`.MuiDataGrid-row[data-id="${highlightProductId}"]`) ||
+                    document.querySelector(`[data-id="${highlightProductId}"]`) ||
+                    document.querySelector('.highlighted-row');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        });
+        return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
+    }, [highlightProductId, loading, filteredProducts.length, paginationModel.page]);
 
     /* ── Computed stats ── */
     const inStockCount    = products.filter(p => p.quantity > 0).length;
@@ -458,7 +462,7 @@ const SellerDashboardPage = () => {
                     model.status === "REJECTED" && model.rejectionReason ? 76 : 56
                 }
                 getRowClassName={(params) =>
-                    params.id === highlightProductId ? "highlighted-row" : ""
+                    String(params.id) === String(highlightProductId) ? "highlighted-row" : ""
                 }
                 sx={{
                     "& .highlighted-row": {
