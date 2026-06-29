@@ -514,7 +514,7 @@ const AdminProductsPage = () => {
                     <Select label="Status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                         {STATUS_OPTIONS.map(s => (
                             <MenuItem key={s} value={s}>
-                                {s === "ALL" ? "All statuses" : STATUS_CONFIG[s]?.label || s}
+                                {s === "ALL" ? "All statuses" : STATUS_STYLE[s]?.label || s}
                             </MenuItem>
                         ))}
                     </Select>
