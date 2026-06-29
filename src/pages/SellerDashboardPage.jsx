@@ -38,19 +38,16 @@ const STATUS_TOOLTIP = {
 };
 
 const StatusBadge = memo(({ status }) => {
-    const s = STATUS_STYLE[status] || { label: status, color: "#71717a", bg: "rgba(113,113,122,0.1)", border: "rgba(113,113,122,0.3)" };
+    const s = STATUS_STYLE[status] || { label: status, color: "#71717a" };
     const badge = (
         <span style={{
-            display: "inline-flex", alignItems: "center", gap: "5px",
-            padding: "3px 9px 3px 7px", borderRadius: "20px",
-            background: s.bg, border: `1px solid ${s.border}`,
-            color: s.color, fontFamily: "var(--font-mono)",
-            fontSize: "11px", fontWeight: 700, letterSpacing: "0.03em",
-            whiteSpace: "nowrap", width: "fit-content", alignSelf: "flex-start",
-            cursor: STATUS_TOOLTIP[status] ? "help" : "default",
+            display: "inline-flex", alignItems: "center", gap: "6px",
+            width: "fit-content", cursor: STATUS_TOOLTIP[status] ? "help" : "default",
         }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
-            {s.label}
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
+            <span style={{ color: s.color, fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap" }}>
+                {s.label}
+            </span>
         </span>
     );
     if (STATUS_TOOLTIP[status]) {
