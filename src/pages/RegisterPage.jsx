@@ -63,13 +63,8 @@ const RegisterPage = () => {
             });
 
         } catch (error) {
-
-            toast.error(
-                error.response?.data?.message ||
-                error.response?.data ||
-                "Registration failed"
-            );
-
+            const msg = error.response?.data?.message || error.response?.data || "Registration failed.";
+            toast.error(typeof msg === "string" ? msg : "Registration failed.");
         } finally {
 
             setLoading(false);
