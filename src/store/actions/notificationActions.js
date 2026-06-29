@@ -57,6 +57,18 @@ export const deleteNotification = createAsyncThunk(
     }
 );
 
+export const fetchUnreadCount = createAsyncThunk(
+    'notifications/fetchUnreadCount',
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await api.get('/notifications/unread-count');
+            return res.data.count;
+        } catch {
+            return rejectWithValue(null);
+        }
+    }
+);
+
 export const deleteAllNotifications = createAsyncThunk(
     'notifications/deleteAll',
     async (_, { rejectWithValue }) => {

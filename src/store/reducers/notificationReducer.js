@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchNotifications,
+    fetchUnreadCount,
     markNotificationRead,
     markAllNotificationsRead,
     deleteNotification,
@@ -28,6 +29,10 @@ const notificationSlice = createSlice({
                 state.unreadCount = action.payload.filter(n => !n.read).length;
             })
             .addCase(fetchNotifications.rejected, (state) => { state.loading = false; })
+
+            .addCase(fetchUnreadCount.fulfilled, (state, action) => {
+                state.unreadCount = action.payload ?? 0;
+            })
 
             .addCase(markNotificationRead.fulfilled, (state, action) => {
                 const n = state.items.find(i => i.id === action.payload);
