@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 
 import {
     Box,
@@ -144,6 +144,7 @@ const AdminProductsPage = () => {
     const [statusFilter,     setStatusFilter]     = useState(location.state?.autoFilter ?? "ALL");
     const [search,           setSearch]           = useState("");
     const [paginationModel,  setPaginationModel]  = useState({ page: 0, pageSize: 25 });
+    const gridApiRef = useGridApiRef();
 
     const [isFormOpen,        setIsFormOpen]        = useState(false);
     const [editingProductId,  setEditingProductId]  = useState(null);
@@ -234,13 +235,26 @@ const AdminProductsPage = () => {
         if (!highlightProductId || loading || filteredProducts.length === 0) return;
         const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
         if (idx === -1) return;
-        const targetPage = Math.floor(idx / paginationModel.pageSize);
+
+        const pageSize = paginationModel.pageSize;
+        const targetPage = Math.floor(idx / pageSize);
         setPaginationModel(m => ({ ...m, page: targetPage }));
-        const timer = setTimeout(() => {
+
+        /* DataGrid virtualizes rows — use apiRef to scroll within the grid,
+           then retry DOM fallback until the row element is painted */
+        let timerId;
+        let attempts = 0;
+        const tryScroll = () => {
+            try { gridApiRef.current.scrollToIndexes({ rowIndex: idx }); } catch {}
             const el = document.querySelector(`[data-id="${highlightProductId}"]`);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 350);
-        return () => clearTimeout(timer);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+            } else if (++attempts < 8) {
+                timerId = setTimeout(tryScroll, 200);
+            }
+        };
+        timerId = setTimeout(tryScroll, 300);
+        return () => clearTimeout(timerId);
     }, [highlightProductId, loading, filteredProducts.length]);
 
     /*
@@ -564,6 +578,7 @@ const AdminProductsPage = () => {
             {/* ── DataGrid ── */}
             <div style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", overflow: "hidden" }}>
                 <DataGrid
+                    apiRef={gridApiRef}
                     rows={filteredProducts}
                     columns={columns}
                     disableRowSelectionOnClick

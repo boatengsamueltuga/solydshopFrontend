@@ -145,13 +145,22 @@ const SellerDashboardPage = () => {
         if (!highlightProductId || loading || filteredProducts.length === 0) return;
         const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
         if (idx === -1) return;
+
         const targetPage = Math.floor(idx / paginationModel.pageSize);
         setPaginationModel(m => ({ ...m, page: targetPage }));
-        const timer = setTimeout(() => {
+
+        let timerId;
+        let attempts = 0;
+        const tryScroll = () => {
             const el = document.querySelector(`[data-id="${highlightProductId}"]`);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 350);
-        return () => clearTimeout(timer);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+            } else if (++attempts < 8) {
+                timerId = setTimeout(tryScroll, 200);
+            }
+        };
+        timerId = setTimeout(tryScroll, 300);
+        return () => clearTimeout(timerId);
     }, [highlightProductId, loading, filteredProducts.length]);
 
     /* ── Computed stats ── */
