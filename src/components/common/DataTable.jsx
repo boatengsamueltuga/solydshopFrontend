@@ -53,6 +53,9 @@ const DataTable = ({
   pageSizeOptions = DEFAULT_PAGE_SIZES,
   emptyMessage = 'No records found',
   toolbar,
+  sx: sxProp,
+  paginationModel,
+  onPaginationModelChange,
   ...rest
 }) => {
   return (
@@ -85,13 +88,14 @@ const DataTable = ({
         getRowId={getRowId}
         loading={loading}
         autoHeight
+        disableVirtualization
         rowHeight={56}
         disableRowSelectionOnClick
         pageSizeOptions={pageSizeOptions}
-        initialState={{
-          pagination: { paginationModel: { pageSize } },
-          ...rest.initialState,
-        }}
+        {...(paginationModel
+          ? { paginationModel, onPaginationModelChange }
+          : { initialState: { pagination: { paginationModel: { pageSize } }, ...rest.initialState } }
+        )}
         slots={{
           noRowsOverlay:    EmptyOverlay,
           noResultsOverlay: EmptyOverlay,
@@ -107,6 +111,7 @@ const DataTable = ({
           '& .MuiDataGrid-virtualScroller': { minHeight: 120 },
           '& .MuiDataGrid-row:hover': { backgroundColor: 'var(--surface-hover)' },
           '& .MuiDataGrid-row.Mui-hovered': { backgroundColor: 'var(--surface-hover)' },
+          ...sxProp,
         }}
       />
     </Box>

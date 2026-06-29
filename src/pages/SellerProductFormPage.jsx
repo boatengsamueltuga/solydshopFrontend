@@ -19,6 +19,8 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 
 const EMPTY_FORM = {
     productName: "",
@@ -44,6 +46,10 @@ const SellerProductFormPage = () => {
     const [saving,      setSaving]      = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
 
+    const stateProduct     = location.state?.product;
+    const isRejected       = isEdit && stateProduct?.status === "REJECTED";
+    const rejectionReason  = stateProduct?.rejectionReason || null;
+
     const getXsrfToken = () =>
         document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
 
@@ -57,7 +63,6 @@ const SellerProductFormPage = () => {
     /* ── Load product for editing ── */
     useEffect(() => {
         if (!isEdit) return;
-        const stateProduct = location.state?.product;
         if (stateProduct) {
             populateForm(stateProduct);
             setLoading(false);
@@ -127,7 +132,9 @@ const SellerProductFormPage = () => {
                 await api.put(`/seller/products/${id}`, payload, {
                     headers: { "X-XSRF-TOKEN": getXsrfToken() },
                 });
-                toast.success("Product updated");
+                toast.success(isRejected
+                    ? "Product resubmitted — the admin will review it shortly"
+                    : "Product updated");
             } else {
                 await api.post("/seller/products", payload, {
                     headers: { "X-XSRF-TOKEN": getXsrfToken() },
@@ -148,7 +155,7 @@ const SellerProductFormPage = () => {
         ? URL.createObjectURL(selectedFile)
         : formData.imageUrl || null;
 
-    const pageTitle = isEdit ? "Edit Product" : "Add Product";
+    const pageTitle = isRejected ? "Fix & Resubmit" : isEdit ? "Edit Product" : "Add Product";
 
     /* ── Loading state ── */
     if (loading) {
@@ -193,6 +200,23 @@ const SellerProductFormPage = () => {
                     </p>
                 )}
             </div>
+
+            {/* ── Rejection reason banner ── */}
+            {isRejected && (
+                <Alert
+                    severity="error"
+                    sx={{ mb: 3, maxWidth: "760px", "& .MuiAlert-message": { width: "100%" } }}
+                >
+                    <AlertTitle sx={{ fontWeight: 700 }}>This product was rejected by an admin</AlertTitle>
+                    {rejectionReason
+                        ? <><strong>Reason:</strong> {rejectionReason}</>
+                        : "No reason was provided."}
+                    <p style={{ margin: "8px 0 0", fontSize: "13px", opacity: 0.85 }}>
+                        Fix the issues above, then click <strong>Fix &amp; Resubmit</strong>.
+                        Your product will automatically go back into the admin review queue.
+                    </p>
+                </Alert>
+            )}
 
             {/* ── Form panel ── */}
             <div style={{
@@ -378,7 +402,7 @@ const SellerProductFormPage = () => {
                             }}
                         >
                             {saving && <CircularProgress size={14} sx={{ color: "var(--text)" }} />}
-                            {saving ? "Saving…" : isEdit ? "Update Product" : "Create Product"}
+                            {saving ? "Saving…" : isRejected ? "Fix & Resubmit" : isEdit ? "Update Product" : "Create Product"}
                         </button>
                     </Box>
 

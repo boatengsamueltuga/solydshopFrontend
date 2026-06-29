@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { HiMenu, HiBell, HiHome } from 'react-icons/hi';
 import { togglePanel } from '../../store/reducers/notificationReducer';
+import { fetchUnreadCount } from '../../store/actions/notificationActions';
 import NotificationPanel from './NotificationPanel';
 
 /* ── Inline styles ─────────────────────────────────────────────────────── */
@@ -97,6 +99,12 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
   const { unreadCount, panelOpen } = useSelector((s) => s.notifications);
 
   const initials = user?.email?.[0]?.toUpperCase() ?? 'U';
+
+  useEffect(() => {
+    dispatch(fetchUnreadCount());
+    const id = setInterval(() => dispatch(fetchUnreadCount()), 30_000);
+    return () => clearInterval(id);
+  }, [dispatch]);
 
   return (
     <div style={S.bar} role="banner">
