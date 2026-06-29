@@ -88,6 +88,7 @@ const DataTable = ({
         getRowId={getRowId}
         loading={loading}
         autoHeight
+        disableVirtualization
         rowHeight={56}
         disableRowSelectionOnClick
         pageSizeOptions={pageSizeOptions}
