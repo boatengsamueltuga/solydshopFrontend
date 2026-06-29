@@ -387,7 +387,7 @@ const AdminProductsPage = () => {
             ),
         }] : []),
         {
-            field: "status", headerName: "Status", width: 170,
+            field: "status", headerName: "Status", width: 150,
             renderCell: (params) => (
                 <AdminStatusSelect
                     product={params.row}

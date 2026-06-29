@@ -37,12 +37,13 @@ const STATUS_TOOLTIP = {
     ARCHIVED:       "Archived — no longer available",
 };
 
-const StatusBadge = memo(({ status }) => {
+const StatusBadge = memo(({ status, tooltip }) => {
     const s = STATUS_STYLE[status] || { label: status, color: "#71717a" };
+    const tip = tooltip ?? STATUS_TOOLTIP[status] ?? null;
     const badge = (
         <span style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
-            width: "fit-content", cursor: STATUS_TOOLTIP[status] ? "help" : "default",
+            width: "fit-content", cursor: tip ? "help" : "default",
         }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
             <span style={{ color: s.color, fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap" }}>
@@ -50,8 +51,12 @@ const StatusBadge = memo(({ status }) => {
             </span>
         </span>
     );
-    if (STATUS_TOOLTIP[status]) {
-        return <Tooltip title={STATUS_TOOLTIP[status]} arrow placement="top">{badge}</Tooltip>;
+    if (tip) {
+        return (
+            <Tooltip title={tip} arrow placement="top" enterDelay={150}>
+                {badge}
+            </Tooltip>
+        );
     }
     return badge;
 });
@@ -209,17 +214,22 @@ const SellerDashboardPage = () => {
         {
             field:    "status",
             headerName: "Status",
-            width:    200,
+            width:    155,
             renderCell: ({ row }) => (
                 <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", gap: "4px", padding: "6px 0", minWidth: 0 }}>
-                    <StatusBadge status={row.status} />
+                    <StatusBadge
+                        status={row.status}
+                        tooltip={row.status === "REJECTED" && row.rejectionReason
+                            ? `Rejected: ${row.rejectionReason}`
+                            : undefined}
+                    />
                     {row.status === "REJECTED" && row.rejectionReason && (
                         <span style={{
                             fontSize: "11px", color: "#dc2626",
                             fontFamily: "var(--font-body)", lineHeight: 1.35,
                             overflow: "hidden", display: "-webkit-box",
                             WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                            wordBreak: "break-word",
+                            wordBreak: "break-word", maxWidth: "130px",
                         }}>
                             {row.rejectionReason}
                         </span>
