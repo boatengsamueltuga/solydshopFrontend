@@ -1,4 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -138,7 +139,8 @@ const AdminProductsPage = () => {
     const [categories, setCategories] = useState([]);
     const [loading,    setLoading]    = useState(true);
 
-    const [statusFilter, setStatusFilter] = useState("ALL");
+    const location = useLocation();
+    const [statusFilter, setStatusFilter] = useState(location.state?.autoFilter ?? "ALL");
     const [search,       setSearch]       = useState("");
 
     const [isFormOpen,        setIsFormOpen]        = useState(false);

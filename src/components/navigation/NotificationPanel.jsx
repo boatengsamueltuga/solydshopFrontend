@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
+import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause } from 'react-icons/hi';
 import { closePanel } from '../../store/reducers/notificationReducer';
 import {
     fetchNotifications,
@@ -11,8 +12,30 @@ import {
 } from '../../store/actions/notificationActions';
 
 const TYPE_ICON = {
-    NEW_ORDER:    <HiShoppingBag />,
-    ORDER_STATUS: <HiCheckCircle />,
+    NEW_ORDER:         <HiShoppingBag />,
+    ORDER_STATUS:      <HiCheckCircle />,
+    PRODUCT_REVIEW:    <HiClipboardList />,
+    PRODUCT_APPROVED:  <HiCheckCircle />,
+    PRODUCT_REJECTED:  <HiExclamationCircle />,
+    PRODUCT_SUSPENDED: <HiPause />,
+    PRODUCT_ARCHIVED:  <HiArchive />,
+};
+
+const TYPE_COLOR = {
+    PRODUCT_REVIEW:    'var(--warning)',
+    PRODUCT_APPROVED:  'var(--success)',
+    PRODUCT_REJECTED:  'var(--error)',
+    PRODUCT_SUSPENDED: '#60a5fa',
+    PRODUCT_ARCHIVED:  'var(--text-3)',
+};
+
+/* where to navigate when clicking a notification */
+const TYPE_LINK = {
+    PRODUCT_REVIEW:    { path: '/admin/products',   state: { autoFilter: 'PENDING_REVIEW' } },
+    PRODUCT_APPROVED:  { path: '/seller/dashboard', state: null },
+    PRODUCT_REJECTED:  { path: '/seller/dashboard', state: null },
+    PRODUCT_SUSPENDED: { path: '/seller/dashboard', state: null },
+    PRODUCT_ARCHIVED:  { path: '/seller/dashboard', state: null },
 };
 
 const formatTime = (iso) => {
@@ -29,6 +52,7 @@ const formatTime = (iso) => {
 
 const NotificationPanel = () => {
     const dispatch  = useDispatch();
+    const navigate  = useNavigate();
     const panelRef  = useRef(null);
     const { items, loading, unreadCount } = useSelector((s) => s.notifications);
 
@@ -46,8 +70,13 @@ const NotificationPanel = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, [dispatch]);
 
-    const handleMarkRead = (id, read) => {
-        if (!read) dispatch(markNotificationRead(id));
+    const handleClick = (n) => {
+        if (!n.read) dispatch(markNotificationRead(n.id));
+        const dest = TYPE_LINK[n.type];
+        if (dest) {
+            dispatch(closePanel());
+            navigate(dest.path, dest.state ? { state: dest.state } : {});
+        }
     };
 
     return (
@@ -165,33 +194,36 @@ const NotificationPanel = () => {
                         <p style={{ color: 'var(--text-3)', fontSize: '13px', margin: 0 }}>No notifications yet</p>
                     </div>
                 ) : (
-                    items.map((n) => (
+                    items.map((n) => {
+                        const iconColor  = TYPE_COLOR[n.type] ?? 'var(--accent)';
+                        const clickable  = Boolean(TYPE_LINK[n.type]) || !n.read;
+                        return (
                         <div
                             key={n.id}
-                            onClick={() => handleMarkRead(n.id, n.read)}
+                            onClick={() => handleClick(n)}
                             style={{
                                 display:         'flex',
                                 gap:             'var(--space-3)',
                                 padding:         'var(--space-3) var(--space-4)',
                                 borderBottom:    '1px solid var(--border-subtle)',
-                                cursor:          n.read ? 'default' : 'pointer',
+                                cursor:          clickable ? 'pointer' : 'default',
                                 backgroundColor: n.read ? 'transparent' : 'var(--accent-subtle)',
                                 transition:      'background-color 0.15s',
                             }}
-                            onMouseEnter={e => { if (!n.read) e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; }}
-                            onMouseLeave={e => { if (!n.read) e.currentTarget.style.backgroundColor = 'var(--accent-subtle)'; }}
+                            onMouseEnter={e => { if (clickable) e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.backgroundColor = n.read ? 'transparent' : 'var(--accent-subtle)'; }}
                         >
                             <div style={{
                                 flexShrink:      0,
                                 width:           '30px',
                                 height:          '30px',
                                 borderRadius:    '50%',
-                                backgroundColor: 'var(--accent-subtle)',
-                                border:          '1px solid var(--accent-border)',
+                                backgroundColor: `color-mix(in srgb, ${iconColor} 12%, transparent)`,
+                                border:          `1px solid color-mix(in srgb, ${iconColor} 30%, transparent)`,
                                 display:         'flex',
                                 alignItems:      'center',
                                 justifyContent:  'center',
-                                color:           'var(--accent)',
+                                color:           iconColor,
                                 fontSize:        '15px',
                                 marginTop:       '1px',
                             }}>
@@ -260,7 +292,8 @@ const NotificationPanel = () => {
                                 </button>
                             </div>
                         </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
         </div>
