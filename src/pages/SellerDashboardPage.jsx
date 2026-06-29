@@ -112,20 +112,6 @@ const SellerDashboardPage = () => {
         fetchProducts();
     }, [fetchProducts]);
 
-    /* scroll to highlighted product once data loads */
-    useEffect(() => {
-        if (!highlightProductId || loading || filteredProducts.length === 0) return;
-        const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
-        if (idx === -1) return;
-        const targetPage = Math.floor(idx / paginationModel.pageSize);
-        setPaginationModel(m => ({ ...m, page: targetPage }));
-        const timer = setTimeout(() => {
-            const el = document.querySelector(`[data-id="${highlightProductId}"]`);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 350);
-        return () => clearTimeout(timer);
-    }, [highlightProductId, loading, filteredProducts.length]);
-
     const handleDelete = useCallback(async (product) => {
         if (!window.confirm(`Delete "${product.productName}"?`)) return;
         setDeleting(true);
@@ -153,6 +139,20 @@ const SellerDashboardPage = () => {
             p.partNumber?.toLowerCase().includes(q)
         );
     }, [products, search]);
+
+    /* scroll to highlighted product once data loads */
+    useEffect(() => {
+        if (!highlightProductId || loading || filteredProducts.length === 0) return;
+        const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
+        if (idx === -1) return;
+        const targetPage = Math.floor(idx / paginationModel.pageSize);
+        setPaginationModel(m => ({ ...m, page: targetPage }));
+        const timer = setTimeout(() => {
+            const el = document.querySelector(`[data-id="${highlightProductId}"]`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 350);
+        return () => clearTimeout(timer);
+    }, [highlightProductId, loading, filteredProducts.length]);
 
     /* ── Computed stats ── */
     const inStockCount    = products.filter(p => p.quantity > 0).length;

@@ -205,20 +205,6 @@ const AdminProductsPage = () => {
         fetchCategories();
     }, []);
 
-    /* scroll to highlighted product once data loads */
-    useEffect(() => {
-        if (!highlightProductId || loading || filteredProducts.length === 0) return;
-        const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
-        if (idx === -1) return;
-        const targetPage = Math.floor(idx / paginationModel.pageSize);
-        setPaginationModel(m => ({ ...m, page: targetPage }));
-        const timer = setTimeout(() => {
-            const el = document.querySelector(`[data-id="${highlightProductId}"]`);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 350);
-        return () => clearTimeout(timer);
-    }, [highlightProductId, loading, filteredProducts.length]);
-
     /*
     |----------------------------------------------------------
     | Filtered rows
@@ -242,6 +228,20 @@ const AdminProductsPage = () => {
         }
         return list;
     }, [products, statusFilter, search]);
+
+    /* scroll to highlighted product once data loads */
+    useEffect(() => {
+        if (!highlightProductId || loading || filteredProducts.length === 0) return;
+        const idx = filteredProducts.findIndex(p => p.productId === highlightProductId);
+        if (idx === -1) return;
+        const targetPage = Math.floor(idx / paginationModel.pageSize);
+        setPaginationModel(m => ({ ...m, page: targetPage }));
+        const timer = setTimeout(() => {
+            const el = document.querySelector(`[data-id="${highlightProductId}"]`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 350);
+        return () => clearTimeout(timer);
+    }, [highlightProductId, loading, filteredProducts.length]);
 
     /*
     |----------------------------------------------------------
