@@ -88,9 +88,9 @@ const StatCard = memo(({ label, value, sub, loading }) => (
 
 const SellerDashboardPage = () => {
 
-    const navigate  = useNavigate();
-    const location  = useLocation();
-    const [highlightProductId, setHighlightProductId] = useState(location.state?.highlightProductId ?? null);
+    const navigate           = useNavigate();
+    const location           = useLocation();
+    const highlightProductId = location.state?.highlightProductId ?? null;
     const [products,  setProducts]  = useState([]);
     const [loading,   setLoading]   = useState(true);
     const [deleting,  setDeleting]  = useState(false);

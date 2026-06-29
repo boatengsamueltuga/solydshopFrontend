@@ -139,10 +139,10 @@ const AdminProductsPage = () => {
     const [categories, setCategories] = useState([]);
     const [loading,    setLoading]    = useState(true);
 
-    const location = useLocation();
-    const [statusFilter,       setStatusFilter]       = useState(location.state?.autoFilter ?? "ALL");
-    const [search,             setSearch]             = useState("");
-    const [highlightProductId, setHighlightProductId] = useState(location.state?.highlightProductId ?? null);
+    const location            = useLocation();
+    const highlightProductId  = location.state?.highlightProductId ?? null;
+    const [statusFilter, setStatusFilter] = useState(location.state?.autoFilter ?? "ALL");
+    const [search,       setSearch]       = useState("");
 
     const [isFormOpen,        setIsFormOpen]        = useState(false);
     const [editingProductId,  setEditingProductId]  = useState(null);

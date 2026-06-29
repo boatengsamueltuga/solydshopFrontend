@@ -53,6 +53,7 @@ const DataTable = ({
   pageSizeOptions = DEFAULT_PAGE_SIZES,
   emptyMessage = 'No records found',
   toolbar,
+  sx: sxProp,
   ...rest
 }) => {
   return (
@@ -107,6 +108,7 @@ const DataTable = ({
           '& .MuiDataGrid-virtualScroller': { minHeight: 120 },
           '& .MuiDataGrid-row:hover': { backgroundColor: 'var(--surface-hover)' },
           '& .MuiDataGrid-row.Mui-hovered': { backgroundColor: 'var(--surface-hover)' },
+          ...sxProp,
         }}
       />
     </Box>
