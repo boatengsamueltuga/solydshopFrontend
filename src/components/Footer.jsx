@@ -27,7 +27,6 @@ export default function Footer() {
                         </p>
                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             {[
-                                { label: "Catalog",           to: "/"                 },
                                 { label: "My Orders",         to: "/orders"           },
                                 { label: "My Account",        to: "/account"          },
                                 { label: "Seller Dashboard",  to: "/seller/dashboard" },
