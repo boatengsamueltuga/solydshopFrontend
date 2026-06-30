@@ -98,6 +98,8 @@ export default function ProductDetailPage() {
     const [qty,          setQty]          = useState(1);
     const [addingToCart, setAddingToCart] = useState(false);
     const [selectedImg,  setSelectedImg]  = useState(null);
+    const [imgIdx,       setImgIdx]       = useState(0);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
     const [quoteOpen,    setQuoteOpen]    = useState(false);
     const [quoteForm,    setQuoteForm]    = useState({ qtyNeeded: 1, urgency: 'Standard', notes: '', contactEmail: '', phone: '' });
     const [quoteSending, setQuoteSending] = useState(false);
@@ -110,7 +112,11 @@ export default function ProductDetailPage() {
         setSelectedImg(null);
 
         api.get(`/public/products/${id}`)
-            .then(res => { setProduct(res.data); setSelectedImg(res.data.imageUrl ?? null); })
+            .then(res => {
+                setProduct(res.data);
+                setSelectedImg(res.data.imageUrl ?? null);
+                setImgIdx(0);
+            })
             .catch(() => setFetchError('Product not found or no longer available.'))
             .finally(() => setLoading(false));
     }, [id]);
@@ -138,6 +144,30 @@ export default function ProductDetailPage() {
             setAddingToCart(false);
         }
     };
+
+    /* ── Image gallery helpers ──────────────────────────────── */
+    const imageSlots = product
+        ? [product.imageUrl, product.image2Url, product.image3Url, product.image4Url]
+              .filter(u => u && u.trim())
+        : [];
+
+    const goImage = (dir) => {
+        if (imageSlots.length < 2) return;
+        const next = (imgIdx + dir + imageSlots.length) % imageSlots.length;
+        setImgIdx(next);
+        setSelectedImg(imageSlots[next]);
+    };
+
+    useEffect(() => {
+        if (!lightboxOpen) return;
+        const onKey = (e) => {
+            if (e.key === 'ArrowLeft')  goImage(-1);
+            if (e.key === 'ArrowRight') goImage(1);
+            if (e.key === 'Escape')     setLightboxOpen(false);
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [lightboxOpen, imgIdx, imageSlots.length]);
 
     /* ── Open quote modal (pre-fill user email) ─────────────── */
     const openQuote = () => {
@@ -298,29 +328,31 @@ export default function ProductDetailPage() {
                         overflow:     'hidden',
                     }}
                 >
-                    {/* Image box — white bg for clean product image presentation */}
+                    {/* Main image viewer */}
                     <div
+                        onClick={() => { if (selectedImg) setLightboxOpen(true); }}
                         style={{
-                            width:    '100%',
-                            height:   '280px',
-                            position: 'relative',
-                            overflow: 'hidden',
+                            width:      '100%',
+                            height:     '360px',
+                            position:   'relative',
+                            overflow:   'hidden',
                             background: '#ffffff',
+                            cursor:     selectedImg ? 'zoom-in' : 'default',
                         }}
                     >
-                        {/* Placeholder icon — shown when no image URL */}
+                        {/* No-image placeholder */}
                         {!selectedImg && (
                             <div
                                 style={{
-                                    position:        'absolute',
-                                    inset:           0,
-                                    display:         'flex',
-                                    flexDirection:   'column',
-                                    alignItems:      'center',
-                                    justifyContent:  'center',
-                                    gap:             '10px',
-                                    userSelect:      'none',
-                                    background:      'var(--surface-high)',
+                                    position:       'absolute',
+                                    inset:          0,
+                                    display:        'flex',
+                                    flexDirection:  'column',
+                                    alignItems:     'center',
+                                    justifyContent: 'center',
+                                    gap:            '10px',
+                                    userSelect:     'none',
+                                    background:     'var(--surface-high)',
                                 }}
                             >
                                 <svg width="52" height="52" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.25 }}>
@@ -334,11 +366,12 @@ export default function ProductDetailPage() {
                             </div>
                         )}
 
-                        {/* Product image on white background */}
+                        {/* Product image */}
                         {selectedImg && (
                             <img
+                                key={selectedImg}
                                 src={selectedImg}
-                                alt={product.productName}
+                                alt={`${product.productName} — view ${imgIdx + 1}`}
                                 style={{
                                     position:   'absolute',
                                     inset:      '24px',
@@ -347,24 +380,186 @@ export default function ProductDetailPage() {
                                     objectFit:  'contain',
                                     display:    'block',
                                     background: '#ffffff',
+                                    transition: 'opacity 0.15s ease',
                                 }}
                                 onError={e => { e.currentTarget.style.display = 'none'; }}
                             />
                         )}
+
+                        {/* Prev arrow */}
+                        {imageSlots.length > 1 && (
+                            <button
+                                aria-label="Previous image"
+                                onClick={e => { e.stopPropagation(); goImage(-1); }}
+                                style={{
+                                    position:       'absolute',
+                                    left:           '10px',
+                                    top:            '50%',
+                                    transform:      'translateY(-50%)',
+                                    width:          '36px',
+                                    height:         '36px',
+                                    borderRadius:   '50%',
+                                    background:     'rgba(0,0,0,0.45)',
+                                    border:         'none',
+                                    color:          '#fff',
+                                    fontSize:       '20px',
+                                    lineHeight:     '1',
+                                    cursor:         'pointer',
+                                    display:        'flex',
+                                    alignItems:     'center',
+                                    justifyContent: 'center',
+                                    transition:     'background 0.15s',
+                                    zIndex:         2,
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.72)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.45)'; }}
+                            >
+                                ‹
+                            </button>
+                        )}
+
+                        {/* Next arrow */}
+                        {imageSlots.length > 1 && (
+                            <button
+                                aria-label="Next image"
+                                onClick={e => { e.stopPropagation(); goImage(1); }}
+                                style={{
+                                    position:       'absolute',
+                                    right:          '10px',
+                                    top:            '50%',
+                                    transform:      'translateY(-50%)',
+                                    width:          '36px',
+                                    height:         '36px',
+                                    borderRadius:   '50%',
+                                    background:     'rgba(0,0,0,0.45)',
+                                    border:         'none',
+                                    color:          '#fff',
+                                    fontSize:       '20px',
+                                    lineHeight:     '1',
+                                    cursor:         'pointer',
+                                    display:        'flex',
+                                    alignItems:     'center',
+                                    justifyContent: 'center',
+                                    transition:     'background 0.15s',
+                                    zIndex:         2,
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.72)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.45)'; }}
+                            >
+                                ›
+                            </button>
+                        )}
+
+                        {/* Counter badge */}
+                        {imageSlots.length > 1 && (
+                            <div
+                                style={{
+                                    position:     'absolute',
+                                    bottom:       '10px',
+                                    right:        '12px',
+                                    background:   'rgba(0,0,0,0.55)',
+                                    color:        '#fff',
+                                    fontSize:     '11px',
+                                    fontFamily:   'var(--font-mono)',
+                                    padding:      '2px 8px',
+                                    borderRadius: '20px',
+                                    userSelect:   'none',
+                                    zIndex:       2,
+                                }}
+                            >
+                                {imgIdx + 1} / {imageSlots.length}
+                            </div>
+                        )}
+
+                        {/* Zoom hint */}
+                        {selectedImg && (
+                            <div
+                                style={{
+                                    position:     'absolute',
+                                    bottom:       '10px',
+                                    left:         '12px',
+                                    background:   'rgba(0,0,0,0.45)',
+                                    color:        '#fff',
+                                    fontSize:     '10px',
+                                    fontFamily:   'var(--font-mono)',
+                                    padding:      '2px 8px',
+                                    borderRadius: '20px',
+                                    userSelect:   'none',
+                                    letterSpacing: '0.06em',
+                                    zIndex:       2,
+                                }}
+                            >
+                                🔍 ZOOM
+                            </div>
+                        )}
                     </div>
 
-                    {/* Thumbnail strip — CSS class handles desktop-only visibility */}
-                    {product.imageUrl && (
-                        <div className="pdp-thumb-strip">
-                            <button
-                                className={`pdp-thumb${selectedImg === product.imageUrl ? ' active' : ''}`}
-                                onClick={() => setSelectedImg(product.imageUrl)}
-                                aria-label="Main product image"
-                            >
-                                <img src={product.imageUrl} alt={product.productName} />
-                            </button>
-                        </div>
-                    )}
+                    {/* Thumbnail strip — 4 slots always visible */}
+                    <div
+                        className="pdp-thumb-strip"
+                        style={{
+                            display:         'flex',
+                            gap:             '8px',
+                            padding:         '10px 12px',
+                            borderTop:       '1px solid var(--border)',
+                            background:      'var(--surface-mid)',
+                            overflowX:       'auto',
+                            scrollbarWidth:  'none',
+                        }}
+                    >
+                        {[0, 1, 2, 3].map(i => {
+                            const url    = imageSlots[i];
+                            const active = i === imgIdx && Boolean(url);
+                            return (
+                                <button
+                                    key={i}
+                                    aria-label={url ? `View angle ${i + 1}` : `Angle ${i + 1} — not set`}
+                                    disabled={!url}
+                                    onClick={() => { setImgIdx(i); setSelectedImg(url); }}
+                                    style={{
+                                        flexShrink:   0,
+                                        width:        '68px',
+                                        height:       '68px',
+                                        border:       active
+                                            ? '2px solid var(--accent)'
+                                            : '1px solid var(--border)',
+                                        borderRadius: '6px',
+                                        overflow:     'hidden',
+                                        background:   url ? '#fff' : 'var(--surface-high)',
+                                        cursor:       url ? 'pointer' : 'default',
+                                        padding:      0,
+                                        opacity:      url ? 1 : 0.4,
+                                        transition:   'border-color 0.15s, opacity 0.15s',
+                                        position:     'relative',
+                                    }}
+                                >
+                                    {url ? (
+                                        <img
+                                            src={url}
+                                            alt={`Angle ${i + 1}`}
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', padding: '4px' }}
+                                        />
+                                    ) : (
+                                        <div style={{
+                                            width: '100%', height: '100%',
+                                            display: 'flex', flexDirection: 'column',
+                                            alignItems: 'center', justifyContent: 'center',
+                                            gap: '3px',
+                                        }}>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ opacity: 0.3 }}>
+                                                <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                                                <circle cx="8.5" cy="8.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+                                                <path d="M2 15l5-5 4 4 3-3 8 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                            <span style={{ fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-3)' }}>
+                                                {i + 1}
+                                            </span>
+                                        </div>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* ── Right: specs panel ───────────────────────── */}
@@ -757,6 +952,164 @@ export default function ProductDetailPage() {
                     {addingToCart ? 'Adding…' : inStock ? 'Add to Cart' : 'Out of Stock'}
                 </button>
             </div>
+
+            {/* ── Lightbox ─────────────────────────────────────────── */}
+            {lightboxOpen && selectedImg && (
+                <div
+                    onClick={() => setLightboxOpen(false)}
+                    style={{
+                        position:       'fixed',
+                        inset:          0,
+                        zIndex:         9999,
+                        background:     'rgba(0,0,0,0.92)',
+                        display:        'flex',
+                        alignItems:     'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    {/* Close */}
+                    <button
+                        aria-label="Close lightbox"
+                        onClick={() => setLightboxOpen(false)}
+                        style={{
+                            position:   'absolute',
+                            top:        '18px',
+                            right:      '22px',
+                            background: 'rgba(255,255,255,0.12)',
+                            border:     'none',
+                            color:      '#fff',
+                            fontSize:   '26px',
+                            lineHeight: '1',
+                            width:      '44px',
+                            height:     '44px',
+                            borderRadius: '50%',
+                            cursor:     'pointer',
+                            display:    'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex:     1,
+                        }}
+                    >
+                        ×
+                    </button>
+
+                    {/* Prev */}
+                    {imageSlots.length > 1 && (
+                        <button
+                            aria-label="Previous image"
+                            onClick={e => { e.stopPropagation(); goImage(-1); }}
+                            style={{
+                                position:   'absolute',
+                                left:       '16px',
+                                top:        '50%',
+                                transform:  'translateY(-50%)',
+                                background: 'rgba(255,255,255,0.12)',
+                                border:     'none',
+                                color:      '#fff',
+                                fontSize:   '32px',
+                                width:      '52px',
+                                height:     '52px',
+                                borderRadius: '50%',
+                                cursor:     'pointer',
+                                display:    'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex:     1,
+                            }}
+                        >
+                            ‹
+                        </button>
+                    )}
+
+                    {/* Next */}
+                    {imageSlots.length > 1 && (
+                        <button
+                            aria-label="Next image"
+                            onClick={e => { e.stopPropagation(); goImage(1); }}
+                            style={{
+                                position:   'absolute',
+                                right:      '16px',
+                                top:        '50%',
+                                transform:  'translateY(-50%)',
+                                background: 'rgba(255,255,255,0.12)',
+                                border:     'none',
+                                color:      '#fff',
+                                fontSize:   '32px',
+                                width:      '52px',
+                                height:     '52px',
+                                borderRadius: '50%',
+                                cursor:     'pointer',
+                                display:    'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex:     1,
+                            }}
+                        >
+                            ›
+                        </button>
+                    )}
+
+                    {/* Main image */}
+                    <img
+                        src={selectedImg}
+                        alt={product.productName}
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            maxWidth:   '90vw',
+                            maxHeight:  '85vh',
+                            objectFit:  'contain',
+                            borderRadius: '4px',
+                            userSelect: 'none',
+                        }}
+                    />
+
+                    {/* Dot indicators */}
+                    {imageSlots.length > 1 && (
+                        <div
+                            style={{
+                                position:       'absolute',
+                                bottom:         '20px',
+                                display:        'flex',
+                                gap:            '8px',
+                                alignItems:     'center',
+                            }}
+                        >
+                            {imageSlots.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={e => { e.stopPropagation(); setImgIdx(i); setSelectedImg(imageSlots[i]); }}
+                                    style={{
+                                        width:        i === imgIdx ? '20px' : '8px',
+                                        height:       '8px',
+                                        borderRadius: '4px',
+                                        background:   i === imgIdx ? '#fff' : 'rgba(255,255,255,0.35)',
+                                        border:       'none',
+                                        cursor:       'pointer',
+                                        padding:      0,
+                                        transition:   'width 0.2s, background 0.2s',
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Counter */}
+                    {imageSlots.length > 1 && (
+                        <div
+                            style={{
+                                position:   'absolute',
+                                top:        '22px',
+                                left:       '22px',
+                                color:      'rgba(255,255,255,0.65)',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize:   '13px',
+                            }}
+                        >
+                            {imgIdx + 1} / {imageSlots.length}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* ── Quote Request Modal (E7) ──────────────────────── */}
             {quoteOpen && (
