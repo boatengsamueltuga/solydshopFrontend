@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
-import { HiAdjustments, HiSearch, HiViewGrid, HiX } from "react-icons/hi";
+import { HiAdjustments, HiArrowRight, HiCube, HiSearch, HiX } from "react-icons/hi";
 import { FaShoppingCart, FaHeart, FaRegHeart, FaEye } from "react-icons/fa";
 import {
     fetchProductsStart,
@@ -571,7 +571,7 @@ const HomePage = () => {
                                 onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
                                 onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                             >
-                                <HiViewGrid style={{ fontSize: "15px" }} />
+                                <HiArrowRight style={{ fontSize: "15px" }} />
                                 Browse Parts
                             </button>
                             {user && !user.roles?.includes("ROLE_ADMIN") && !user.roles?.includes("ROLE_SELLER") && (
@@ -613,9 +613,58 @@ const HomePage = () => {
                         </div>
                     </div>
 
-                    {/* Right: industrial bearing illustration */}
-                    <div className="flex items-center justify-center" style={{ opacity: 0.9 }}>
-                        <BearingIllustration />
+                    {/* Right: featured parts panel */}
+                    <div className="hidden md:flex flex-col" style={{ gap: "var(--space-3)" }}>
+                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", margin: 0 }}>
+                            Recently Listed
+                        </p>
+                        <div style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", overflow: "hidden" }}>
+                            {loading ? (
+                                [0,1,2].map(i => (
+                                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3) var(--space-4)", borderBottom: i < 2 ? "1px solid var(--border-subtle)" : "none" }}>
+                                        <div style={{ width: "40px", height: "40px", background: "var(--surface-high)", borderRadius: "var(--r-sm)", flexShrink: 0, animation: "solyd-pulse 1.4s ease-in-out infinite" }} />
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ height: "10px", width: "70%", background: "var(--surface-high)", borderRadius: "2px", marginBottom: "6px", animation: "solyd-pulse 1.4s ease-in-out infinite" }} />
+                                            <div style={{ height: "8px",  width: "40%", background: "var(--surface-high)", borderRadius: "2px", animation: "solyd-pulse 1.4s ease-in-out infinite" }} />
+                                        </div>
+                                    </div>
+                                ))
+                            ) : products.slice(0, 3).map((p, i) => (
+                                <div
+                                    key={p.productId}
+                                    onClick={() => navigate(`/products/${p.productId}`)}
+                                    style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3) var(--space-4)", borderBottom: i < 2 ? "1px solid var(--border-subtle)" : "none", cursor: "pointer", transition: "background var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                >
+                                    <div style={{ width: "40px", height: "40px", background: "var(--surface-high)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                        {p.imageUrl
+                                            ? <img src={p.imageUrl} alt={p.productName} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                                            : <HiCube style={{ fontSize: "18px", color: "var(--text-4)" }} />
+                                        }
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 600, color: "var(--text)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                            {p.productName}
+                                        </p>
+                                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-3)", margin: "2px 0 0" }}>
+                                            {fmtCurrency(p.price)}
+                                        </p>
+                                    </div>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--success)", background: "var(--success-subtle)", border: "1px solid var(--success)", borderRadius: "var(--r-sm)", padding: "2px 6px", flexShrink: 0 }}>
+                                        In Stock
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.06em", color: "var(--accent)", textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px", transition: "opacity var(--duration-fast)" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
+                            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                        >
+                            View all parts <HiArrowRight style={{ fontSize: "13px" }} />
+                        </button>
                     </div>
                     </div>
                 </div>

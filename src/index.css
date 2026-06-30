@@ -302,6 +302,12 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
     color:            var(--text) !important;
 }
 
+/* ── Skeleton pulse animation ────────────────────────────────────────────── */
+@keyframes solyd-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
 /* ── BearingIllustration dark mode ──────────────────────────────────────── */
 /* CSS presentation-attribute overrides: class (0,1,0) > attr (0,0,0)       */
 
