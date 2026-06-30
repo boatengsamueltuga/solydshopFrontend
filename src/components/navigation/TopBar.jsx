@@ -129,7 +129,8 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
         </button>
 
         <button
-          style={S.iconBtn}
+          style={{ ...S.iconBtn, display: 'none' }}
+          className="admin-topbar-home"
           onClick={() => navigate('/')}
           aria-label="Go to home"
           title="Home"

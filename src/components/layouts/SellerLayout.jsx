@@ -105,6 +105,7 @@ const SellerLayout = ({ title = 'Seller', children }) => {
           .seller-sidebar-desktop { display: none !important; }
           .seller-main-col { margin-left: 0 !important; }
           .admin-topbar-hamburger { display: flex !important; }
+          .admin-topbar-home { display: flex !important; }
         }
         @media (min-width: 768px) {
           .seller-sidebar-mobile { display: none !important; }
