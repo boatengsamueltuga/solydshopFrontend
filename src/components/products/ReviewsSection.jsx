@@ -206,7 +206,6 @@ export default function ReviewsSection({ productId }) {
         } catch (err) {
             const msg = err?.response?.data?.message ?? "Failed to submit review. Please try again.";
             setFormError(msg);
-            toast.error(msg);
         } finally {
             setSubmitting(false);
         }
