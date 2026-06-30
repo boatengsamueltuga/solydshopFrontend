@@ -547,7 +547,7 @@ const HomePage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-[1fr_440px] lg:grid-cols-[1fr_560px] xl:grid-cols-[1fr_680px] gap-10 lg:gap-12 items-center">
 
                     {/* Left: headline + CTAs + stats */}
-                    <div>
+                    <div className="flex flex-col items-center md:items-start text-center md:text-left">
                         {/* Eyebrow label */}
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
                             <span className="animate-pulse" style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--accent)", flexShrink: 0 }} />
@@ -564,7 +564,7 @@ const HomePage = () => {
                             Buy and sell heavy machinery components worldwide. Verified sellers, OEM-grade parts, and fast international shipping — all on one platform.
                         </p>
 
-                        <div className="flex flex-wrap gap-3 items-center" style={{ marginTop: "28px" }}>
+                        <div className="flex flex-wrap gap-3 items-center justify-center md:justify-start" style={{ marginTop: "28px" }}>
                             <button
                                 onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
                                 style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)", display: "flex", alignItems: "center", gap: "8px" }}
@@ -599,7 +599,7 @@ const HomePage = () => {
 
 
                         {/* Stats row */}
-                        <div className="flex flex-wrap gap-6 mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                        <div className="flex flex-wrap gap-6 mt-8 pt-6 justify-center md:justify-start" style={{ borderTop: "1px solid var(--border)" }}>
                             {[
                                 { num: "24K+",  label: "Parts Listed"      },
                                 { num: "150+",  label: "Countries Served"  },
