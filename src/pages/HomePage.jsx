@@ -597,23 +597,6 @@ const HomePage = () => {
                             )}
                         </div>
 
-                        {/* Trust chips */}
-                        <div className="flex flex-wrap gap-x-4 gap-y-2" style={{ marginTop: "16px" }}>
-                            {[
-                                "Verified Suppliers",
-                                "Secure B2B Checkout",
-                                "48 h Dispatch",
-                                "ISO 9001 Certified",
-                            ].map((label) => (
-                                <span key={label} style={{ display: "flex", alignItems: "center", gap: "5px", fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--text-3)", letterSpacing: "0.02em" }}>
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                                        <circle cx="6" cy="6" r="6" fill="var(--success)" opacity="0.18" />
-                                        <path d="M3.5 6l1.8 1.8L8.5 4.5" stroke="var(--success)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    {label}
-                                </span>
-                            ))}
-                        </div>
 
                         {/* Stats row */}
                         <div className="flex flex-wrap gap-6 mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
