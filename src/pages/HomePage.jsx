@@ -544,7 +544,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Headline + illustration grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_400px] lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_580px] gap-10 lg:gap-12 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_440px] lg:grid-cols-[1fr_560px] xl:grid-cols-[1fr_680px] gap-10 lg:gap-12 items-center">
 
                     {/* Left: headline + CTAs + stats */}
                     <div>
