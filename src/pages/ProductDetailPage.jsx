@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import api from '../api/api';
 import { fmtPrice } from '../utils/format';
 import { incrementCartCount } from '../features/cart/cartSlice';
+import ReviewsSection from '../components/products/ReviewsSection';
 import './ProductDetailPage.css';
 
 /* ── XSRF helper (mirrors the pattern used in HomePage.jsx) ─── */
@@ -732,6 +733,9 @@ export default function ProductDetailPage() {
 
             </div>
             {/* end grid */}
+
+            {/* ── Reviews ─────────────────────────────────────── */}
+            <ReviewsSection productId={id} />
 
             {/* ── Mobile sticky action bar (< 768px) ──────────── */}
             <div className="pdp-action-bar">
