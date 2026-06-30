@@ -197,7 +197,7 @@ export default function ReviewsSection({ productId }) {
                 productId,
                 rating:  formRating,
                 comment: formComment.trim() || null,
-            });
+            }, { silent: true });
             toast.success("Review submitted — thank you!");
             setSubmitted(true);
             setFormRating(0);
