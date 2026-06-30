@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import { fmtPrice } from "../utils/format";
 import { setCartCount } from "../features/cart/cartSlice";
 import toast from "react-hot-toast";
 import { IconButton, Tooltip } from "@mui/material";
@@ -102,7 +103,7 @@ const CartPage = () => {
                 </h1>
                 <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", color: "var(--text-3)", marginTop: "var(--space-1)" }}>
                     {itemCount > 0
-                        ? `${itemCount} item${itemCount !== 1 ? "s" : ""} · $${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+                        ? `${itemCount} item${itemCount !== 1 ? "s" : ""} · ${fmtPrice(totalPrice)}`
                         : "Your cart is empty"}
                 </p>
             </div>
@@ -244,7 +245,7 @@ const CartPage = () => {
                                             {item.productName}
                                         </h3>
                                         <p style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text-3)", margin: 0 }}>
-                                            ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })} ea
+                                            {fmtPrice(item.price)} ea
                                         </p>
                                     </div>
 
@@ -298,7 +299,7 @@ const CartPage = () => {
                                             minWidth:   "88px",
                                             textAlign:  "right",
                                         }}>
-                                            ${(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(item.price * item.quantity)}
                                         </span>
 
                                         {/* Remove */}
@@ -340,7 +341,7 @@ const CartPage = () => {
                                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-3)" }}>
                                     <span style={{ color: "var(--text-3)", fontSize: "13px" }}>Items ({itemCount})</span>
                                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--text)", fontWeight: 600 }}>
-                                        ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        {fmtPrice(totalPrice)}
                                     </span>
                                 </div>
                                 <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -355,7 +356,7 @@ const CartPage = () => {
                                         Total
                                     </span>
                                     <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "22px", color: "var(--text)" }}>
-                                        ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        {fmtPrice(totalPrice)}
                                     </span>
                                 </div>
 

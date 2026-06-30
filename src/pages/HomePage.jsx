@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
-import { HiAdjustments, HiSearch, HiX } from "react-icons/hi";
+import { HiAdjustments, HiArrowRight, HiSearch, HiX } from "react-icons/hi";
 import { FaShoppingCart, FaHeart, FaRegHeart, FaEye } from "react-icons/fa";
 import {
     fetchProductsStart,
@@ -17,6 +17,7 @@ import {
 } from "../features/wishlist/wishlistSlice";
 import { setCartCount } from "../features/cart/cartSlice";
 import SolydLogo from "../components/SolydLogo";
+import { fmtCurrency, fmtPrice } from "../utils/format";
 
 const getXsrfToken = () =>
     document.cookie.split("; ").find((r) => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -64,7 +65,7 @@ const BearingIllustration = () => {
 
     return (
         <svg className="solyd-bearing-svg" viewBox="0 0 560 450" fill="none" xmlns="http://www.w3.org/2000/svg"
-             aria-hidden="true" style={{ width: "100%", maxHeight: "450px" }}>
+             aria-hidden="true" style={{ width: "100%", height: "auto" }}>
 
             <defs>
                 <pattern id="bgGrid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -543,7 +544,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Headline + illustration grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_440px] lg:grid-cols-[1fr_560px] xl:grid-cols-[1fr_680px] gap-10 lg:gap-12 items-center">
 
                     {/* Left: headline + CTAs + stats */}
                     <div>
@@ -563,33 +564,39 @@ const HomePage = () => {
                             Buy and sell heavy machinery components worldwide. Verified sellers, OEM-grade parts, and fast international shipping — all on one platform.
                         </p>
 
-                        <div className="flex flex-wrap gap-3" style={{ marginTop: "28px" }}>
+                        <div className="flex flex-wrap gap-3 items-center justify-center sm:justify-start" style={{ marginTop: "28px" }}>
                             <button
                                 onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)" }}
+                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 36px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)", display: "flex", alignItems: "center", gap: "8px" }}
                                 onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
                                 onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                             >
+                                <HiArrowRight style={{ fontSize: "15px" }} />
                                 Browse Parts
                             </button>
-                            {(() => {
-                                const roles = user?.roles ?? [];
-                                let label, path;
-                                if (roles.includes("ROLE_ADMIN"))       { label = "Admin Dashboard";  path = "/admin/dashboard";  }
-                                else if (roles.includes("ROLE_SELLER")) { label = "Seller Dashboard"; path = "/seller/dashboard"; }
-                                else                                    { label = "My Orders";        path = "/orders";           }
-                                return (
-                                    <button
-                                        onClick={() => navigate(path)}
-                                        style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
-                                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
-                                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
-                                    >
-                                        {label}
-                                    </button>
-                                );
-                            })()}
+                            {user && !user.roles?.includes("ROLE_ADMIN") && !user.roles?.includes("ROLE_SELLER") && (
+                                <button
+                                    onClick={() => navigate("/wishlist")}
+                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)", display: "flex", alignItems: "center", gap: "8px" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                >
+                                    <FaHeart style={{ fontSize: "13px", color: "var(--accent)" }} />
+                                    My Wishlist
+                                </button>
+                            )}
+                            {!user && (
+                                <button
+                                    onClick={() => navigate("/register")}
+                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                >
+                                    Get Started
+                                </button>
+                            )}
                         </div>
+
 
                         {/* Stats row */}
                         <div className="flex flex-wrap gap-6 mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
@@ -771,7 +778,7 @@ const HomePage = () => {
                                     Price Range (USD)
                                 </label>
                                 <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "var(--accent)" }}>
-                                    ${Number(priceMax).toLocaleString()}+
+                                    {fmtCurrency(priceMax)}+
                                 </span>
                             </div>
                             <input
@@ -781,7 +788,7 @@ const HomePage = () => {
                                 max={100000}
                                 value={priceMax}
                                 onChange={(e) => setPriceMax(Number(e.target.value))}
-                                aria-valuetext={`Up to $${Number(priceMax).toLocaleString()}`}
+                                aria-valuetext={`Up to ${fmtCurrency(priceMax)}`}
                                 className="w-full h-1 cursor-pointer"
                                 style={{ accentColor: "var(--accent)", background: "var(--border-mid)" }}
                             />
@@ -1079,7 +1086,7 @@ const HomePage = () => {
                                                     color: "var(--text)",
                                                     letterSpacing: "-0.02em",
                                                 }}>
-                                                    ${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    {fmtCurrency(product.price)}
                                                 </span>
                                             </div>
                                             <div style={{ display: "flex", gap: "5px" }}>
@@ -1246,7 +1253,7 @@ const HomePage = () => {
                                             <h4 className="text-[11px] font-bold truncate" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>{item.productName}</h4>
                                             <p className="text-[10px] mt-0.5" style={{ color: "var(--text-3)" }}>Qty: {item.quantity}</p>
                                             <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--text-2)" }}>
-                                                ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                {fmtPrice(item.price)}
                                             </span>
                                         </div>
                                         <button
@@ -1270,7 +1277,7 @@ const HomePage = () => {
                                 <div className="flex justify-between text-xs">
                                     <span style={{ color: "var(--text-2)" }}>Subtotal</span>
                                     <span style={{ fontFamily: "var(--font-mono)", color: "var(--text)", fontWeight: 600 }}>
-                                        ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        {fmtPrice(cartTotal)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-xs">
@@ -1280,7 +1287,7 @@ const HomePage = () => {
                                 <div className="flex justify-between pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
                                     <span className="text-sm font-bold" style={{ color: "var(--text)" }}>Total</span>
                                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>
-                                        ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        {fmtPrice(cartTotal)}
                                     </span>
                                 </div>
                                 <button
@@ -1451,7 +1458,7 @@ const HomePage = () => {
                                     <div>
                                         <span className="block" style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-4)" }}>Unit Price</span>
                                         <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.15rem", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
-                                            ${Number(quickViewProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(quickViewProduct.price)}
                                         </span>
                                     </div>
                                     <button

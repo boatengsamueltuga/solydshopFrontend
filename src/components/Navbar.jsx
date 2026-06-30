@@ -125,8 +125,8 @@ const Navbar = () => {
         <>
             {/* ── Fixed Header ──────────────────────────────────── */}
             <header
-                className="fixed top-0 left-0 right-0 z-50 w-full"
-                style={{ background: C.bg, borderBottom: `1px solid ${C.border}` }}
+                className="fixed top-0 left-0 right-0 w-full"
+                style={{ background: C.bg, borderBottom: `1px solid ${C.border}`, zIndex: "var(--z-overlay)" }}
             >
                 <div
                     className="flex justify-between items-center w-full mx-auto h-20 px-4 sm:px-6 md:px-10"
@@ -138,9 +138,6 @@ const Navbar = () => {
                             <SolydLogo size={36} />
                             <span style={{ fontSize: "22px", fontWeight: 700, color: C.primary, fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
                                 SolydShop
-                            </span>
-                            <span className="hidden sm:inline-block" style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", color: C.textMuted, textTransform: "uppercase", border: `1px solid ${C.border}`, borderRadius: "3px", padding: "2px 6px", whiteSpace: "nowrap" }}>
-                                PROCUREMENT PORTAL
                             </span>
                         </Link>
 
@@ -472,15 +469,46 @@ const Navbar = () => {
                             </div>
                         )}
 
+                        {/* Dashboard shortcut — pinned to top for admin/seller */}
+                        {(isAdmin || isSeller) && (
+                            <Link
+                                to={isAdmin ? "/admin/dashboard" : "/seller/dashboard"}
+                                onClick={closeMenu}
+                                style={{
+                                    display:        "flex",
+                                    alignItems:     "center",
+                                    gap:            "10px",
+                                    marginTop:      "10px",
+                                    marginBottom:   "4px",
+                                    padding:        "12px 14px",
+                                    background:     C.btnBg,
+                                    borderRadius:   "8px",
+                                    textDecoration: "none",
+                                    color:          C.btnText,
+                                }}
+                            >
+                                {isAdmin
+                                    ? <HiViewGrid size={18} aria-hidden="true" style={{ flexShrink: 0 }} />
+                                    : <HiShoppingBag size={18} aria-hidden="true" style={{ flexShrink: 0 }} />
+                                }
+                                <div>
+                                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 700, fontFamily: "Inter, sans-serif", color: C.btnText }}>
+                                        {isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
+                                    </p>
+                                    <p style={{ margin: 0, fontSize: "11px", fontFamily: "Inter, sans-serif", color: C.btnText, opacity: 0.75 }}>
+                                        {isAdmin ? "Manage products, orders & users" : "Manage your listings & orders"}
+                                    </p>
+                                </div>
+                            </Link>
+                        )}
+
                         {/* Mobile links */}
                         {[
-                            { to: "/",                   label: "Home",             Icon: HiHome,          show: true },
-                            { to: "/wishlist",           label: "Wishlist",         Icon: FaHeart,         show: isAuthenticated },
-                            { to: "/cart",               label: "Cart",             Icon: FaShoppingCart,  show: isAuthenticated },
-                            { to: "/orders",             label: "Orders",           Icon: HiClipboardList, show: isAuthenticated },
-                            { to: "/account",            label: "My Account",       Icon: HiUser,          show: isAuthenticated },
-                            { to: "/seller/dashboard",   label: "Seller Dashboard", Icon: HiShoppingBag,   show: isSeller },
-                            { to: "/admin/dashboard",    label: "Admin Dashboard",  Icon: HiViewGrid,      show: isAdmin },
+                            { to: "/",          label: "Home",       Icon: HiHome,          show: true },
+                            { to: "/wishlist",  label: "Wishlist",   Icon: FaHeart,         show: isAuthenticated },
+                            { to: "/cart",      label: "Cart",       Icon: FaShoppingCart,  show: isAuthenticated },
+                            { to: "/orders",    label: "Orders",     Icon: HiClipboardList, show: isAuthenticated },
+                            { to: "/account",   label: "My Account", Icon: HiUser,          show: isAuthenticated },
                         ].filter((l) => l.show).map((l) => (
                             <Link
                                 key={l.to}

@@ -191,7 +191,7 @@ const AdminCategoriesPage = () => {
     */
 
     return (
-        <AdminLayout title="Categories">
+        <AdminLayout title="Admin Panel">
 
             {/* ── Page banner ── */}
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import api from "../api/api";
+import { fmtPrice } from "../utils/format";
 import { HiCheckCircle, HiExternalLink } from "react-icons/hi";
 
 const OrderConfirmationPage = () => {
@@ -133,7 +134,7 @@ const OrderConfirmationPage = () => {
                             <Row label="Total"
                                 value={
                                     <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, color: "var(--success)" }}>
-                                        ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        {fmtPrice(order.totalAmount)}
                                     </span>
                                 }
                             />
@@ -155,7 +156,7 @@ const OrderConfirmationPage = () => {
                                             <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-xs)", color: "var(--text-3)", margin: 0 }}>Qty: {item.quantity}</p>
                                         </div>
                                         <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--text-2)", whiteSpace: "nowrap" }}>
-                                            ${Number(item.orderedProductPrice * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(item.orderedProductPrice * item.quantity)}
                                         </p>
                                     </div>
                                 ))}

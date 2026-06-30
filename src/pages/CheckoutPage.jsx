@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -12,6 +12,7 @@ import {
 
 import api  from "../api/api";
 import toast from "react-hot-toast";
+import { fmtPrice } from "../utils/format";
 
 import { Button, Stack, TextField } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -69,7 +70,7 @@ const StepIndicator = ({ step }) => {
 | Inner payment form — rendered inside <Elements>
 |----------------------------------------------------------
 */
-const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
+const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress, hasBlockedItems, onUnavailableItem }) => {
     const stripe   = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -120,9 +121,16 @@ const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
             toast.success("Payment submitted! Your order is being processed.");
             navigate(`/order-confirmation?orderId=${orderId}`);
 
-        } catch {
-            toast.error("Payment failed. Please try again.");
-            setPaymentError("Something went wrong. Please try again.");
+        } catch (err) {
+            const msg = err?.response?.data?.message || "Something went wrong. Please try again.";
+            // "X" is no longer available — surface via the structured blocked-items UI,
+            // not as a generic inline error, so the customer has a clear path forward.
+            const unavailableMatch = msg.match(/"(.+?)" is no longer available/i);
+            if (unavailableMatch) {
+                onUnavailableItem(unavailableMatch[1]);
+            } else {
+                setPaymentError(msg);
+            }
             setPaying(false);
         }
     };
@@ -183,23 +191,23 @@ const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
                         Order Total
                     </span>
                     <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "22px", color: "var(--text)" }}>
-                        ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        {fmtPrice(totalPrice)}
                     </span>
                 </div>
                 <button
                     type="submit"
-                    disabled={!stripe || paying}
+                    disabled={!stripe || paying || hasBlockedItems}
                     style={{
                         width:         "100%",
                         padding:       "var(--space-4)",
-                        background:    !stripe || paying ? "var(--border)" : "var(--accent)",
+                        background:    !stripe || paying || hasBlockedItems ? "var(--border)" : "var(--accent)",
                         color:         "var(--text)",
                         border:        "none",
                         borderRadius:  "var(--r-md)",
                         fontFamily:    "var(--font-body)",
                         fontWeight:    700,
                         fontSize:      "14px",
-                        cursor:        !stripe || paying ? "not-allowed" : "pointer",
+                        cursor:        !stripe || paying || hasBlockedItems ? "not-allowed" : "pointer",
                         display:       "flex",
                         alignItems:    "center",
                         justifyContent:"center",
@@ -215,7 +223,7 @@ const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
                     ) : (
                         <>
                             <LockOutlinedIcon sx={{ fontSize: 14 }} />
-                            Pay ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })} →
+                            Pay {fmtPrice(totalPrice)} →
                         </>
                     )}
                 </button>
@@ -229,7 +237,7 @@ const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
 | Address form — step 1
 |----------------------------------------------------------
 */
-const AddressForm = ({ onContinue }) => {
+const AddressForm = ({ onContinue, hasBlockedItems }) => {
     const [companyName, setCompanyName] = useState("");
     const [contactName, setContactName] = useState("");
     const [address1,    setAddress1]    = useState("");
@@ -280,17 +288,18 @@ const AddressForm = ({ onContinue }) => {
 
             <button
                 type="submit"
+                disabled={hasBlockedItems}
                 style={{
                     width:         "100%",
                     padding:       "var(--space-4)",
-                    background:    "var(--accent)",
+                    background:    hasBlockedItems ? "var(--border)" : "var(--accent)",
                     color:         "var(--text)",
                     border:        "none",
                     borderRadius:  "var(--r-md)",
                     fontFamily:    "var(--font-body)",
                     fontWeight:    700,
                     fontSize:      "14px",
-                    cursor:        "pointer",
+                    cursor:        hasBlockedItems ? "not-allowed" : "pointer",
                     marginTop:     "var(--space-5)",
                     letterSpacing: "0.02em",
                 }}
@@ -319,6 +328,7 @@ const CheckoutPage = () => {
     const [loading,         setLoading]         = useState(true);
     const [step,            setStep]            = useState("address");
     const [shippingAddress, setShippingAddress] = useState("");
+    const [blockedItems,    setBlockedItems]    = useState([]);
 
     /* Body class lets CSS hide Stripe's injected Link button everywhere except checkout */
     useEffect(() => {
@@ -333,6 +343,32 @@ const CheckoutPage = () => {
             .catch(() => toast.error("Could not load cart"))
             .finally(() => setLoading(false));
     }, [user]);
+
+    /* Pre-flight: check every cart item's current status as soon as cart loads */
+    useEffect(() => {
+        if (!cart?.items?.length) return;
+        (async () => {
+            const blocked = [];
+            await Promise.allSettled(
+                cart.items.map(async (item) => {
+                    try {
+                        const { data } = await api.get(`/public/products/${item.productId}`);
+                        if (data?.status && data.status !== "ACTIVE") {
+                            blocked.push({ id: item.productId, name: item.productName });
+                        }
+                    } catch { /* backend will also validate at order creation time */ }
+                })
+            );
+            if (blocked.length) setBlockedItems(blocked);
+        })();
+    }, [cart]);
+
+    /* Called by CheckoutForm when the backend rejects an item at payment time */
+    const handleUnavailableItem = useCallback((name) => {
+        setBlockedItems(prev =>
+            prev.some(b => b.name === name) ? prev : [...prev, { id: null, name }]
+        );
+    }, []);
 
     if (loading) return (
         <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "var(--space-3)" }}>
@@ -417,6 +453,51 @@ const CheckoutPage = () => {
 
                     {/* ── Form column ── */}
                     <div>
+
+                        {/* Unavailable items alert — shown on both steps */}
+                        {blockedItems.length > 0 && (
+                            <div style={{
+                                background:   "var(--error-subtle)",
+                                border:       "1px solid var(--error)",
+                                borderLeft:   "4px solid var(--error)",
+                                borderRadius: "var(--r-md)",
+                                padding:      "var(--space-4) var(--space-5)",
+                                marginBottom: "var(--space-5)",
+                            }}>
+                                <p style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: "14px", color: "var(--error)", margin: "0 0 var(--space-2)" }}>
+                                    {blockedItems.length === 1
+                                        ? "1 item in your cart is no longer available"
+                                        : `${blockedItems.length} items in your cart are no longer available`}
+                                </p>
+                                <ul style={{ margin: "0 0 var(--space-3)", paddingLeft: "var(--space-5)" }}>
+                                    {blockedItems.map((b, i) => (
+                                        <li key={i} style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--error)", margin: "2px 0" }}>
+                                            "{b.name}" has been removed from sale
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--text-2)", margin: "0 0 var(--space-3)" }}>
+                                    Remove {blockedItems.length === 1 ? "this item" : "these items"} from your cart to continue with your order.
+                                </p>
+                                <button
+                                    onClick={() => navigate("/cart")}
+                                    style={{
+                                        background:   "var(--error)",
+                                        color:        "#fff",
+                                        border:       "none",
+                                        borderRadius: "var(--r-sm)",
+                                        padding:      "var(--space-2) var(--space-4)",
+                                        fontFamily:   "var(--font-body)",
+                                        fontSize:     "13px",
+                                        fontWeight:   700,
+                                        cursor:       "pointer",
+                                    }}
+                                >
+                                    Return to Cart →
+                                </button>
+                            </div>
+                        )}
+
                         <div style={{
                             background:   "var(--surface-mid)",
                             border:       "1px solid var(--border)",
@@ -424,7 +505,10 @@ const CheckoutPage = () => {
                             padding:      "var(--space-6)",
                         }}>
                             {step === "address" && (
-                                <AddressForm onContinue={(formatted) => { setShippingAddress(formatted); setStep("payment"); }} />
+                                <AddressForm
+                                    hasBlockedItems={blockedItems.length > 0}
+                                    onContinue={(formatted) => { setShippingAddress(formatted); setStep("payment"); }}
+                                />
                             )}
 
                             {step === "payment" && (
@@ -433,6 +517,8 @@ const CheckoutPage = () => {
                                         totalPrice={totalPrice}
                                         shippingAddress={shippingAddress}
                                         onEditAddress={() => setStep("address")}
+                                        hasBlockedItems={blockedItems.length > 0}
+                                        onUnavailableItem={handleUnavailableItem}
                                     />
                                 </Elements>
                             )}
@@ -481,7 +567,7 @@ const CheckoutPage = () => {
                                             </p>
                                         </div>
                                         <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 600, color: "var(--text)", flexShrink: 0 }}>
-                                            ${(Number(item.price) * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(Number(item.price) * item.quantity)}
                                         </span>
                                     </div>
                                 ))}
@@ -492,7 +578,7 @@ const CheckoutPage = () => {
                                     Total
                                 </span>
                                 <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "18px", color: "var(--text)" }}>
-                                    ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    {fmtPrice(totalPrice)}
                                 </span>
                             </div>
                         </div>

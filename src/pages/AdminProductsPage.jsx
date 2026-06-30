@@ -36,6 +36,7 @@ import RefreshIcon               from "@mui/icons-material/Refresh";
 import InventoryOutlinedIcon     from "@mui/icons-material/InventoryOutlined";
 
 import api         from "../api/api";
+import { fmtCurrency, fmtPrice } from "../utils/format";
 import toast       from "react-hot-toast";
 import AdminLayout from "../components/layouts/AdminLayout";
 import SheetPanel  from "../components/common/SheetPanel";
@@ -150,6 +151,7 @@ const AdminProductsPage = () => {
     const [editingProductId,  setEditingProductId]  = useState(null);
     const [isViewOpen,        setIsViewOpen]        = useState(false);
     const [selectedProduct,   setSelectedProduct]   = useState(null);
+    const [viewImgIdx,        setViewImgIdx]        = useState(0);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [productToDelete,   setProductToDelete]   = useState(null);
     const [rejectDialogOpen,  setRejectDialogOpen]  = useState(false);
@@ -166,11 +168,12 @@ const AdminProductsPage = () => {
 
     const [productForm, setProductForm] = useState({
         productName: "", description: "", modelNumber: "",
-        partNumber: "", imageUrl: "", price: "", quantity: "", categoryId: "",
+        partNumber: "", imageUrl: "", image2Url: "", image3Url: "", image4Url: "",
+        price: "", quantity: "", categoryId: "",
     });
 
     const resetForm = () => {
-        setProductForm({ productName: "", description: "", modelNumber: "", partNumber: "", imageUrl: "", price: "", quantity: "", categoryId: "" });
+        setProductForm({ productName: "", description: "", modelNumber: "", partNumber: "", imageUrl: "", image2Url: "", image3Url: "", image4Url: "", price: "", quantity: "", categoryId: "" });
         setEditingProductId(null);
     };
 
@@ -265,6 +268,7 @@ const AdminProductsPage = () => {
 
     const handleViewProduct = useCallback((product) => {
         setSelectedProduct(product);
+        setViewImgIdx(0);
         setIsViewOpen(true);
     }, []);
 
@@ -275,7 +279,10 @@ const AdminProductsPage = () => {
             description: product.description,
             modelNumber: product.modelNumber || "",
             partNumber:  product.partNumber  || "",
-            imageUrl:    product.imageUrl,
+            imageUrl:    product.imageUrl    || "",
+            image2Url:   product.image2Url   || "",
+            image3Url:   product.image3Url   || "",
+            image4Url:   product.image4Url   || "",
             price:       product.price,
             quantity:    product.quantity,
             categoryId:  String(product.categoryId),
@@ -306,24 +313,27 @@ const AdminProductsPage = () => {
         }
     };
 
-    const handleImageUpload = async (e) => {
+    const getXsrf = () =>
+        document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
+
+    const handleImageUploadForSlot = (slot) => async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        if (file.size > 10 * 1024 * 1024) { toast.error("Image must be 10 MB or smaller."); return; }
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            const res = await api.post("/upload", formData, {
-                headers: { "X-XSRF-TOKEN": document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1] },
-            });
-            setProductForm(prev => ({ ...prev, imageUrl: res.data }));
-            toast.success("Image uploaded.");
+            const fd = new FormData();
+            fd.append("file", file);
+            const res = await api.post("/upload", fd, { headers: { "X-XSRF-TOKEN": getXsrf() } });
+            const key = ["imageUrl", "image2Url", "image3Url", "image4Url"][slot];
+            setProductForm(prev => ({ ...prev, [key]: res.data }));
+            toast.success(`Image ${slot + 1} uploaded.`);
         } catch {
             toast.error("Image upload failed.");
         }
     };
 
     const handleSaveProduct = async () => {
-        if (!productForm.productName || !productForm.description || !productForm.imageUrl || !productForm.price || !productForm.quantity || !productForm.categoryId) {
+        if (!productForm.productName || !productForm.description || !productForm.price || !productForm.quantity || !productForm.categoryId) {
             toast.error("Please fill in all required fields.");
             return;
         }
@@ -332,7 +342,10 @@ const AdminProductsPage = () => {
             description: productForm.description,
             modelNumber: productForm.modelNumber || null,
             partNumber:  productForm.partNumber  || null,
-            imageUrl:    productForm.imageUrl,
+            imageUrl:    productForm.imageUrl  || null,
+            image2Url:   productForm.image2Url || null,
+            image3Url:   productForm.image3Url || null,
+            image4Url:   productForm.image4Url || null,
             price:       Number(productForm.price),
             quantity:    Number(productForm.quantity),
             categoryId:  Number(productForm.categoryId),
@@ -438,7 +451,7 @@ const AdminProductsPage = () => {
             field: "price", headerName: "Price", width: 100,
             renderCell: (params) => (
                 <span style={{ color: "var(--success)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600 }}>
-                    ${Number(params.row.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    {fmtCurrency(params.row.price)}
                 </span>
             ),
         },
@@ -495,7 +508,7 @@ const AdminProductsPage = () => {
     const pendingCount = products.filter(p => p.status === "PENDING_REVIEW").length;
 
     return (
-        <AdminLayout title="Products">
+        <AdminLayout title="Admin Panel">
 
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-4)" }}>
                 <PageBanner
@@ -617,14 +630,41 @@ const AdminProductsPage = () => {
                 }>
                 {selectedProduct && (
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                        <Box sx={{ width: 200, height: 200, margin: "0 auto", background: "var(--surface-high)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                            <Box component="img" src={selectedProduct.imageUrl} alt={selectedProduct.productName}
-                                sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
-                        </Box>
+                        {(() => {
+                            const viewSlots = [selectedProduct.imageUrl, selectedProduct.image2Url, selectedProduct.image3Url, selectedProduct.image4Url].filter(Boolean);
+                            const viewImg   = viewSlots[viewImgIdx] ?? null;
+                            return (
+                                <>
+                                    {/* Main image */}
+                                    <Box sx={{ width: "100%", height: 220, background: "#fff", border: "1px solid var(--border)", borderRadius: "var(--r-md)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                                        {viewImg
+                                            ? <Box component="img" src={viewImg} alt={selectedProduct.productName} sx={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain" }} />
+                                            : <CloudUploadIcon sx={{ fontSize: 40, color: "var(--text-4)", opacity: 0.3 }} />
+                                        }
+                                    </Box>
+                                    {/* Thumbnail row */}
+                                    {viewSlots.length > 1 && (
+                                        <Box sx={{ display: "flex", gap: 1 }}>
+                                            {viewSlots.map((url, i) => (
+                                                <Box key={i} component="button" type="button" onClick={() => setViewImgIdx(i)}
+                                                    sx={{
+                                                        width: 56, height: 56, flexShrink: 0,
+                                                        border: `2px solid ${i === viewImgIdx ? "var(--accent)" : "var(--border)"}`,
+                                                        borderRadius: "var(--r-sm)", background: "#fff",
+                                                        overflow: "hidden", cursor: "pointer", p: 0,
+                                                    }}>
+                                                    <Box component="img" src={url} alt={`Angle ${i+1}`} sx={{ width: "100%", height: "100%", objectFit: "contain", p: "3px" }} />
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    )}
+                                </>
+                            );
+                        })()}
 
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
                             <Typography variant="h4" fontWeight="bold" sx={{ color: "var(--success)", fontFamily: "var(--font-mono)" }}>
-                                ${Number(selectedProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                {fmtPrice(selectedProduct.price)}
                             </Typography>
                             <StatusBadge status={selectedProduct.status} />
                             {selectedProduct.categoryName && (
@@ -719,25 +759,63 @@ const AdminProductsPage = () => {
                     <TextField label="Part Number" size="small" fullWidth placeholder="e.g. 3066T-1234"
                         value={productForm.partNumber}
                         onChange={(e) => setProductForm({ ...productForm, partNumber: e.target.value })} />
+                    {/* 4-slot image upload grid */}
                     <Box sx={{ gridColumn: "1 / -1" }}>
-                        <input type="file" id="adminProductImgInput" hidden accept="image/*" onChange={handleImageUpload} />
-                        <Stack direction="row" alignItems="center" flexWrap="wrap">
-                            <Button variant="outlined" size="small" startIcon={<CloudUploadIcon />}
-                                onClick={() => document.getElementById("adminProductImgInput").click()}
-                                sx={{ textTransform: "none" }}>
-                                {productForm.imageUrl ? "Change Image" : "Upload Image"}
-                            </Button>
-                            {productForm.imageUrl && (
-                                <Chip label="Image uploaded" size="small" variant="outlined"
-                                    sx={{ color: "var(--success)", borderColor: "var(--success)", ml: "16px" }} />
-                            )}
-                        </Stack>
-                    </Box>
-                    {productForm.imageUrl && (
-                        <Box sx={{ gridColumn: "1 / -1", height: 90, background: "var(--surface-high)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                            <Box component="img" src={productForm.imageUrl} alt="Preview" sx={{ maxHeight: 80, maxWidth: 120, objectFit: "contain" }} />
+                        <Typography variant="caption" sx={{ display: "block", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-3)", mb: 1, fontWeight: 600 }}>
+                            Product Images <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(up to 4 angles)</span>
+                        </Typography>
+                        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1.5 }}>
+                            {[0, 1, 2, 3].map(i => {
+                                const key     = ["imageUrl","image2Url","image3Url","image4Url"][i];
+                                const preview = productForm[key];
+                                return (
+                                    <Box key={i} sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                                        {/* Preview box */}
+                                        <Box sx={{
+                                            width: "100%", aspectRatio: "1",
+                                            border: `1px solid ${preview ? "var(--border)" : "var(--border-subtle)"}`,
+                                            borderRadius: "var(--r-sm)",
+                                            background: preview ? "#fff" : "var(--surface-high)",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            overflow: "hidden", position: "relative",
+                                        }}>
+                                            {preview ? (
+                                                <Box component="img" src={preview} alt={`Angle ${i+1}`}
+                                                    sx={{ width: "100%", height: "100%", objectFit: "contain", p: "4px" }} />
+                                            ) : (
+                                                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5, opacity: 0.35 }}>
+                                                    <CloudUploadIcon sx={{ fontSize: 20, color: "var(--text-3)" }} />
+                                                    <Typography variant="caption" sx={{ fontSize: "9px", fontFamily: "var(--font-mono)", color: "var(--text-3)" }}>
+                                                        {i === 0 ? "Main" : `Angle ${i+1}`}
+                                                    </Typography>
+                                                </Box>
+                                            )}
+                                            {preview && (
+                                                <Box component="button" type="button"
+                                                    onClick={() => setProductForm(f => ({ ...f, [key]: "" }))}
+                                                    sx={{
+                                                        position: "absolute", top: "3px", right: "3px",
+                                                        width: "18px", height: "18px", borderRadius: "50%",
+                                                        background: "rgba(0,0,0,0.55)", border: "none",
+                                                        color: "#fff", fontSize: "13px", lineHeight: "1",
+                                                        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                                        p: 0,
+                                                    }}
+                                                >×</Box>
+                                            )}
+                                        </Box>
+                                        {/* Upload button */}
+                                        <Button component="label" variant="outlined" size="small" fullWidth
+                                            startIcon={<CloudUploadIcon sx={{ fontSize: 14 }} />}
+                                            sx={{ textTransform: "none", fontWeight: 600, fontSize: "11px", minWidth: 0 }}>
+                                            {preview ? "Change" : i === 0 ? "Main" : `Angle ${i+1}`}
+                                            <input type="file" accept="image/*" hidden onChange={handleImageUploadForSlot(i)} />
+                                        </Button>
+                                    </Box>
+                                );
+                            })}
                         </Box>
-                    )}
+                    </Box>
                     <Box sx={{ gridColumn: "1 / -1" }}>
                         <TextField label="Description" size="small" fullWidth multiline rows={4}
                             value={productForm.description}

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
+import { fmtCurrency, fmtPrice } from "../utils/format";
 import { Step, StepLabel, Stepper } from "@mui/material";
 import { HiShoppingBag, HiCube, HiRefresh } from "react-icons/hi";
 
@@ -46,12 +47,25 @@ const StatusBadge = ({ status }) => {
     );
 };
 
+const PAGE_SIZE = 10;
+
+const TABS = [
+    { key: "ALL",             label: "All"        },
+    { key: "PAYMENT_PENDING", label: "Pending"    },
+    { key: "PROCESSING",      label: "Processing" },
+    { key: "SHIPPED",         label: "Shipped"    },
+    { key: "DELIVERED",       label: "Delivered"  },
+    { key: "CANCELLED",       label: "Cancelled"  },
+];
+
 const OrdersPage = () => {
 
     const [orders,     setOrders]     = useState([]);
     const [loading,    setLoading]    = useState(true);
     const [error,      setError]      = useState("");
     const [reordering, setReordering] = useState(new Set());
+    const [activeTab,  setActiveTab]  = useState("ALL");
+    const [page,       setPage]       = useState(0);
 
     const { user } = useSelector((state) => state.auth);
     const navigate = useNavigate();
@@ -71,6 +85,8 @@ const OrdersPage = () => {
         if (user?.userId) fetchOrders();
     }, [user]);
 
+    const handleTabChange = (key) => { setActiveTab(key); setPage(0); };
+
     if (loading) return (
         <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "var(--space-3)" }}>
             <div className="solyd-spinner" />
@@ -85,7 +101,11 @@ const OrdersPage = () => {
         </div>
     );
 
-    const totalSpent = orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+    const totalSpent      = orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+    const filteredOrders  = activeTab === "ALL" ? orders : orders.filter(o => o.status === activeTab);
+    const totalPages      = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+    const pagedOrders     = filteredOrders.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    const tabCount        = (key) => key === "ALL" ? orders.length : orders.filter(o => o.status === key).length;
 
     const handleReorder = async (order) => {
         if (!user?.userId) return;
@@ -118,9 +138,59 @@ const OrdersPage = () => {
                 </h1>
                 {orders.length > 0 && (
                     <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", color: "var(--text-3)", marginTop: "var(--space-1)" }}>
-                        {orders.length} order{orders.length !== 1 ? "s" : ""} · ${totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2 })} total
+                        {orders.length} order{orders.length !== 1 ? "s" : ""} · {fmtCurrency(totalSpent)} total
                     </p>
                 )}
+            </div>
+
+            {/* ── Status tabs ── */}
+            <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", overflowX: "auto" }}>
+                <div style={{ maxWidth: "var(--content-max)", margin: "0 auto", padding: "0 var(--space-6)", display: "flex", gap: "0" }}>
+                    {TABS.map(({ key, label }) => {
+                        const count   = tabCount(key);
+                        const isActive = activeTab === key;
+                        return (
+                            <button
+                                key={key}
+                                onClick={() => handleTabChange(key)}
+                                style={{
+                                    background:    "transparent",
+                                    border:        "none",
+                                    borderBottom:  isActive ? "2px solid var(--accent)" : "2px solid transparent",
+                                    padding:       "var(--space-3) var(--space-4)",
+                                    fontFamily:    "var(--font-mono)",
+                                    fontSize:      "12px",
+                                    fontWeight:    isActive ? 700 : 500,
+                                    color:         isActive ? "var(--accent)" : "var(--text-3)",
+                                    cursor:        "pointer",
+                                    whiteSpace:    "nowrap",
+                                    transition:    "color var(--duration-fast), border-color var(--duration-fast)",
+                                    display:       "flex",
+                                    alignItems:    "center",
+                                    gap:           "6px",
+                                }}
+                                onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = "var(--text)"; }}
+                                onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = "var(--text-3)"; }}
+                            >
+                                {label}
+                                {count > 0 && (
+                                    <span style={{
+                                        background:    isActive ? "var(--accent)" : "var(--surface-high)",
+                                        color:         isActive ? "var(--bg)" : "var(--text-3)",
+                                        fontSize:      "10px",
+                                        fontWeight:    700,
+                                        padding:       "1px 5px",
+                                        borderRadius:  "999px",
+                                        minWidth:      "18px",
+                                        textAlign:     "center",
+                                    }}>
+                                        {count}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* ── Content ── */}
@@ -150,11 +220,16 @@ const OrdersPage = () => {
                         </button>
                     </div>
 
+                ) : filteredOrders.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "var(--space-16) var(--space-6)", color: "var(--text-3)", fontFamily: "var(--font-body)", fontSize: "14px" }}>
+                        No {activeTab.toLowerCase().replace("_", " ")} orders.
+                    </div>
+
                 ) : (
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
 
-                        {orders.map((order) => {
+                        {pagedOrders.map((order) => {
                             const s = STATUS_STYLE[order.status] ?? STATUS_STYLE.PENDING;
                             return (
                                 <div
@@ -201,7 +276,7 @@ const OrdersPage = () => {
                                                     Order Total
                                                 </p>
                                                 <p style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "18px", color: "var(--text)", margin: 0 }}>
-                                                    ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    {fmtCurrency(order.totalAmount)}
                                                 </p>
                                             </div>
                                         </div>
@@ -289,13 +364,13 @@ const OrdersPage = () => {
                                                                 {item.productName}
                                                             </p>
                                                             <p style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-3)", margin: "2px 0 0" }}>
-                                                                Qty: {item.quantity} · ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })} ea
+                                                                Qty: {item.quantity} · {fmtPrice(item.price)} ea
                                                             </p>
                                                         </div>
                                                     </div>
 
                                                     <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "14px", color: "var(--text)", whiteSpace: "nowrap" }}>
-                                                        ${Number(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                        {fmtPrice(item.price * item.quantity)}
                                                     </span>
                                                 </div>
                                             ))}
@@ -306,7 +381,7 @@ const OrdersPage = () => {
                                             <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-3)" }}>
                                                 <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>Order Total</span>
                                                 <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--success)" }}>
-                                                    ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    {fmtPrice(order.totalAmount)}
                                                 </span>
                                             </div>
                                             <button
@@ -339,6 +414,54 @@ const OrdersPage = () => {
                                 </div>
                             );
                         })}
+                        {/* ── Pagination ── */}
+                        {totalPages > 1 && (
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4) 0", marginTop: "var(--space-2)" }}>
+                                <button
+                                    onClick={() => setPage(p => Math.max(0, p - 1))}
+                                    disabled={page === 0}
+                                    style={{
+                                        padding:      "var(--space-2) var(--space-5)",
+                                        background:   "var(--surface-mid)",
+                                        border:       "1px solid var(--border)",
+                                        borderRadius: "var(--r-sm)",
+                                        color:        page === 0 ? "var(--text-4)" : "var(--text-2)",
+                                        fontFamily:   "var(--font-mono)",
+                                        fontSize:     "12px",
+                                        fontWeight:   600,
+                                        cursor:       page === 0 ? "not-allowed" : "pointer",
+                                        transition:   "border-color var(--duration-fast), color var(--duration-fast)",
+                                    }}
+                                    onMouseEnter={e => { if (page !== 0) { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; } }}
+                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = page === 0 ? "var(--text-4)" : "var(--text-2)"; }}
+                                >
+                                    ← Previous
+                                </button>
+                                <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text-3)" }}>
+                                    Page {page + 1} of {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                                    disabled={page >= totalPages - 1}
+                                    style={{
+                                        padding:      "var(--space-2) var(--space-5)",
+                                        background:   "var(--surface-mid)",
+                                        border:       "1px solid var(--border)",
+                                        borderRadius: "var(--r-sm)",
+                                        color:        page >= totalPages - 1 ? "var(--text-4)" : "var(--text-2)",
+                                        fontFamily:   "var(--font-mono)",
+                                        fontSize:     "12px",
+                                        fontWeight:   600,
+                                        cursor:       page >= totalPages - 1 ? "not-allowed" : "pointer",
+                                        transition:   "border-color var(--duration-fast), color var(--duration-fast)",
+                                    }}
+                                    onMouseEnter={e => { if (page < totalPages - 1) { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; } }}
+                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = page >= totalPages - 1 ? "var(--text-4)" : "var(--text-2)"; }}
+                                >
+                                    Next →
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
