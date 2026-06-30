@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
-import { HiAdjustments, HiSearch, HiX } from "react-icons/hi";
+import { HiAdjustments, HiSearch, HiViewGrid, HiX } from "react-icons/hi";
 import { FaShoppingCart, FaHeart, FaRegHeart, FaEye } from "react-icons/fa";
 import {
     fetchProductsStart,
@@ -567,12 +567,24 @@ const HomePage = () => {
                         <div className="flex flex-wrap gap-3" style={{ marginTop: "28px" }}>
                             <button
                                 onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)" }}
+                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)", display: "flex", alignItems: "center", gap: "8px" }}
                                 onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
                                 onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                             >
+                                <HiViewGrid style={{ fontSize: "15px" }} />
                                 Browse Parts
                             </button>
+                            {user && !user.roles?.includes("ROLE_ADMIN") && !user.roles?.includes("ROLE_SELLER") && (
+                                <button
+                                    onClick={() => navigate("/wishlist")}
+                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)", display: "flex", alignItems: "center", gap: "8px" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                >
+                                    <FaHeart style={{ fontSize: "13px", color: "var(--accent)" }} />
+                                    My Wishlist
+                                </button>
+                            )}
                             {!user && (
                                 <button
                                     onClick={() => navigate("/register")}
