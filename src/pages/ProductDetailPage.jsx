@@ -333,7 +333,7 @@ export default function ProductDetailPage() {
                         onClick={() => { if (selectedImg) setLightboxOpen(true); }}
                         style={{
                             width:      '100%',
-                            height:     '360px',
+                            height:     'clamp(200px, 36vh, 280px)',
                             position:   'relative',
                             overflow:   'hidden',
                             background: '#ffffff',
@@ -500,7 +500,7 @@ export default function ProductDetailPage() {
                         style={{
                             display:         'flex',
                             gap:             '8px',
-                            padding:         '10px 12px',
+                            padding:         '8px 12px',
                             borderTop:       '1px solid var(--border)',
                             background:      'var(--surface-mid)',
                             overflowX:       'auto',
@@ -518,8 +518,8 @@ export default function ProductDetailPage() {
                                     onClick={() => { setImgIdx(i); setSelectedImg(url); }}
                                     style={{
                                         flexShrink:   0,
-                                        width:        '68px',
-                                        height:       '68px',
+                                        width:        '58px',
+                                        height:       '58px',
                                         border:       active
                                             ? '2px solid var(--accent)'
                                             : '1px solid var(--border)',
@@ -1055,8 +1055,8 @@ export default function ProductDetailPage() {
                         alt={product.productName}
                         onClick={e => e.stopPropagation()}
                         style={{
-                            maxWidth:   '90vw',
-                            maxHeight:  '85vh',
+                            maxWidth:   '72vw',
+                            maxHeight:  '65vh',
                             objectFit:  'contain',
                             borderRadius: '4px',
                             userSelect: 'none',
