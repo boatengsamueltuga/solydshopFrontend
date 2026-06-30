@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import api from '../api/api';
+import { fmtPrice } from '../utils/format';
 import { incrementCartCount } from '../features/cart/cartSlice';
 import './ProductDetailPage.css';
 
@@ -432,10 +433,7 @@ export default function ProductDetailPage() {
                                         lineHeight: 1,
                                     }}
                                 >
-                                    ${Number(product.price).toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2,
-                                    })}
+                                    {fmtPrice(product.price)}
                                 </span>
                                 <span
                                     style={{
@@ -740,10 +738,7 @@ export default function ProductDetailPage() {
                 <div className="pdp-action-bar-price">
                     <div className="pdp-action-bar-label">Unit Price</div>
                     <div className="pdp-action-bar-amount">
-                        ${Number(product.price).toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                        })}
+                        {fmtPrice(product.price)}
                     </div>
                 </div>
                 <button

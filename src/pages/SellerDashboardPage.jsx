@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import api from "../api/api";
 import toast from "react-hot-toast";
+import { fmtCurrency } from "../utils/format";
 
 import SellerLayout from "../components/layouts/SellerLayout";
 import DataTable from "../components/common/DataTable";
@@ -178,11 +179,7 @@ const SellerDashboardPage = () => {
     const catalogValue    = products.filter(p => p.status === "ACTIVE")
                                     .reduce((sum, p) => sum + (p.price * p.quantity), 0);
 
-    const formatCompact = (n) => {
-        if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-        if (n >= 1_000)     return `$${(n / 1_000).toFixed(1)}K`;
-        return `$${n.toLocaleString("en-US")}`;
-    };
+    const formatCompact = fmtCurrency;
 
     /* ── DataTable columns ── */
     const columns = useMemo(() => [
@@ -276,7 +273,7 @@ const SellerDashboardPage = () => {
             width:    110,
             renderCell: ({ value }) => (
                 <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "13px", color: "var(--text)" }}>
-                    ${Number(value).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    {fmtCurrency(value)}
                 </span>
             ),
         },

@@ -35,7 +35,7 @@ import ClearIcon                 from "@mui/icons-material/Clear";
 import RefreshIcon               from "@mui/icons-material/Refresh";
 import InventoryOutlinedIcon     from "@mui/icons-material/InventoryOutlined";
 
-import api         from "../api/api";
+import api         from \"../api/api\";\nimport { fmtCurrency, fmtPrice } from \"../utils/format\";
 import toast       from "react-hot-toast";
 import AdminLayout from "../components/layouts/AdminLayout";
 import SheetPanel  from "../components/common/SheetPanel";
@@ -438,7 +438,7 @@ const AdminProductsPage = () => {
             field: "price", headerName: "Price", width: 100,
             renderCell: (params) => (
                 <span style={{ color: "var(--success)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600 }}>
-                    ${Number(params.row.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    {fmtCurrency(params.row.price)}
                 </span>
             ),
         },
@@ -624,7 +624,7 @@ const AdminProductsPage = () => {
 
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
                             <Typography variant="h4" fontWeight="bold" sx={{ color: "var(--success)", fontFamily: "var(--font-mono)" }}>
-                                ${Number(selectedProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                {fmtPrice(selectedProduct.price)}
                             </Typography>
                             <StatusBadge status={selectedProduct.status} />
                             {selectedProduct.categoryName && (

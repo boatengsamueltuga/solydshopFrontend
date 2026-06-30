@@ -24,7 +24,7 @@ import SearchIcon     from "@mui/icons-material/Search";
 import ClearIcon      from "@mui/icons-material/Clear";
 import RefreshIcon    from "@mui/icons-material/Refresh";
 
-import api          from "../api/api";
+import api          from \"../api/api\";\nimport { fmtCurrency, fmtPrice } from \"../utils/format\";
 import toast        from "react-hot-toast";
 import AdminLayout  from "../components/layouts/AdminLayout";
 import SheetPanel   from "../components/common/SheetPanel";
@@ -213,7 +213,7 @@ const AdminOrdersPage = () => {
             width: isMobile ? 90 : 120,
             renderCell: (params) => (
                 <span style={{ color: "var(--success)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600 }}>
-                    ${Number(params.row.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    {fmtCurrency(params.row.totalAmount)}
                 </span>
             ),
         },
@@ -438,7 +438,7 @@ const AdminOrdersPage = () => {
                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                 <Typography variant="body2" sx={{ fontWeight: 700, color: "var(--text)" }}>Order Total</Typography>
                                 <Typography variant="h6" sx={{ fontWeight: 700, color: "var(--success)", fontFamily: "var(--font-mono)" }}>
-                                    ${Number(selectedOrder.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    {fmtPrice(selectedOrder.totalAmount)}
                                 </Typography>
                             </Box>
                         </Box>
@@ -488,11 +488,11 @@ const AdminOrdersPage = () => {
                                             <Typography variant="body2" sx={{ fontWeight: 600, color: "var(--text)" }}>{item.productName}</Typography>
                                             <Typography variant="caption" sx={{ color: "var(--text-3)" }}>
                                                 Qty: <strong style={{ color: "var(--accent)" }}>{item.quantity}</strong>
-                                                {" · "}Unit: <strong style={{ color: "var(--success)" }}>${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong>
+                                                {" · "}Unit: <strong style={{ color: "var(--success)" }}>{fmtPrice(item.price)}</strong>
                                             </Typography>
                                         </Box>
                                         <Typography variant="body2" sx={{ fontWeight: 700, color: "var(--success)", fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>
-                                            ${Number(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(item.price * item.quantity)}
                                         </Typography>
                                     </Box>
                                 ))}

@@ -11,9 +11,10 @@ import {
     HiViewGridAdd,
 } from "react-icons/hi";
 
-import api         from "../api/api";
-import AdminLayout from "../components/layouts/AdminLayout";
-import PageBanner  from "../components/common/PageBanner";
+import api                    from "../api/api";
+import AdminLayout            from "../components/layouts/AdminLayout";
+import PageBanner             from "../components/common/PageBanner";
+import { fmtCurrency, fmtPrice } from "../utils/format";
 
 /* ── Status colour map ─────────────────────────────────────────────────────── */
 const STATUS_STYLE = {
@@ -160,7 +161,7 @@ const AdminDashboardPage = () => {
         .slice(0, 5);
 
     const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
-    const revenueDisplay = "$" + totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 });
+    const revenueDisplay = fmtCurrency(totalRevenue);
 
     return (
         <AdminLayout title="Admin Panel">
@@ -282,7 +283,7 @@ const AdminDashboardPage = () => {
                                                 {order.customerName}
                                             </td>
                                             <td style={{ padding: "var(--space-3) var(--space-4)", color: "var(--success)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap" }}>
-                                                ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                {fmtCurrency(order.totalAmount)}
                                             </td>
                                             <td style={{ padding: "var(--space-3) var(--space-4)" }}>
                                                 <StatusBadge status={order.status} />

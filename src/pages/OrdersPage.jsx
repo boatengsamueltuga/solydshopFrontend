@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
+import { fmtCurrency, fmtPrice } from "../utils/format";
 import { Step, StepLabel, Stepper } from "@mui/material";
 import { HiShoppingBag, HiCube, HiRefresh } from "react-icons/hi";
 
@@ -118,7 +119,7 @@ const OrdersPage = () => {
                 </h1>
                 {orders.length > 0 && (
                     <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", color: "var(--text-3)", marginTop: "var(--space-1)" }}>
-                        {orders.length} order{orders.length !== 1 ? "s" : ""} · ${totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2 })} total
+                        {orders.length} order{orders.length !== 1 ? "s" : ""} · {fmtCurrency(totalSpent)} total
                     </p>
                 )}
             </div>
@@ -201,7 +202,7 @@ const OrdersPage = () => {
                                                     Order Total
                                                 </p>
                                                 <p style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "18px", color: "var(--text)", margin: 0 }}>
-                                                    ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    {fmtCurrency(order.totalAmount)}
                                                 </p>
                                             </div>
                                         </div>
@@ -289,13 +290,13 @@ const OrdersPage = () => {
                                                                 {item.productName}
                                                             </p>
                                                             <p style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--text-3)", margin: "2px 0 0" }}>
-                                                                Qty: {item.quantity} · ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })} ea
+                                                                Qty: {item.quantity} · {fmtPrice(item.price)} ea
                                                             </p>
                                                         </div>
                                                     </div>
 
                                                     <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "14px", color: "var(--text)", whiteSpace: "nowrap" }}>
-                                                        ${Number(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                        {fmtPrice(item.price * item.quantity)}
                                                     </span>
                                                 </div>
                                             ))}
@@ -306,7 +307,7 @@ const OrdersPage = () => {
                                             <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-3)" }}>
                                                 <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>Order Total</span>
                                                 <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", color: "var(--success)" }}>
-                                                    ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    {fmtPrice(order.totalAmount)}
                                                 </span>
                                             </div>
                                             <button
