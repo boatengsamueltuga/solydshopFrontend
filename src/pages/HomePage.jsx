@@ -564,11 +564,10 @@ const HomePage = () => {
                             Buy and sell heavy machinery components worldwide. Verified sellers, OEM-grade parts, and fast international shipping — all on one platform.
                         </p>
 
-                        <div className="flex flex-wrap gap-3 items-center" style={{ marginTop: "28px" }}>
+                        <div className="flex flex-wrap gap-3 items-center justify-center sm:justify-start" style={{ marginTop: "28px" }}>
                             <button
                                 onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                                className="w-full sm:w-auto"
-                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+                                style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 36px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)", display: "flex", alignItems: "center", gap: "8px" }}
                                 onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
                                 onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                             >
