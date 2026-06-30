@@ -61,6 +61,9 @@ api.interceptors.response.use(
 
     (error) => {
 
+        /* Callers can pass { silent: true } to suppress global toasts */
+        if (error.config?.silent) return Promise.reject(error);
+
         /*
         ---------------------------------------------------------------
         | No Server Response

@@ -151,7 +151,7 @@ export default function ReviewsSection({ productId }) {
     const fetchReviews = useCallback(async () => {
         setLoading(true);
         try {
-            const { data } = await api.get(`/public/reviews/product/${productId}`);
+            const { data } = await api.get(`/public/reviews/product/${productId}`, { silent: true });
             const list = Array.isArray(data) ? data : (data.reviews ?? []);
             setReviews(list);
             if (list.length > 0) {
