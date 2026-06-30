@@ -564,7 +564,7 @@ const HomePage = () => {
                             Buy and sell heavy machinery components worldwide. Verified sellers, OEM-grade parts, and fast international shipping — all on one platform.
                         </p>
 
-                        <div className="flex flex-wrap gap-3" style={{ marginTop: "28px" }}>
+                        <div className="flex flex-wrap gap-3 items-center" style={{ marginTop: "28px" }}>
                             <button
                                 onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
                                 style={{ background: "var(--accent)", color: "var(--text)", border: "none", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "opacity var(--duration-fast)", display: "flex", alignItems: "center", gap: "8px" }}
@@ -595,6 +595,24 @@ const HomePage = () => {
                                     Get Started
                                 </button>
                             )}
+                        </div>
+
+                        {/* Trust chips */}
+                        <div className="flex flex-wrap gap-x-4 gap-y-2" style={{ marginTop: "16px" }}>
+                            {[
+                                "Verified Suppliers",
+                                "Secure B2B Checkout",
+                                "48 h Dispatch",
+                                "ISO 9001 Certified",
+                            ].map((label) => (
+                                <span key={label} style={{ display: "flex", alignItems: "center", gap: "5px", fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--text-3)", letterSpacing: "0.02em" }}>
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                                        <circle cx="6" cy="6" r="6" fill="var(--success)" opacity="0.18" />
+                                        <path d="M3.5 6l1.8 1.8L8.5 4.5" stroke="var(--success)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    {label}
+                                </span>
+                            ))}
                         </div>
 
                         {/* Stats row */}
