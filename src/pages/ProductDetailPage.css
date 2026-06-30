@@ -156,6 +156,14 @@
 }
 .pdp-action-bar-btn:hover:not(:disabled) { opacity: 0.88; }
 .pdp-action-bar-btn:disabled             { cursor: default; }
+.pdp-action-bar-quote {
+    background:   transparent;
+    color:        var(--text-2);
+    border:       1px solid var(--border);
+    padding-top:  calc(var(--space-3) - 1px);
+    padding-bottom: calc(var(--space-3) - 1px);
+}
+.pdp-action-bar-quote:hover { border-color: var(--accent) !important; color: var(--text) !important; }
 
 /* ── Button hover states ──────────────────────────────────── */
 .pdp-btn-primary:hover:not(:disabled) { background: var(--accent-hi) !important; }

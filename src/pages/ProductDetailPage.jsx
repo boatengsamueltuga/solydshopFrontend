@@ -953,6 +953,12 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
                 <button
+                    className="pdp-action-bar-btn pdp-action-bar-quote"
+                    onClick={openQuote}
+                >
+                    Request Quote
+                </button>
+                <button
                     className="pdp-action-bar-btn"
                     onClick={handleAddToCart}
                     disabled={!inStock || addingToCart}
