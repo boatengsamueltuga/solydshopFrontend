@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import SolydLogo from "./SolydLogo";
 
 export default function Footer() {
+    const { user } = useSelector(s => s.auth);
+    const isSeller = user?.roles?.includes("ROLE_SELLER");
+    const isAdmin  = user?.roles?.includes("ROLE_ADMIN");
+
     return (
         <footer style={{ background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
             <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10" style={{ textAlign: "left" }}>
@@ -27,11 +32,12 @@ export default function Footer() {
                         </p>
                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             {[
-                                { label: "My Orders",         to: "/orders"           },
-                                { label: "My Account",        to: "/account"          },
-                                { label: "Seller Dashboard",  to: "/seller/dashboard" },
-                                { label: "About",             to: "/about"            },
-                            ].map(({ label, to }) => (
+                                { label: "My Orders",         to: "/orders",            show: true         },
+                                { label: "My Account",        to: "/account",           show: true         },
+                                { label: "Seller Dashboard",  to: "/seller/dashboard",  show: isSeller     },
+                                { label: "Admin Dashboard",   to: "/admin/dashboard",   show: isAdmin      },
+                                { label: "About",             to: "/about",             show: true         },
+                            ].filter(l => l.show).map(({ label, to }) => (
                                 <Link
                                     key={label}
                                     to={to}
