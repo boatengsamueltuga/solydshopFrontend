@@ -65,7 +65,7 @@ const BearingIllustration = () => {
 
     return (
         <svg className="solyd-bearing-svg" viewBox="0 0 560 450" fill="none" xmlns="http://www.w3.org/2000/svg"
-             aria-hidden="true" style={{ width: "100%", maxHeight: "450px" }}>
+             aria-hidden="true" style={{ width: "100%", height: "auto" }}>
 
             <defs>
                 <pattern id="bgGrid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -544,7 +544,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Headline + illustration grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_400px] lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_580px] gap-10 lg:gap-12 items-center">
 
                     {/* Left: headline + CTAs + stats */}
                     <div>
