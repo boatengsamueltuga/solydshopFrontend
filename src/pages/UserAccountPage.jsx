@@ -98,39 +98,66 @@ const UserAccountPage = () => {
     const totalSpend = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
     const roles = user?.roles ?? [];
 
+    const initials = (user?.name ?? "U")
+        .split(" ")
+        .map(w => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+
     return (
         <div style={{
-            minHeight:   "100vh",
-            background:  "var(--bg)",
-            color:       "var(--text)",
-            fontFamily:  "var(--font-body)",
-            paddingTop:  "calc(80px + var(--space-8))",
+            minHeight:     "100vh",
+            background:    "var(--bg)",
+            color:         "var(--text)",
+            fontFamily:    "var(--font-body)",
+            paddingTop:    "80px",
             paddingBottom: "var(--space-12)",
         }}>
-            <div style={{ maxWidth: "680px", margin: "0 auto", padding: "0 var(--space-6)" }}>
 
-                {/* Header */}
-                <div style={{ marginBottom: "var(--space-8)" }}>
-                    <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "var(--space-2)" }}>
-                        Account
-                    </p>
-                    <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-3xl)", color: "var(--text)", letterSpacing: "-0.01em", margin: "0 0 var(--space-3)" }}>
-                        {user?.name ?? "My Account"}
-                    </h1>
-                    <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
-                        {roles.map(r => <RoleBadge key={r} role={r} />)}
+            {/* Page header band */}
+            <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
+                <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-6) var(--space-6)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+                        {/* Avatar */}
+                        <div style={{
+                            width:          "52px",
+                            height:         "52px",
+                            borderRadius:   "50%",
+                            background:     "var(--accent)",
+                            color:          "var(--bg)",
+                            display:        "flex",
+                            alignItems:     "center",
+                            justifyContent: "center",
+                            fontFamily:     "var(--font-mono)",
+                            fontWeight:     700,
+                            fontSize:       "18px",
+                            flexShrink:     0,
+                        }}>
+                            {initials}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                            <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", margin: "0 0 4px" }}>
+                                Account
+                            </p>
+                            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "clamp(1.25rem, 4vw, 1.75rem)", color: "var(--text)", letterSpacing: "-0.01em", margin: "0 0 var(--space-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {user?.name ?? "My Account"}
+                            </h1>
+                            <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
+                                {roles.map(r => <RoleBadge key={r} role={r} />)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats inline */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--space-4)", marginTop: "var(--space-5)" }}>
+                        <StatCard label="Orders Placed" value={orders.length} loading={loading} />
+                        <StatCard label="Total Spend" value={fmtCurrency(totalSpend)} loading={loading} />
                     </div>
                 </div>
+            </div>
 
-                {/* Stats */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--space-4)", marginBottom: "var(--space-8)" }}>
-                    <StatCard label="Orders Placed" value={orders.length} loading={loading} />
-                    <StatCard
-                        label="Total Spend"
-                        value={fmtCurrency(totalSpend)}
-                        loading={loading}
-                    />
-                </div>
+            <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-6) var(--space-6) 0" }}>
 
                 {/* Profile Details */}
                 <section style={{
@@ -272,6 +299,7 @@ const UserAccountPage = () => {
                     </Link>
                 </div>
 
+            </div>
             </div>
         </div>
     );
