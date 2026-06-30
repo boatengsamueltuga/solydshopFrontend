@@ -60,6 +60,8 @@ const CheckoutPage         = lazy(() => import("./pages/CheckoutPage"));
 const OrdersPage           = lazy(() => import("./pages/OrdersPage"));
 const SellerDashboardPage  = lazy(() => import("./pages/SellerDashboardPage"));
 const SellerProductFormPage = lazy(() => import("./pages/SellerProductFormPage"));
+const SellerQuotesPage     = lazy(() => import("./pages/SellerQuotesPage"));
+const MyQuotesPage         = lazy(() => import("./pages/MyQuotesPage"));
 const NotFoundPage         = lazy(() => import("./pages/NotFoundPage"));
 const UserAccountPage      = lazy(() => import("./pages/UserAccountPage"));
 const OrderConfirmationPage = lazy(() => import("./pages/OrderConfirmationPage"));
@@ -125,6 +127,9 @@ function App() {
                     <Route path="/seller/dashboard" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerDashboardPage /></ProtectedRoute>} />
                     <Route path="/seller/products/new" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerProductFormPage /></ProtectedRoute>} />
                     <Route path="/seller/products/:id/edit" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerProductFormPage /></ProtectedRoute>} />
+                    <Route path="/seller/quotes" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerQuotesPage /></ProtectedRoute>} />
+
+                    <Route path="/quotes/my" element={<ProtectedRoute><MyQuotesPage /></ProtectedRoute>} />
 
                     <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminDashboardPage /></ProtectedRoute>} />
                     <Route path="/admin/products" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminProductsPage /></ProtectedRoute>} />

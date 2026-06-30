@@ -180,10 +180,22 @@ export default function ProductDetailPage() {
         e.preventDefault();
         if (!quoteForm.contactEmail.trim()) { toast.error('Please enter a contact email.'); return; }
         setQuoteSending(true);
-        await new Promise(r => setTimeout(r, 800));
-        setQuoteSending(false);
-        setQuoteOpen(false);
-        toast.success('Quote request submitted. Our team will contact you within 24 hours.');
+        try {
+            await api.post('/quotes', {
+                productId:    product.productId,
+                qtyNeeded:    Number(quoteForm.qtyNeeded) || 1,
+                urgency:      quoteForm.urgency,
+                notes:        quoteForm.notes,
+                contactEmail: quoteForm.contactEmail,
+                phone:        quoteForm.phone,
+            });
+            setQuoteOpen(false);
+            toast.success('Quote request submitted. The seller will respond shortly.');
+        } catch {
+            toast.error('Failed to submit quote. Please try again.');
+        } finally {
+            setQuoteSending(false);
+        }
     };
 
     /* ── Shared page shell ───────────────────────────────────── */

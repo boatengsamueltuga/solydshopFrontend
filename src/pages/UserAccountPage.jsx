@@ -281,6 +281,22 @@ const UserAccountPage = () => {
                     >
                         My Orders
                     </Link>
+                    <Link to="/quotes/my" style={{
+                        padding:       "var(--space-3) var(--space-5)",
+                        background:    "transparent",
+                        color:         "var(--text-2)",
+                        textDecoration: "none",
+                        borderRadius:  "var(--r-md)",
+                        border:        "1px solid var(--border)",
+                        fontFamily:    "var(--font-body)",
+                        fontWeight:    600,
+                        fontSize:      "var(--text-sm)",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                    >
+                        My Quotes
+                    </Link>
                     <Link to="/" style={{
                         padding:       "var(--space-3) var(--space-5)",
                         background:    "transparent",
