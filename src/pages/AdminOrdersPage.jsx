@@ -24,7 +24,8 @@ import SearchIcon     from "@mui/icons-material/Search";
 import ClearIcon      from "@mui/icons-material/Clear";
 import RefreshIcon    from "@mui/icons-material/Refresh";
 
-import api          from \"../api/api\";\nimport { fmtCurrency, fmtPrice } from \"../utils/format\";
+import api          from "../api/api";
+import { fmtCurrency, fmtPrice } from "../utils/format";
 import toast        from "react-hot-toast";
 import AdminLayout  from "../components/layouts/AdminLayout";
 import SheetPanel   from "../components/common/SheetPanel";
