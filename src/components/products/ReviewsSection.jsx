@@ -206,6 +206,7 @@ export default function ReviewsSection({ productId }) {
         } catch (err) {
             const msg = err?.response?.data?.message ?? "Failed to submit review. Please try again.";
             setFormError(msg);
+            toast.error(msg);
         } finally {
             setSubmitting(false);
         }
@@ -290,9 +291,6 @@ export default function ReviewsSection({ productId }) {
                                         {formComment.length}/1000
                                     </p>
                                 </div>
-                                {formError && (
-                                    <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--error)", margin: 0 }}>{formError}</p>
-                                )}
                                 <button
                                     type="submit"
                                     disabled={submitting}
@@ -309,6 +307,9 @@ export default function ReviewsSection({ productId }) {
                                 >
                                     {submitting ? "Submitting…" : "Submit Review"}
                                 </button>
+                                {formError && (
+                                    <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--error)", margin: "var(--space-2) 0 0" }}>{formError}</p>
+                                )}
                             </form>
                         </div>
                     )}
