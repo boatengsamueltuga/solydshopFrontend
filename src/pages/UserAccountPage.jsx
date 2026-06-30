@@ -300,7 +300,6 @@ const UserAccountPage = () => {
                 </div>
 
             </div>
-            </div>
         </div>
     );
 };
