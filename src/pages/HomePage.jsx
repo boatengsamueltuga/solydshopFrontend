@@ -578,7 +578,8 @@ const HomePage = () => {
                                 let label, path;
                                 if (roles.includes("ROLE_ADMIN"))       { label = "Admin Dashboard";  path = "/admin/dashboard";  }
                                 else if (roles.includes("ROLE_SELLER")) { label = "Seller Dashboard"; path = "/seller/dashboard"; }
-                                else                                    { label = "My Orders";        path = "/orders";           }
+                                else if (user)                          { label = "My Account";       path = "/account";          }
+                                else                                    { label = "Get Started";      path = "/register";         }
                                 return (
                                     <button
                                         onClick={() => navigate(path)}
