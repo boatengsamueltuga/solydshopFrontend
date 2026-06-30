@@ -573,24 +573,16 @@ const HomePage = () => {
                             >
                                 Browse Parts
                             </button>
-                            {(() => {
-                                const roles = user?.roles ?? [];
-                                let label, path;
-                                if (roles.includes("ROLE_ADMIN"))       { label = "Admin Dashboard";  path = "/admin/dashboard";  }
-                                else if (roles.includes("ROLE_SELLER")) { label = "Seller Dashboard"; path = "/seller/dashboard"; }
-                                else if (user)                          { label = "My Account";       path = "/account";          }
-                                else                                    { label = "Get Started";      path = "/register";         }
-                                return (
-                                    <button
-                                        onClick={() => navigate(path)}
-                                        style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
-                                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
-                                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
-                                    >
-                                        {label}
-                                    </button>
-                                );
-                            })()}
+                            {!user && (
+                                <button
+                                    onClick={() => navigate("/register")}
+                                    style={{ background: "transparent", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", padding: "12px 28px", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: "12px", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", transition: "border-color var(--duration-fast)" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
+                                >
+                                    Get Started
+                                </button>
+                            )}
                         </div>
 
                         {/* Stats row */}
