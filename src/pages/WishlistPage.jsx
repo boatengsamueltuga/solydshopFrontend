@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
+import { fmtPrice } from "../utils/format";
 import toast from "react-hot-toast";
 import { FaRegHeart, FaShoppingCart, FaTrash } from "react-icons/fa";
 import { optimisticRemoveItem, setWishlistItems } from "../features/wishlist/wishlistSlice";
@@ -147,7 +148,7 @@ export default function WishlistPage() {
                                             Unit Price
                                         </span>
                                         <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
-                                            ${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(product.price)}
                                         </span>
                                     </div>
                                 </div>

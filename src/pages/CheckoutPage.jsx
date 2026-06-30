@@ -12,6 +12,7 @@ import {
 
 import api  from "../api/api";
 import toast from "react-hot-toast";
+import { fmtPrice } from "../utils/format";
 
 import { Button, Stack, TextField } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -183,7 +184,7 @@ const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
                         Order Total
                     </span>
                     <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "22px", color: "var(--text)" }}>
-                        ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        {fmtPrice(totalPrice)}
                     </span>
                 </div>
                 <button
@@ -215,7 +216,7 @@ const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
                     ) : (
                         <>
                             <LockOutlinedIcon sx={{ fontSize: 14 }} />
-                            Pay ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })} →
+                            Pay {fmtPrice(totalPrice)} →
                         </>
                     )}
                 </button>
@@ -481,7 +482,7 @@ const CheckoutPage = () => {
                                             </p>
                                         </div>
                                         <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 600, color: "var(--text)", flexShrink: 0 }}>
-                                            ${(Number(item.price) * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(Number(item.price) * item.quantity)}
                                         </span>
                                     </div>
                                 ))}
@@ -492,7 +493,7 @@ const CheckoutPage = () => {
                                     Total
                                 </span>
                                 <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "18px", color: "var(--text)" }}>
-                                    ${totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                    {fmtPrice(totalPrice)}
                                 </span>
                             </div>
                         </div>

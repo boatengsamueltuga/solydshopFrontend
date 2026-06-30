@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import api from "../api/api";
+import { fmtCurrency } from "../utils/format";
 import { HiUser, HiMail, HiShieldCheck, HiClipboardList } from "react-icons/hi";
 
 const ROLE_STYLE = {
@@ -126,7 +127,7 @@ const UserAccountPage = () => {
                     <StatCard label="Orders Placed" value={orders.length} loading={loading} />
                     <StatCard
                         label="Total Spend"
-                        value={"$" + totalSpend.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        value={fmtCurrency(totalSpend)}
                         loading={loading}
                     />
                 </div>
@@ -204,7 +205,7 @@ const UserAccountPage = () => {
                                                 #{order.orderId}
                                             </td>
                                             <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--success)", whiteSpace: "nowrap" }}>
-                                                ${Number(order.totalAmount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                {fmtCurrency(order.totalAmount)}
                                             </td>
                                             <td style={{ padding: "var(--space-3) var(--space-4)" }}>
                                                 {(() => {

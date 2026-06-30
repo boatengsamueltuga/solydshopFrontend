@@ -17,6 +17,7 @@ import {
 } from "../features/wishlist/wishlistSlice";
 import { setCartCount } from "../features/cart/cartSlice";
 import SolydLogo from "../components/SolydLogo";
+import { fmtCurrency, fmtPrice } from "../utils/format";
 
 const getXsrfToken = () =>
     document.cookie.split("; ").find((r) => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -771,7 +772,7 @@ const HomePage = () => {
                                     Price Range (USD)
                                 </label>
                                 <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "var(--accent)" }}>
-                                    ${Number(priceMax).toLocaleString()}+
+                                    {fmtCurrency(priceMax)}+
                                 </span>
                             </div>
                             <input
@@ -781,7 +782,7 @@ const HomePage = () => {
                                 max={100000}
                                 value={priceMax}
                                 onChange={(e) => setPriceMax(Number(e.target.value))}
-                                aria-valuetext={`Up to $${Number(priceMax).toLocaleString()}`}
+                                aria-valuetext={`Up to ${fmtCurrency(priceMax)}`}
                                 className="w-full h-1 cursor-pointer"
                                 style={{ accentColor: "var(--accent)", background: "var(--border-mid)" }}
                             />
@@ -1079,7 +1080,7 @@ const HomePage = () => {
                                                     color: "var(--text)",
                                                     letterSpacing: "-0.02em",
                                                 }}>
-                                                    ${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    {fmtCurrency(product.price)}
                                                 </span>
                                             </div>
                                             <div style={{ display: "flex", gap: "5px" }}>
@@ -1246,7 +1247,7 @@ const HomePage = () => {
                                             <h4 className="text-[11px] font-bold truncate" style={{ color: "var(--text)", fontFamily: "var(--font-display)" }}>{item.productName}</h4>
                                             <p className="text-[10px] mt-0.5" style={{ color: "var(--text-3)" }}>Qty: {item.quantity}</p>
                                             <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, color: "var(--text-2)" }}>
-                                                ${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                {fmtPrice(item.price)}
                                             </span>
                                         </div>
                                         <button
@@ -1270,7 +1271,7 @@ const HomePage = () => {
                                 <div className="flex justify-between text-xs">
                                     <span style={{ color: "var(--text-2)" }}>Subtotal</span>
                                     <span style={{ fontFamily: "var(--font-mono)", color: "var(--text)", fontWeight: 600 }}>
-                                        ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        {fmtPrice(cartTotal)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-xs">
@@ -1280,7 +1281,7 @@ const HomePage = () => {
                                 <div className="flex justify-between pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
                                     <span className="text-sm font-bold" style={{ color: "var(--text)" }}>Total</span>
                                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "14px", fontWeight: 700, color: "var(--text)" }}>
-                                        ${cartTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                        {fmtPrice(cartTotal)}
                                     </span>
                                 </div>
                                 <button
@@ -1451,7 +1452,7 @@ const HomePage = () => {
                                     <div>
                                         <span className="block" style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-4)" }}>Unit Price</span>
                                         <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.15rem", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
-                                            ${Number(quickViewProduct.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                            {fmtPrice(quickViewProduct.price)}
                                         </span>
                                     </div>
                                     <button
