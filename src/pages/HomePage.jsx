@@ -614,7 +614,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Right: industrial bearing illustration */}
-                    <div className="hidden md:flex items-center justify-center" style={{ opacity: 0.9 }}>
+                    <div className="flex items-center justify-center" style={{ opacity: 0.9 }}>
                         <BearingIllustration />
                     </div>
                     </div>
