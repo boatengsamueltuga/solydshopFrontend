@@ -544,7 +544,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Headline + illustration grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] lg:grid-cols-[minmax(0,480px)_minmax(0,300px)_380px] gap-8 lg:gap-10 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-center">
 
                     {/* Left: headline + CTAs + stats */}
                     <div>
@@ -611,48 +611,6 @@ const HomePage = () => {
                                 </div>
                             ))}
                         </div>
-                    </div>
-
-                    {/* Middle: recently listed panel (lg+ only) */}
-                    <div className="hidden lg:flex flex-col" style={{ gap: "var(--space-3)" }}>
-                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", margin: 0 }}>
-                            Recently Listed
-                        </p>
-                        <div style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", overflow: "hidden" }}>
-                            {products.slice(0, 4).map((p, i) => (
-                                <div
-                                    key={p.productId}
-                                    onClick={() => navigate(`/products/${p.productId}`)}
-                                    style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "10px var(--space-4)", borderBottom: i < 3 ? "1px solid var(--border-subtle)" : "none", cursor: "pointer", transition: "background var(--duration-fast)" }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-hover)")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                                >
-                                    <div style={{ width: "36px", height: "36px", background: "var(--surface-high)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                        {p.imageUrl
-                                            ? <img src={p.imageUrl} alt={p.productName} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                                            : <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, color: "var(--text-4)" }}>{p.productName?.[0]}</span>
-                                        }
-                                    </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 600, color: "var(--text)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                            {p.productName}
-                                        </p>
-                                        <p style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--accent)", margin: "2px 0 0", fontWeight: 600 }}>
-                                            {fmtCurrency(p.price)}
-                                        </p>
-                                    </div>
-                                    <HiArrowRight style={{ fontSize: "12px", color: "var(--text-4)", flexShrink: 0 }} />
-                                </div>
-                            ))}
-                        </div>
-                        <button
-                            onClick={() => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.06em", color: "var(--text-3)", display: "flex", alignItems: "center", gap: "4px", transition: "color var(--duration-fast)" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
-                        >
-                            View all parts <HiArrowRight style={{ fontSize: "12px" }} />
-                        </button>
                     </div>
 
                     {/* Right: industrial bearing illustration */}

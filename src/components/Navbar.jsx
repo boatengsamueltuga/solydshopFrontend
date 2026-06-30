@@ -139,9 +139,6 @@ const Navbar = () => {
                             <span style={{ fontSize: "22px", fontWeight: 700, color: C.primary, fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
                                 SolydShop
                             </span>
-                            <span className="hidden sm:inline-block" style={{ fontFamily: "var(--font-mono)", fontSize: "9px", fontWeight: 600, letterSpacing: "0.1em", color: C.textMuted, textTransform: "uppercase", border: `1px solid ${C.border}`, borderRadius: "3px", padding: "2px 6px", whiteSpace: "nowrap" }}>
-                                PROCUREMENT PORTAL
-                            </span>
                         </Link>
 
                         <nav className="hidden md:flex items-center gap-6">
