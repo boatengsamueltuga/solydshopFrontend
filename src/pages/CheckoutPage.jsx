@@ -120,9 +120,9 @@ const CheckoutForm = ({ totalPrice, shippingAddress, onEditAddress }) => {
             toast.success("Payment submitted! Your order is being processed.");
             navigate(`/order-confirmation?orderId=${orderId}`);
 
-        } catch {
-            toast.error("Payment failed. Please try again.");
-            setPaymentError("Something went wrong. Please try again.");
+        } catch (err) {
+            const msg = err?.response?.data?.message || "Something went wrong. Please try again.";
+            setPaymentError(msg);
             setPaying(false);
         }
     };

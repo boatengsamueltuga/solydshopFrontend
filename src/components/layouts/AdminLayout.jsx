@@ -122,6 +122,7 @@ const AdminLayout = ({ title = 'Admin', children }) => {
         @media (max-width: 767px) {
           .admin-sidebar-desktop { display: none !important; }
           .admin-main-col { margin-left: 0 !important; }
+          .admin-topbar-hamburger { display: flex !important; }
         }
         @media (min-width: 768px) {
           .admin-sidebar-mobile { display: none !important; }

@@ -125,8 +125,8 @@ const Navbar = () => {
         <>
             {/* ── Fixed Header ──────────────────────────────────── */}
             <header
-                className="fixed top-0 left-0 right-0 z-50 w-full"
-                style={{ background: C.bg, borderBottom: `1px solid ${C.border}` }}
+                className="fixed top-0 left-0 right-0 w-full"
+                style={{ background: C.bg, borderBottom: `1px solid ${C.border}`, zIndex: "var(--z-overlay)" }}
             >
                 <div
                     className="flex justify-between items-center w-full mx-auto h-20 px-4 sm:px-6 md:px-10"

@@ -112,7 +112,8 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
       {/* Left: hamburger + home + page title */}
       <div style={S.left}>
         <button
-          style={S.menuBtn}
+          style={{ ...S.menuBtn, display: 'none' }}
+          className="admin-topbar-hamburger"
           onClick={onMenuClick}
           aria-label="Toggle sidebar"
           onMouseEnter={(e) => {
