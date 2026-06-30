@@ -495,7 +495,7 @@ const AdminProductsPage = () => {
     const pendingCount = products.filter(p => p.status === "PENDING_REVIEW").length;
 
     return (
-        <AdminLayout title="Products">
+        <AdminLayout title="Admin Panel">
 
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-4)" }}>
                 <PageBanner

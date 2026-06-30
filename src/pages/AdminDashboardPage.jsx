@@ -163,7 +163,7 @@ const AdminDashboardPage = () => {
     const revenueDisplay = "$" + totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 });
 
     return (
-        <AdminLayout title="Dashboard">
+        <AdminLayout title="Admin Panel">
 
             {/* ── Page banner ── */}
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-6)" }}>

@@ -248,7 +248,7 @@ const AdminOrdersPage = () => {
     */
 
     return (
-        <AdminLayout title="Orders">
+        <AdminLayout title="Admin Panel">
 
             {/* ── Page banner ── */}
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>
