@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import api from "../api/api";
 import { fmtCurrency } from "../utils/format";
 import { HiUser, HiMail, HiShieldCheck, HiClipboardList } from "react-icons/hi";
+import ListAltOutlinedIcon    from "@mui/icons-material/ListAltOutlined";
+import RequestQuoteOutlinedIcon from "@mui/icons-material/RequestQuoteOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 
 const ROLE_STYLE = {
     ROLE_ADMIN:  { label: "Admin",  color: "var(--error)",   bg: "var(--error-subtle)"   },
@@ -12,11 +15,12 @@ const ROLE_STYLE = {
 };
 
 const ORDER_STATUS_STYLE = {
-    PENDING:    { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
-    PROCESSING: { color: "var(--info)",     bg: "var(--info-subtle)"     },
-    SHIPPED:    { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
-    DELIVERED:  { color: "var(--success)",  bg: "var(--success-subtle)"  },
-    CANCELLED:  { color: "var(--error)",    bg: "var(--error-subtle)"    },
+    PENDING:         { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
+    PAYMENT_PENDING: { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
+    PROCESSING:      { color: "var(--info)",     bg: "var(--info-subtle)"     },
+    SHIPPED:         { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
+    DELIVERED:       { color: "var(--success)",  bg: "var(--success-subtle)"  },
+    CANCELLED:       { color: "var(--error)",    bg: "var(--error-subtle)"    },
 };
 
 const RoleBadge = ({ role }) => {
@@ -159,6 +163,61 @@ const UserAccountPage = () => {
 
             <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-6) var(--space-6) 0" }}>
 
+                {/* Quick actions — primary navigation, top of content */}
+                <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap", marginBottom: "var(--space-6)" }}>
+                    <Link
+                        to="/orders"
+                        style={{
+                            display: "flex", alignItems: "center", gap: "var(--space-2)",
+                            padding: "var(--space-3) var(--space-5)",
+                            background: "var(--accent)", color: "var(--text)",
+                            textDecoration: "none", borderRadius: "var(--r-md)",
+                            fontFamily: "var(--font-body)", fontWeight: 700,
+                            fontSize: "var(--text-sm)", letterSpacing: "0.04em",
+                            textTransform: "uppercase", transition: "opacity 0.15s",
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
+                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                    >
+                        <ListAltOutlinedIcon style={{ fontSize: 18 }} />
+                        My Orders
+                    </Link>
+                    <Link
+                        to="/quotes/my"
+                        style={{
+                            display: "flex", alignItems: "center", gap: "var(--space-2)",
+                            padding: "var(--space-3) var(--space-5)",
+                            background: "transparent", color: "var(--text-2)",
+                            textDecoration: "none", borderRadius: "var(--r-md)",
+                            border: "1px solid var(--border)", fontFamily: "var(--font-body)",
+                            fontWeight: 600, fontSize: "var(--text-sm)",
+                            transition: "border-color 0.15s, color 0.15s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                    >
+                        <RequestQuoteOutlinedIcon style={{ fontSize: 18 }} />
+                        My Quotes
+                    </Link>
+                    <Link
+                        to="/"
+                        style={{
+                            display: "flex", alignItems: "center", gap: "var(--space-2)",
+                            padding: "var(--space-3) var(--space-5)",
+                            background: "transparent", color: "var(--text-2)",
+                            textDecoration: "none", borderRadius: "var(--r-md)",
+                            border: "1px solid var(--border)", fontFamily: "var(--font-body)",
+                            fontWeight: 600, fontSize: "var(--text-sm)",
+                            transition: "border-color 0.15s, color 0.15s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                    >
+                        <StorefrontOutlinedIcon style={{ fontSize: 18 }} />
+                        Browse Catalog
+                    </Link>
+                </div>
+
                 {/* Profile Details */}
                 <section style={{
                     background:    "var(--surface-mid)",
@@ -224,96 +283,42 @@ const UserAccountPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {[...orders].sort((a, b) => b.orderId - a.orderId).slice(0, 5).map((order, i, arr) => (
-                                        <tr key={order.orderId}
-                                            style={{ borderBottom: i < arr.length - 1 ? "1px solid var(--border-subtle)" : "none" }}
-                                        >
-                                            <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--text-3)" }}>
-                                                #{order.orderId}
-                                            </td>
-                                            <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--success)", whiteSpace: "nowrap" }}>
-                                                {fmtCurrency(order.totalAmount)}
-                                            </td>
-                                            <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                                                {(() => {
-                                                    const ss = ORDER_STATUS_STYLE[order.status] ?? { color: "var(--text-3)", bg: "var(--surface-high)" };
-                                                    return (
-                                                        <span style={{
-                                                            fontFamily:    "var(--font-mono)",
-                                                            fontSize:      "11px",
-                                                            fontWeight:    600,
-                                                            letterSpacing: "0.04em",
-                                                            textTransform: "uppercase",
-                                                            padding:       "2px 8px",
-                                                            borderRadius:  "var(--r-sm)",
-                                                            background:    ss.bg,
-                                                            color:         ss.color,
-                                                        }}>
-                                                            {order.status}
-                                                        </span>
-                                                    );
-                                                })()}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {[...orders].sort((a, b) => b.orderId - a.orderId).slice(0, 5).map((order, i, arr) => {
+                                        const ss = ORDER_STATUS_STYLE[order.status] ?? { color: "var(--text-3)", bg: "var(--surface-high)" };
+                                        return (
+                                            <tr key={order.orderId}
+                                                style={{ borderBottom: i < arr.length - 1 ? "1px solid var(--border-subtle)" : "none" }}
+                                            >
+                                                <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--text-3)" }}>
+                                                    #{order.orderId}
+                                                </td>
+                                                <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--success)", whiteSpace: "nowrap" }}>
+                                                    {fmtCurrency(order.totalAmount)}
+                                                </td>
+                                                <td style={{ padding: "var(--space-3) var(--space-4)" }}>
+                                                    <span style={{
+                                                        fontFamily:    "var(--font-mono)",
+                                                        fontSize:      "11px",
+                                                        fontWeight:    600,
+                                                        letterSpacing: "0.04em",
+                                                        textTransform: "uppercase",
+                                                        padding:       "2px 8px",
+                                                        borderRadius:  "var(--r-sm)",
+                                                        background:    ss.bg,
+                                                        color:         ss.color,
+                                                        whiteSpace:    "nowrap",
+                                                    }}>
+                                                        {order.status.replace(/_/g, " ")}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
                     )}
                 </section>
-
-                {/* Quick links */}
-                <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-                    <Link to="/orders" style={{
-                        padding:       "var(--space-3) var(--space-5)",
-                        background:    "var(--accent)",
-                        color:         "var(--text)",
-                        textDecoration: "none",
-                        borderRadius:  "var(--r-md)",
-                        fontFamily:    "var(--font-body)",
-                        fontWeight:    700,
-                        fontSize:      "var(--text-sm)",
-                        letterSpacing: "0.04em",
-                        textTransform: "uppercase",
-                    }}
-                        onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
-                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-                    >
-                        My Orders
-                    </Link>
-                    <Link to="/quotes/my" style={{
-                        padding:       "var(--space-3) var(--space-5)",
-                        background:    "transparent",
-                        color:         "var(--text-2)",
-                        textDecoration: "none",
-                        borderRadius:  "var(--r-md)",
-                        border:        "1px solid var(--border)",
-                        fontFamily:    "var(--font-body)",
-                        fontWeight:    600,
-                        fontSize:      "var(--text-sm)",
-                    }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                    >
-                        My Quotes
-                    </Link>
-                    <Link to="/" style={{
-                        padding:       "var(--space-3) var(--space-5)",
-                        background:    "transparent",
-                        color:         "var(--text-2)",
-                        textDecoration: "none",
-                        borderRadius:  "var(--r-md)",
-                        border:        "1px solid var(--border)",
-                        fontFamily:    "var(--font-body)",
-                        fontWeight:    600,
-                        fontSize:      "var(--text-sm)",
-                    }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                    >
-                        Browse Catalog
-                    </Link>
-                </div>
 
             </div>
         </div>
