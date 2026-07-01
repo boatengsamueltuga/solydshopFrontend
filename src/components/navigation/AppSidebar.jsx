@@ -37,6 +37,7 @@ const ADMIN_GROUPS = [
     links: [
       { to: '/admin/orders',     label: 'Orders',     Icon: HiClipboardList },
       { to: '/admin/users',      label: 'Users',      Icon: HiUsers },
+      { to: '/admin/quotes',     label: 'Quotes',     Icon: HiDocumentText },
     ],
   },
 ];
