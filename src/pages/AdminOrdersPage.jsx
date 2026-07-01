@@ -252,8 +252,6 @@ const AdminOrdersPage = () => {
     return (
         <AdminLayout title="Admin Panel">
 
-            <BackButton style={{ marginBottom: "var(--space-4)" }} />
-
             {/* ── Page banner ── */}
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>
                 <PageBanner
@@ -262,6 +260,8 @@ const AdminOrdersPage = () => {
                     icon={<ListAltOutlinedIcon sx={{ fontSize: 20 }} />}
                 />
             </div>
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             {/* ── Status tabs ── */}
             <div style={{

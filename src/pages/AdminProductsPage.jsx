@@ -511,8 +511,6 @@ const AdminProductsPage = () => {
     return (
         <AdminLayout title="Admin Panel">
 
-            <BackButton style={{ marginBottom: "var(--space-4)" }} />
-
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-4)" }}>
                 <PageBanner
                     title="Products"
@@ -527,6 +525,8 @@ const AdminProductsPage = () => {
                     }
                 />
             </div>
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             {/* ── Toolbar ── */}
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>

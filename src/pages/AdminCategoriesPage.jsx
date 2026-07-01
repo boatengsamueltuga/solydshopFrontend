@@ -194,8 +194,6 @@ const AdminCategoriesPage = () => {
     return (
         <AdminLayout title="Admin Panel">
 
-            <BackButton style={{ marginBottom: "var(--space-4)" }} />
-
             {/* ── Page banner ── */}
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>
                 <PageBanner
@@ -215,6 +213,8 @@ const AdminCategoriesPage = () => {
                     }
                 />
             </div>
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             {/* ── Card Grid ── */}
             {loading ? (
