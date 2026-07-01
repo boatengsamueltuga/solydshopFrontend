@@ -246,7 +246,6 @@
     background:      var(--bg);
     flex-shrink:     0;
 }
-.rfq-doc-header-left { display: flex; align-items: center; gap: var(--space-3); }
 .rfq-eyebrow {
     font-family:    var(--font-body);
     font-size:      10px;
@@ -254,13 +253,6 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color:          var(--text-3);
-}
-.rfq-ref {
-    font-family:  var(--font-mono);
-    font-size:    11px;
-    font-weight:  700;
-    color:        var(--accent);
-    letter-spacing: 0.04em;
 }
 .rfq-close {
     background: none;

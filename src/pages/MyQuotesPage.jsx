@@ -76,20 +76,26 @@ const MyQuotesPage = () => {
 
                                     {/* Info */}
                                     <div>
-                                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+                                        {/* Row 1: product name + status + quote ID */}
+                                        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
                                             <Link
                                                 to={`/products/${q.productId}`}
-                                                style={{ fontWeight: 600, fontSize: 14, color: "var(--text)", fontFamily: "var(--font-display)", textDecoration: "none" }}
+                                                style={{ fontWeight: 600, fontSize: 14, color: "var(--text)", fontFamily: "var(--font-display)", textDecoration: "none", flex: 1 }}
                                             >
                                                 {q.productName}
                                             </Link>
-                                            <span style={{
-                                                padding: "2px 10px", borderRadius: 99,
-                                                background: s.bg, color: s.color,
-                                                fontSize: 11, fontWeight: 700,
-                                            }}>
-                                                {s.label}
-                                            </span>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                                                <span style={{
+                                                    padding: "2px 10px", borderRadius: 99,
+                                                    background: s.bg, color: s.color,
+                                                    fontSize: 11, fontWeight: 700,
+                                                }}>
+                                                    {s.label}
+                                                </span>
+                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-4)", letterSpacing: "0.02em" }}>
+                                                    #{q.quoteId}
+                                                </span>
+                                            </div>
                                         </div>
 
                                         <p style={{ fontSize: 12, color: "var(--text-3)", margin: "0 0 4px", fontFamily: "var(--font-body)" }}>

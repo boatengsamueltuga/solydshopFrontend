@@ -101,7 +101,6 @@ export default function ProductDetailPage() {
     const [imgIdx,       setImgIdx]       = useState(0);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [quoteOpen,    setQuoteOpen]    = useState(false);
-    const [quoteRef,     setQuoteRef]     = useState('');
     const [quoteForm,    setQuoteForm]    = useState({ qtyNeeded: 1, urgency: 'Standard', notes: '', contactEmail: '', phone: '' });
     const [quoteSending, setQuoteSending] = useState(false);
 
@@ -170,10 +169,9 @@ export default function ProductDetailPage() {
         return () => window.removeEventListener('keydown', onKey);
     }, [lightboxOpen, imgIdx, imageSlots.length]);
 
-    /* ── Open quote modal (pre-fill user email, generate ref) ── */
+    /* ── Open quote modal (pre-fill user email) ─────────────── */
     const openQuote = () => {
         setQuoteForm(f => ({ ...f, contactEmail: user?.email ?? '' }));
-        setQuoteRef('RFQ-' + Date.now().toString(36).toUpperCase().slice(-6));
         setQuoteOpen(true);
     };
 
@@ -183,7 +181,7 @@ export default function ProductDetailPage() {
         if (!quoteForm.contactEmail.trim()) { toast.error('Please enter a contact email.'); return; }
         setQuoteSending(true);
         try {
-            await api.post('/quotes', {
+            const res = await api.post('/quotes', {
                 productId:    product.productId,
                 qtyNeeded:    Number(quoteForm.qtyNeeded) || 1,
                 urgency:      quoteForm.urgency,
@@ -192,7 +190,7 @@ export default function ProductDetailPage() {
                 phone:        quoteForm.phone,
             });
             setQuoteOpen(false);
-            toast.success('Quote request submitted. The seller will respond shortly.');
+            toast.success(`Quote #${res.data.quoteId} submitted — you'll receive a response by email.`);
         } catch {
             toast.error('Failed to submit quote. Please try again.');
         } finally {
@@ -1138,10 +1136,7 @@ export default function ProductDetailPage() {
 
                         {/* Document header */}
                         <div className="rfq-doc-header">
-                            <div className="rfq-doc-header-left">
-                                <span className="rfq-eyebrow">Request for Quote</span>
-                                <span className="rfq-ref">{quoteRef}</span>
-                            </div>
+                            <span className="rfq-eyebrow">Request for Quote</span>
                             <button
                                 className="rfq-close"
                                 onClick={() => setQuoteOpen(false)}
