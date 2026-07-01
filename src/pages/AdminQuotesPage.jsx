@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import api from "../api/api";
 import toast from "react-hot-toast";
-import SellerLayout from "../components/layouts/SellerLayout";
+import AdminLayout from "../components/layouts/AdminLayout";
 import QuoteRespondModal from "../components/quotes/QuoteRespondModal";
 import BackButton from "../components/BackButton";
 
@@ -12,9 +12,9 @@ const STATUS = {
 };
 
 const URGENCY = {
-    Standard:  { color: "var(--text-3)", bg: "var(--surface-high)", border: "var(--border)" },
-    Urgent:    { color: "#d97706",        bg: "rgba(217,119,6,0.10)",  border: "rgba(217,119,6,0.3)" },
-    Emergency: { color: "#dc2626",        bg: "rgba(220,38,38,0.10)",  border: "rgba(220,38,38,0.3)" },
+    Standard:  null,
+    Urgent:    { color: "#d97706", bg: "rgba(217,119,6,0.10)",  border: "rgba(217,119,6,0.3)" },
+    Emergency: { color: "#dc2626", bg: "rgba(220,38,38,0.10)",  border: "rgba(220,38,38,0.3)" },
 };
 
 const fmtDate = (d) =>
@@ -37,8 +37,8 @@ const StatusBadge = ({ status }) => {
 };
 
 const UrgencyBadge = ({ urgency }) => {
-    const u = URGENCY[urgency] || URGENCY.Standard;
-    if (urgency === "Standard") return null;
+    const u = URGENCY[urgency];
+    if (!u) return null;
     return (
         <span style={{
             fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
@@ -52,7 +52,7 @@ const UrgencyBadge = ({ urgency }) => {
 };
 
 /* ── Main page ── */
-const SellerQuotesPage = () => {
+const AdminQuotesPage = () => {
     const [quotes,  setQuotes]  = useState([]);
     const [loading, setLoading] = useState(true);
     const [active,  setActive]  = useState(null);
@@ -60,7 +60,7 @@ const SellerQuotesPage = () => {
 
     const fetchQuotes = useCallback(async () => {
         try {
-            const res = await api.get("/seller/quotes");
+            const res = await api.get("/admin/quotes");
             setQuotes(res.data);
         } catch {
             toast.error("Failed to load quotes.");
@@ -76,20 +76,24 @@ const SellerQuotesPage = () => {
         PENDING:   quotes.filter(q => q.status === "PENDING").length,
         RESPONDED: quotes.filter(q => q.status === "RESPONDED").length,
         DECLINED:  quotes.filter(q => q.status === "DECLINED").length,
+        PLATFORM:  quotes.filter(q => !q.sellerId).length,
     };
 
-    const displayed = filter === "ALL" ? quotes : quotes.filter(q => q.status === filter);
+    const displayed = filter === "ALL"      ? quotes
+        : filter === "PLATFORM"             ? quotes.filter(q => !q.sellerId)
+        :                                     quotes.filter(q => q.status === filter);
 
     const FILTERS = [
         { key: "ALL",       label: "All" },
         { key: "PENDING",   label: "Pending" },
         { key: "RESPONDED", label: "Responded" },
         { key: "DECLINED",  label: "Declined" },
+        { key: "PLATFORM",  label: "Platform" },
     ];
 
     return (
-        <SellerLayout title="Quote Requests">
-            <div style={{ maxWidth: 860, margin: "0 auto" }}>
+        <AdminLayout title="Quotes">
+            <div style={{ maxWidth: 900, margin: "0 auto" }}>
 
                 <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
@@ -99,7 +103,7 @@ const SellerQuotesPage = () => {
                         Quote Requests
                     </h1>
                     <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0, fontFamily: "var(--font-body)" }}>
-                        Buyers requesting custom pricing for your products
+                        All buyer quote requests across the platform
                     </p>
                 </div>
 
@@ -116,6 +120,7 @@ const SellerQuotesPage = () => {
                         { label: "Pending",   value: counts.PENDING,   hi: counts.PENDING > 0 },
                         { label: "Responded", value: counts.RESPONDED, hi: false },
                         { label: "Declined",  value: counts.DECLINED,  hi: false },
+                        { label: "Platform",  value: counts.PLATFORM,  hi: false, note: "Admin-created" },
                     ].map(s => (
                         <div key={s.label}>
                             <p style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "1.5rem", color: s.hi ? "var(--accent)" : "var(--text)", lineHeight: 1, margin: "0 0 3px" }}>
@@ -131,7 +136,7 @@ const SellerQuotesPage = () => {
                 {/* ── Filter tabs ── */}
                 <div style={{ display: "flex", gap: 6, marginBottom: "var(--space-4)", flexWrap: "wrap" }}>
                     {FILTERS.map(f => {
-                        const active_ = filter === f.key;
+                        const isActive = filter === f.key;
                         return (
                             <button
                                 key={f.key}
@@ -139,9 +144,9 @@ const SellerQuotesPage = () => {
                                 style={{
                                     display: "inline-flex", alignItems: "center", gap: 6,
                                     padding: "5px 14px", borderRadius: "var(--r-sm)",
-                                    border: `1px solid ${active_ ? "var(--accent)" : "var(--border)"}`,
-                                    background: active_ ? "var(--accent)" : "transparent",
-                                    color:      active_ ? "var(--text)" : "var(--text-3)",
+                                    border: `1px solid ${isActive ? "var(--accent)" : "var(--border)"}`,
+                                    background: isActive ? "var(--accent)" : "transparent",
+                                    color:      isActive ? "var(--text)" : "var(--text-3)",
                                     fontSize: 12, fontWeight: 600, cursor: "pointer",
                                     fontFamily: "var(--font-body)",
                                     transition: "background 0.15s, color 0.15s, border-color 0.15s",
@@ -153,8 +158,8 @@ const SellerQuotesPage = () => {
                                         fontSize: 10, fontWeight: 700, minWidth: 18, height: 18,
                                         display: "inline-flex", alignItems: "center", justifyContent: "center",
                                         borderRadius: 99,
-                                        background: active_ ? "oklch(0 0 0 / 0.18)" : "var(--surface-high)",
-                                        color: active_ ? "var(--text)" : "var(--text-3)",
+                                        background: isActive ? "oklch(0 0 0 / 0.18)" : "var(--surface-high)",
+                                        color: isActive ? "var(--text)" : "var(--text-3)",
                                         padding: "0 4px",
                                     }}>
                                         {counts[f.key]}
@@ -176,16 +181,17 @@ const SellerQuotesPage = () => {
                     }}>
                         <p style={{ fontSize: 28, margin: "0 0 var(--space-3)" }}>📋</p>
                         <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "var(--text-base)", color: "var(--text-2)", margin: "0 0 var(--space-1)" }}>
-                            {filter === "ALL" ? "No quote requests yet" : `No ${STATUS[filter]?.label.toLowerCase() ?? filter} quotes`}
+                            No quotes match this filter
                         </p>
                         <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--text-4)", margin: 0 }}>
-                            {filter === "ALL" ? "Buyers can request custom pricing from your product pages." : "Try a different filter."}
+                            Try a different filter to view quote requests.
                         </p>
                     </div>
                 ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                         {displayed.map(q => {
                             const st = STATUS[q.status] || STATUS.PENDING;
+                            const isPlatform = !q.sellerId;
                             return (
                                 <div
                                     key={q.quoteId}
@@ -224,7 +230,18 @@ const SellerQuotesPage = () => {
                                                     </span>
                                                 )}
                                             </span>
-                                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, flexWrap: "wrap" }}>
+                                                {isPlatform && (
+                                                    <span style={{
+                                                        fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
+                                                        background: "rgba(96,165,250,0.12)", color: "#60a5fa",
+                                                        border: "1px solid rgba(96,165,250,0.3)",
+                                                        letterSpacing: "0.06em", textTransform: "uppercase",
+                                                        fontFamily: "var(--font-body)", flexShrink: 0,
+                                                    }}>
+                                                        Platform
+                                                    </span>
+                                                )}
                                                 <UrgencyBadge urgency={q.urgency} />
                                                 <StatusBadge status={q.status} />
                                             </div>
@@ -242,7 +259,7 @@ const SellerQuotesPage = () => {
                                         </div>
 
                                         {/* Meta row — labeled data columns */}
-                                        <div style={{ display: "flex", gap: "var(--space-5)", paddingTop: "var(--space-2)", borderTop: "1px solid var(--border)", marginBottom: q.notes ? "var(--space-3)" : 0 }}>
+                                        <div style={{ display: "flex", gap: "var(--space-5)", paddingTop: "var(--space-2)", borderTop: "1px solid var(--border)", marginBottom: q.notes ? "var(--space-3)" : 0, flexWrap: "wrap" }}>
                                             <div>
                                                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-4)", margin: "0 0 2px" }}>Qty</p>
                                                 <p style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 700, color: "var(--text-2)", margin: 0 }}>{q.qtyNeeded}</p>
@@ -251,6 +268,12 @@ const SellerQuotesPage = () => {
                                                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-4)", margin: "0 0 2px" }}>Submitted</p>
                                                 <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-2)", margin: 0 }}>{fmtDate(q.createdAt)}</p>
                                             </div>
+                                            {q.sellerId && (
+                                                <div>
+                                                    <p style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-4)", margin: "0 0 2px" }}>Seller</p>
+                                                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 600, color: "var(--text-2)", margin: 0 }}>{q.sellerName}</p>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Notes */}
@@ -288,7 +311,7 @@ const SellerQuotesPage = () => {
                                             </div>
                                         )}
 
-                                        {/* CTA */}
+                                        {/* CTA — admin can respond to any pending quote */}
                                         {q.status === "PENDING" && (
                                             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "var(--space-3)" }}>
                                                 <button
@@ -320,13 +343,14 @@ const SellerQuotesPage = () => {
             {active && (
                 <QuoteRespondModal
                     quote={active}
-                    endpoint={`/seller/quotes/${active.quoteId}/respond`}
+                    endpoint={`/admin/quotes/${active.quoteId}/respond`}
+                    isAdmin={!active.sellerId}
                     onClose={() => setActive(null)}
                     onSaved={fetchQuotes}
                 />
             )}
-        </SellerLayout>
+        </AdminLayout>
     );
 };
 
-export default SellerQuotesPage;
+export default AdminQuotesPage;

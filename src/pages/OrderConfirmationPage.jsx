@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import api from "../api/api";
 import { fmtPrice } from "../utils/format";
 import { HiCheckCircle, HiExternalLink } from "react-icons/hi";
+import BackButton from "../components/BackButton";
 
 const OrderConfirmationPage = () => {
     const [searchParams] = useSearchParams();
@@ -41,6 +42,8 @@ const OrderConfirmationPage = () => {
             padding:        "var(--space-6)",
         }}>
             <div style={{ maxWidth: "560px", width: "100%" }}>
+
+                <BackButton style={{ marginBottom: "var(--space-5)" }} />
 
                 {/* Success icon */}
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "var(--space-6)" }}>

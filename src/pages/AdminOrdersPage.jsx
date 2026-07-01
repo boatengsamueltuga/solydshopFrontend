@@ -30,6 +30,7 @@ import toast        from "react-hot-toast";
 import AdminLayout  from "../components/layouts/AdminLayout";
 import SheetPanel   from "../components/common/SheetPanel";
 import PageBanner   from "../components/common/PageBanner";
+import BackButton   from "../components/BackButton";
 
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 
@@ -259,6 +260,8 @@ const AdminOrdersPage = () => {
                     icon={<ListAltOutlinedIcon sx={{ fontSize: 20 }} />}
                 />
             </div>
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             {/* ── Status tabs ── */}
             <div style={{

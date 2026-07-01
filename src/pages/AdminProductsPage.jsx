@@ -41,6 +41,7 @@ import toast       from "react-hot-toast";
 import AdminLayout from "../components/layouts/AdminLayout";
 import SheetPanel  from "../components/common/SheetPanel";
 import PageBanner  from "../components/common/PageBanner";
+import BackButton  from "../components/BackButton";
 
 /* ── Status badge styles ── */
 const STATUS_STYLE = {
@@ -524,6 +525,8 @@ const AdminProductsPage = () => {
                     }
                 />
             </div>
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             {/* ── Toolbar ── */}
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-4)", flexWrap: "wrap" }}>

@@ -6,6 +6,7 @@ import api from '../api/api';
 import { fmtPrice } from '../utils/format';
 import { incrementCartCount } from '../features/cart/cartSlice';
 import ReviewsSection from '../components/products/ReviewsSection';
+import BackButton from '../components/BackButton';
 import './ProductDetailPage.css';
 
 /* ── XSRF helper (mirrors the pattern used in HomePage.jsx) ─── */
@@ -181,7 +182,7 @@ export default function ProductDetailPage() {
         if (!quoteForm.contactEmail.trim()) { toast.error('Please enter a contact email.'); return; }
         setQuoteSending(true);
         try {
-            await api.post('/quotes', {
+            const res = await api.post('/quotes', {
                 productId:    product.productId,
                 qtyNeeded:    Number(quoteForm.qtyNeeded) || 1,
                 urgency:      quoteForm.urgency,
@@ -190,7 +191,7 @@ export default function ProductDetailPage() {
                 phone:        quoteForm.phone,
             });
             setQuoteOpen(false);
-            toast.success('Quote request submitted. The seller will respond shortly.');
+            toast.success(`Quote #${res.data.quoteId} submitted — you'll receive a response by email.`);
         } catch {
             toast.error('Failed to submit quote. Please try again.');
         } finally {
@@ -204,7 +205,6 @@ export default function ProductDetailPage() {
             style={{
                 background: 'var(--bg)',
                 minHeight: '100vh',
-                paddingTop: 'var(--topbar-height)',
                 color: 'var(--text)',
                 fontFamily: 'var(--font-body)',
             }}
@@ -214,7 +214,7 @@ export default function ProductDetailPage() {
                 style={{
                     maxWidth: '1440px',
                     margin: '0 auto',
-                    padding: '24px 16px 80px',
+                    padding: '12px 16px 80px',
                 }}
             >
                 {children}
@@ -289,11 +289,14 @@ export default function ProductDetailPage() {
     /* ── Rendered page ───────────────────────────────────────── */
     return shell(
         <>
+            <BackButton style={{ marginBottom: 'var(--space-3)' }} />
+
             {/* Breadcrumb */}
             <nav
                 aria-label="breadcrumb"
+                className="pdp-breadcrumb"
                 style={{
-                    marginBottom: 'var(--space-6)',
+                    marginBottom: 'var(--space-3)',
                     fontSize: 'var(--text-xs)',
                     color: 'var(--text-3)',
                     display: 'flex',
@@ -327,6 +330,18 @@ export default function ProductDetailPage() {
                 </span>
             </nav>
 
+            {/* Mobile-only product identity — visible above the image */}
+            <div className="pdp-mobile-id">
+                <h1 className="pdp-mobile-title">
+                    {product.productName}
+                </h1>
+                {product.partNumber && (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em', marginTop: 'var(--space-1)', display: 'block' }}>
+                        {product.partNumber}
+                    </span>
+                )}
+            </div>
+
             {/* Two-column grid */}
             <div className="pdp-grid">
 
@@ -342,6 +357,7 @@ export default function ProductDetailPage() {
                 >
                     {/* Main image viewer */}
                     <div
+                        className="pdp-main-image-area"
                         onClick={() => { if (selectedImg) setLightboxOpen(true); }}
                         style={{
                             width:      '100%',
@@ -506,7 +522,7 @@ export default function ProductDetailPage() {
                         )}
                     </div>
 
-                    {/* Thumbnail strip — 4 slots always visible */}
+                    {/* Thumbnail strip */}
                     <div
                         className="pdp-thumb-strip"
                         style={{
@@ -577,8 +593,8 @@ export default function ProductDetailPage() {
                 {/* ── Right: specs panel ───────────────────────── */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', minWidth: 0 }}>
 
-                    {/* Product name + category */}
-                    <div>
+                    {/* Product name + category — desktop only (mobile shows pdp-mobile-id above the grid) */}
+                    <div className="pdp-desktop-title">
                         <h1
                             style={{
                                 fontFamily: 'var(--font-display)',
@@ -609,6 +625,7 @@ export default function ProductDetailPage() {
 
                     {/* Price + availability box */}
                     <div
+                        className="pdp-price-card"
                         style={{
                             background: 'var(--surface-mid)',
                             border: '1px solid var(--border)',
@@ -1129,122 +1146,131 @@ export default function ProductDetailPage() {
                 </div>
             )}
 
-            {/* ── Quote Request Modal (E7) ──────────────────────── */}
+            {/* ── Quote Request Modal ──────────────────────────── */}
             {quoteOpen && (
                 <div className="pdp-overlay" onClick={() => setQuoteOpen(false)}>
-                    <div className="pdp-modal" onClick={e => e.stopPropagation()}>
+                    <div className="pdp-modal rfq-modal" onClick={e => e.stopPropagation()}>
 
-                        {/* Header */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                                <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--text-xl)', color: 'var(--text)', margin: 0 }}>
-                                    Request a Quote
-                                </h2>
-                                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--text-3)', margin: 'var(--space-1) 0 0' }}>
-                                    {product.productName}
-                                    {product.partNumber && <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent)', marginLeft: 'var(--space-2)' }}>{product.partNumber}</span>}
-                                </p>
-                            </div>
+                        {/* Document header */}
+                        <div className="rfq-doc-header">
+                            <span className="rfq-eyebrow">Request for Quote</span>
                             <button
+                                className="rfq-close"
                                 onClick={() => setQuoteOpen(false)}
-                                style={{ background: 'none', border: 'none', color: 'var(--text-3)', cursor: 'pointer', fontSize: '20px', lineHeight: 1, padding: 'var(--space-1)', transition: 'color var(--duration-fast)' }}
-                                onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
-                                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
                                 aria-label="Close"
                             >×</button>
                         </div>
 
-                        {/* Form */}
-                        <form onSubmit={handleQuoteSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-
-                            <div className="pdp-modal-row">
-                                <div className="pdp-field">
-                                    <label className="pdp-label">Quantity Needed</label>
-                                    <input
-                                        className="pdp-input"
-                                        type="number"
-                                        min={1}
-                                        value={quoteForm.qtyNeeded}
-                                        onChange={e => setQuoteForm(f => ({ ...f, qtyNeeded: e.target.value }))}
-                                        required
-                                    />
+                        {/* Product context strip */}
+                        <div className="rfq-product-strip">
+                            {product.imageUrl && (
+                                <div className="rfq-product-thumb">
+                                    <img src={product.imageUrl} alt="" />
                                 </div>
-                                <div className="pdp-field">
-                                    <label className="pdp-label">Urgency</label>
-                                    <select
-                                        className="pdp-input"
-                                        value={quoteForm.urgency}
-                                        onChange={e => setQuoteForm(f => ({ ...f, urgency: e.target.value }))}
-                                    >
-                                        <option>Standard</option>
-                                        <option>Urgent</option>
-                                        <option>Emergency</option>
-                                    </select>
+                            )}
+                            <div className="rfq-product-info">
+                                <span className="rfq-product-name">{product.productName}</span>
+                                <span className="rfq-product-meta">
+                                    {product.partNumber && <span className="rfq-mono">{product.partNumber}</span>}
+                                    {product.partNumber && <span className="rfq-meta-sep">·</span>}
+                                    <span className="rfq-mono">${product.price?.toFixed(2)} / unit</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleQuoteSubmit} className="rfq-form">
+
+                            {/* Procurement */}
+                            <div className="rfq-section">
+                                <p className="rfq-section-label">Procurement</p>
+                                <div className="pdp-modal-row">
+                                    <div className="pdp-field">
+                                        <label className="pdp-label">Quantity needed</label>
+                                        <input
+                                            className="pdp-input"
+                                            type="number"
+                                            min={1}
+                                            value={quoteForm.qtyNeeded}
+                                            onChange={e => setQuoteForm(f => ({ ...f, qtyNeeded: e.target.value }))}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="pdp-field">
+                                        <span className="pdp-label">Urgency</span>
+                                        <div className="rfq-urgency-group">
+                                            {['Standard', 'Urgent', 'Emergency'].map(u => (
+                                                <button
+                                                    key={u}
+                                                    type="button"
+                                                    className={`rfq-urgency-btn${quoteForm.urgency === u ? ' rfq-urgency-active' : ''}${u === 'Emergency' ? ' rfq-urgency-emergency' : ''}`}
+                                                    onClick={() => setQuoteForm(f => ({ ...f, urgency: u }))}
+                                                >
+                                                    {u}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="pdp-modal-row">
-                                <div className="pdp-field">
-                                    <label className="pdp-label">Contact Email *</label>
-                                    <input
-                                        className="pdp-input"
-                                        type="email"
-                                        placeholder="you@company.com"
-                                        value={quoteForm.contactEmail}
-                                        onChange={e => setQuoteForm(f => ({ ...f, contactEmail: e.target.value }))}
-                                        required
-                                    />
+                            {/* Contact */}
+                            <div className="rfq-section">
+                                <p className="rfq-section-label">Contact</p>
+                                <div className="pdp-modal-row">
+                                    <div className="pdp-field">
+                                        <label className="pdp-label">Email *</label>
+                                        <input
+                                            className="pdp-input"
+                                            type="email"
+                                            placeholder="you@company.com"
+                                            value={quoteForm.contactEmail}
+                                            onChange={e => setQuoteForm(f => ({ ...f, contactEmail: e.target.value }))}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="pdp-field">
+                                        <label className="pdp-label">Phone</label>
+                                        <input
+                                            className="pdp-input"
+                                            type="tel"
+                                            placeholder="+1 555 000 0000"
+                                            value={quoteForm.phone}
+                                            onChange={e => setQuoteForm(f => ({ ...f, phone: e.target.value }))}
+                                        />
+                                    </div>
                                 </div>
+                            </div>
+
+                            {/* Requirements */}
+                            <div className="rfq-section">
+                                <p className="rfq-section-label">Requirements</p>
                                 <div className="pdp-field">
-                                    <label className="pdp-label">Phone (optional)</label>
-                                    <input
+                                    <textarea
                                         className="pdp-input"
-                                        type="tel"
-                                        placeholder="+1 (555) 000-0000"
-                                        value={quoteForm.phone}
-                                        onChange={e => setQuoteForm(f => ({ ...f, phone: e.target.value }))}
+                                        rows={3}
+                                        placeholder="Delivery location, required date, compatibility requirements, certifications needed…"
+                                        value={quoteForm.notes}
+                                        onChange={e => setQuoteForm(f => ({ ...f, notes: e.target.value }))}
+                                        style={{ resize: 'vertical' }}
                                     />
                                 </div>
                             </div>
 
-                            <div className="pdp-field">
-                                <label className="pdp-label">Notes / Special Requirements</label>
-                                <textarea
-                                    className="pdp-input"
-                                    rows={3}
-                                    placeholder="Delivery location, required delivery date, compatibility notes…"
-                                    value={quoteForm.notes}
-                                    onChange={e => setQuoteForm(f => ({ ...f, notes: e.target.value }))}
-                                    style={{ resize: 'vertical' }}
-                                />
-                            </div>
-
-                            <div style={{ display: 'flex', gap: 'var(--space-3)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--border)' }}>
-                                <button
-                                    type="submit"
-                                    disabled={quoteSending}
-                                    style={{
-                                        flex: 1,
-                                        padding: 'var(--space-3) var(--space-4)',
-                                        background: quoteSending ? 'var(--border)' : 'var(--accent)',
-                                        color: 'var(--text)',
-                                        border: 'none',
-                                        borderRadius: 'var(--r-md)',
-                                        fontFamily: 'var(--font-body)',
-                                        fontWeight: 700,
-                                        fontSize: 'var(--text-sm)',
-                                        cursor: quoteSending ? 'not-allowed' : 'pointer',
-                                        transition: 'background var(--duration-fast)',
-                                    }}
-                                >
-                                    {quoteSending ? 'Submitting…' : 'Submit Quote Request'}
-                                </button>
+                            {/* Footer */}
+                            <div className="pdp-modal-footer rfq-footer">
                                 <button
                                     type="button"
+                                    className="rfq-btn-cancel"
                                     onClick={() => setQuoteOpen(false)}
-                                    style={{ padding: 'var(--space-3) var(--space-5)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--text-2)', cursor: 'pointer' }}
                                 >
                                     Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="rfq-btn-submit"
+                                    disabled={quoteSending}
+                                >
+                                    {quoteSending ? 'Submitting…' : 'Submit RFQ →'}
                                 </button>
                             </div>
                         </form>

@@ -20,6 +20,7 @@ import api          from "../api/api";
 import toast        from "react-hot-toast";
 import AdminLayout  from "../components/layouts/AdminLayout";
 import PageBanner   from "../components/common/PageBanner";
+import BackButton   from "../components/BackButton";
 
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 
@@ -212,6 +213,8 @@ const AdminCategoriesPage = () => {
                     }
                 />
             </div>
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             {/* ── Card Grid ── */}
             {loading ? (

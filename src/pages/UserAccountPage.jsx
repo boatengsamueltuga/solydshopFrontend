@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { fmtCurrency } from "../utils/format";
 import { HiUser, HiMail, HiShieldCheck, HiClipboardList } from "react-icons/hi";
+import ListAltOutlinedIcon    from "@mui/icons-material/ListAltOutlined";
+import RequestQuoteOutlinedIcon from "@mui/icons-material/RequestQuoteOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 
 const ROLE_STYLE = {
     ROLE_ADMIN:  { label: "Admin",  color: "var(--error)",   bg: "var(--error-subtle)"   },
@@ -12,11 +15,12 @@ const ROLE_STYLE = {
 };
 
 const ORDER_STATUS_STYLE = {
-    PENDING:    { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
-    PROCESSING: { color: "var(--info)",     bg: "var(--info-subtle)"     },
-    SHIPPED:    { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
-    DELIVERED:  { color: "var(--success)",  bg: "var(--success-subtle)"  },
-    CANCELLED:  { color: "var(--error)",    bg: "var(--error-subtle)"    },
+    PENDING:         { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
+    PAYMENT_PENDING: { color: "var(--warning)",  bg: "var(--warning-subtle)"  },
+    PROCESSING:      { color: "var(--info)",     bg: "var(--info-subtle)"     },
+    SHIPPED:         { color: "var(--accent)",   bg: "var(--accent-subtle)"   },
+    DELIVERED:       { color: "var(--success)",  bg: "var(--success-subtle)"  },
+    CANCELLED:       { color: "var(--error)",    bg: "var(--error-subtle)"    },
 };
 
 const RoleBadge = ({ role }) => {
@@ -76,9 +80,11 @@ const StatCard = ({ label, value, loading }) => (
 
 const UserAccountPage = () => {
     const { user } = useSelector(s => s.auth);
+    const navigate = useNavigate();
 
-    const [orders,  setOrders]  = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [orders,    setOrders]    = useState([]);
+    const [loading,   setLoading]   = useState(true);
+    const [sellerApp, setSellerApp] = useState(undefined); // undefined = loading
 
     useEffect(() => {
         if (!user?.userId) { setLoading(false); return; }
@@ -95,8 +101,17 @@ const UserAccountPage = () => {
         fetch();
     }, [user]);
 
-    const totalSpend = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
     const roles = user?.roles ?? [];
+    const isBuyerOnly = roles.includes("ROLE_USER") && !roles.includes("ROLE_SELLER") && !roles.includes("ROLE_ADMIN");
+
+    useEffect(() => {
+        if (!isBuyerOnly) { setSellerApp(null); return; }
+        api.get("/seller-applications/my", { silent: true })
+            .then(r => setSellerApp(r.data))
+            .catch(() => setSellerApp(null));
+    }, [isBuyerOnly]);
+
+    const totalSpend = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
 
     const initials = (user?.name ?? "U")
         .split(" ")
@@ -111,11 +126,51 @@ const UserAccountPage = () => {
             background:    "var(--bg)",
             color:         "var(--text)",
             fontFamily:    "var(--font-body)",
-            paddingTop:    "80px",
             paddingBottom: "var(--space-12)",
         }}>
 
-            {/* Page header band */}
+            {/* Quick actions — icon launcher strip */}
+            <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
+                <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-3) var(--space-6)", display: "flex", gap: "var(--space-2)" }}>
+                    {[
+                        { to: "/orders",     Icon: ListAltOutlinedIcon,     label: "Orders"  },
+                        { to: "/quotes/my",  Icon: RequestQuoteOutlinedIcon, label: "Quotes"  },
+                        { to: "/",           Icon: StorefrontOutlinedIcon,   label: "Catalog" },
+                    ].map(({ to, Icon, label }) => (
+                        <Link
+                            key={to}
+                            to={to}
+                            style={{
+                                display:        "flex",
+                                flexDirection:  "column",
+                                alignItems:     "center",
+                                gap:            "4px",
+                                padding:        "var(--space-2) var(--space-4)",
+                                textDecoration: "none",
+                                borderRadius:   "var(--r-md)",
+                                color:          "var(--text-3)",
+                                transition:     "background 0.15s, color 0.15s",
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "var(--surface-mid)"; e.currentTarget.style.color = "var(--accent)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "transparent";        e.currentTarget.style.color = "var(--text-3)";  }}
+                        >
+                            <Icon style={{ fontSize: 22 }} />
+                            <span style={{
+                                fontFamily:    "var(--font-body)",
+                                fontSize:      "10px",
+                                fontWeight:    600,
+                                letterSpacing: "0.06em",
+                                textTransform: "uppercase",
+                                lineHeight:    1,
+                            }}>
+                                {label}
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
+            {/* Profile header band */}
             <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-6) var(--space-6)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
@@ -181,6 +236,70 @@ const UserAccountPage = () => {
                     />
                 </section>
 
+                {/* ── Seller access section (buyers only) ── */}
+                {isBuyerOnly && sellerApp !== undefined && (() => {
+                    const status = sellerApp?.status;
+
+                    if (!sellerApp || status === "REJECTED") return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                                <div>
+                                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--accent)", margin: "0 0 var(--space-1)" }}>
+                                        Sell on SolydShop
+                                    </p>
+                                    <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                        {status === "REJECTED" ? "Application not approved" : "List your products and reach more buyers"}
+                                    </p>
+                                    {status === "REJECTED" ? (
+                                        <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                                            {sellerApp.rejectionReason ?? "Your previous application was not approved."}{" "}
+                                            <span style={{ color: "var(--text-4)" }}>You can update your details and reapply below.</span>
+                                        </p>
+                                    ) : (
+                                        <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
+                                            Apply to become a seller. Applications are reviewed by our team before access is granted.
+                                        </p>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => navigate("/seller-application")}
+                                    style={{
+                                        flexShrink: 0, padding: "var(--space-3) var(--space-5)",
+                                        background: "var(--accent)", border: "none", borderRadius: "var(--r-md)",
+                                        color: "var(--text)", fontFamily: "var(--font-body)", fontWeight: 700,
+                                        fontSize: "var(--text-sm)", cursor: "pointer", letterSpacing: "0.04em",
+                                        textTransform: "uppercase", transition: "opacity 0.15s", whiteSpace: "nowrap",
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.opacity = "0.88"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+                                >
+                                    {status === "REJECTED" ? "Reapply" : "Apply now"}
+                                </button>
+                            </div>
+                        </section>
+                    );
+
+                    if (status === "PENDING") return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--warning)", borderRadius: "var(--r-md)", overflow: "hidden", marginBottom: "var(--space-6)" }}>
+                            <div style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>
+                                <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--warning)", margin: 0 }}>
+                                    Seller Application · Under Review
+                                </p>
+                            </div>
+                            <div style={{ padding: "var(--space-4) var(--space-5)" }}>
+                                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                    {sellerApp.businessName}
+                                </p>
+                                <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
+                                    Your application is being reviewed. We'll notify you once a decision has been made.
+                                </p>
+                            </div>
+                        </section>
+                    );
+
+                    return null;
+                })()}
+
                 {/* Recent Orders */}
                 <section style={{
                     background:    "var(--surface-mid)",
@@ -224,96 +343,42 @@ const UserAccountPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {[...orders].sort((a, b) => b.orderId - a.orderId).slice(0, 5).map((order, i, arr) => (
-                                        <tr key={order.orderId}
-                                            style={{ borderBottom: i < arr.length - 1 ? "1px solid var(--border-subtle)" : "none" }}
-                                        >
-                                            <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--text-3)" }}>
-                                                #{order.orderId}
-                                            </td>
-                                            <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--success)", whiteSpace: "nowrap" }}>
-                                                {fmtCurrency(order.totalAmount)}
-                                            </td>
-                                            <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                                                {(() => {
-                                                    const ss = ORDER_STATUS_STYLE[order.status] ?? { color: "var(--text-3)", bg: "var(--surface-high)" };
-                                                    return (
-                                                        <span style={{
-                                                            fontFamily:    "var(--font-mono)",
-                                                            fontSize:      "11px",
-                                                            fontWeight:    600,
-                                                            letterSpacing: "0.04em",
-                                                            textTransform: "uppercase",
-                                                            padding:       "2px 8px",
-                                                            borderRadius:  "var(--r-sm)",
-                                                            background:    ss.bg,
-                                                            color:         ss.color,
-                                                        }}>
-                                                            {order.status}
-                                                        </span>
-                                                    );
-                                                })()}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {[...orders].sort((a, b) => b.orderId - a.orderId).slice(0, 5).map((order, i, arr) => {
+                                        const ss = ORDER_STATUS_STYLE[order.status] ?? { color: "var(--text-3)", bg: "var(--surface-high)" };
+                                        return (
+                                            <tr key={order.orderId}
+                                                style={{ borderBottom: i < arr.length - 1 ? "1px solid var(--border-subtle)" : "none" }}
+                                            >
+                                                <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--text-3)" }}>
+                                                    #{order.orderId}
+                                                </td>
+                                                <td style={{ padding: "var(--space-3) var(--space-4)", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--success)", whiteSpace: "nowrap" }}>
+                                                    {fmtCurrency(order.totalAmount)}
+                                                </td>
+                                                <td style={{ padding: "var(--space-3) var(--space-4)" }}>
+                                                    <span style={{
+                                                        fontFamily:    "var(--font-mono)",
+                                                        fontSize:      "11px",
+                                                        fontWeight:    600,
+                                                        letterSpacing: "0.04em",
+                                                        textTransform: "uppercase",
+                                                        padding:       "2px 8px",
+                                                        borderRadius:  "var(--r-sm)",
+                                                        background:    ss.bg,
+                                                        color:         ss.color,
+                                                        whiteSpace:    "nowrap",
+                                                    }}>
+                                                        {order.status.replace(/_/g, " ")}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
                     )}
                 </section>
-
-                {/* Quick links */}
-                <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-                    <Link to="/orders" style={{
-                        padding:       "var(--space-3) var(--space-5)",
-                        background:    "var(--accent)",
-                        color:         "var(--text)",
-                        textDecoration: "none",
-                        borderRadius:  "var(--r-md)",
-                        fontFamily:    "var(--font-body)",
-                        fontWeight:    700,
-                        fontSize:      "var(--text-sm)",
-                        letterSpacing: "0.04em",
-                        textTransform: "uppercase",
-                    }}
-                        onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
-                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-                    >
-                        My Orders
-                    </Link>
-                    <Link to="/quotes/my" style={{
-                        padding:       "var(--space-3) var(--space-5)",
-                        background:    "transparent",
-                        color:         "var(--text-2)",
-                        textDecoration: "none",
-                        borderRadius:  "var(--r-md)",
-                        border:        "1px solid var(--border)",
-                        fontFamily:    "var(--font-body)",
-                        fontWeight:    600,
-                        fontSize:      "var(--text-sm)",
-                    }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                    >
-                        My Quotes
-                    </Link>
-                    <Link to="/" style={{
-                        padding:       "var(--space-3) var(--space-5)",
-                        background:    "transparent",
-                        color:         "var(--text-2)",
-                        textDecoration: "none",
-                        borderRadius:  "var(--r-md)",
-                        border:        "1px solid var(--border)",
-                        fontFamily:    "var(--font-body)",
-                        fontWeight:    600,
-                        fontSize:      "var(--text-sm)",
-                    }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                    >
-                        Browse Catalog
-                    </Link>
-                </div>
 
             </div>
         </div>
