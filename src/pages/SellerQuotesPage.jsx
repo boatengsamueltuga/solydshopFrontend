@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import api from "../api/api";
 import toast from "react-hot-toast";
 import SellerLayout from "../components/layouts/SellerLayout";
+import QuoteRespondModal from "../components/quotes/QuoteRespondModal";
 
 const STATUS_STYLE = {
     PENDING:   { label: "Pending",   color: "#d97706" },
@@ -19,135 +20,6 @@ const StatusDot = ({ status }) => {
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
             <span style={{ color: s.color, fontSize: 12, fontWeight: 600 }}>{s.label}</span>
         </span>
-    );
-};
-
-/* ── Respond Modal ── */
-const RespondModal = ({ quote, onClose, onSaved }) => {
-    const [form, setForm]     = useState({ quotedPrice: "", sellerNote: "", action: "RESPOND" });
-    const [saving, setSaving] = useState(false);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (form.action === "RESPOND" && !form.quotedPrice) {
-            toast.error("Please enter a quoted price.");
-            return;
-        }
-        setSaving(true);
-        try {
-            await api.put(`/seller/quotes/${quote.quoteId}/respond`, {
-                action:      form.action,
-                quotedPrice: form.action === "RESPOND" ? Number(form.quotedPrice) : null,
-                sellerNote:  form.sellerNote,
-            });
-            toast.success(form.action === "RESPOND" ? "Response sent to buyer." : "Quote declined.");
-            onSaved();
-            onClose();
-        } catch {
-            toast.error("Failed to send response.");
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    return (
-        <div
-            style={{
-                position: "fixed", inset: 0, zIndex: 1000,
-                background: "rgba(0,0,0,0.55)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                padding: "var(--space-4)",
-            }}
-            onClick={onClose}
-        >
-            <div
-                style={{
-                    background: "var(--surface)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--r-lg)",
-                    padding: "var(--space-6)",
-                    width: "100%", maxWidth: 480,
-                }}
-                onClick={e => e.stopPropagation()}
-            >
-                <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.1rem", color: "var(--text)", margin: "0 0 var(--space-4)" }}>
-                    Respond to Quote
-                </h3>
-
-                {/* Quote summary */}
-                <div style={{ background: "var(--bg)", borderRadius: "var(--r-md)", padding: "var(--space-3)", marginBottom: "var(--space-4)", fontSize: 13 }}>
-                    <p style={{ margin: "0 0 4px", color: "var(--text)", fontWeight: 600 }}>{quote.productName}</p>
-                    <p style={{ margin: 0, color: "var(--text-3)" }}>
-                        Buyer: <strong>{quote.buyerName}</strong> &bull; Qty: <strong>{quote.qtyNeeded}</strong> &bull; Urgency: <strong>{quote.urgency}</strong>
-                    </p>
-                    {quote.notes && <p style={{ margin: "6px 0 0", color: "var(--text-3)", fontStyle: "italic" }}>"{quote.notes}"</p>}
-                </div>
-
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-2)", display: "flex", flexDirection: "column", gap: 4 }}>
-                        Action
-                        <select
-                            value={form.action}
-                            onChange={e => setForm(f => ({ ...f, action: e.target.value }))}
-                            style={{ padding: "8px 10px", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13 }}
-                        >
-                            <option value="RESPOND">Send a quoted price</option>
-                            <option value="DECLINE">Decline this quote</option>
-                        </select>
-                    </label>
-
-                    {form.action === "RESPOND" && (
-                        <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-2)", display: "flex", flexDirection: "column", gap: 4 }}>
-                            Quoted Price (USD)
-                            <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                required
-                                placeholder="e.g. 249.99"
-                                value={form.quotedPrice}
-                                onChange={e => setForm(f => ({ ...f, quotedPrice: e.target.value }))}
-                                style={{ padding: "8px 10px", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13 }}
-                            />
-                        </label>
-                    )}
-
-                    <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-2)", display: "flex", flexDirection: "column", gap: 4 }}>
-                        Note to buyer (optional)
-                        <textarea
-                            rows={3}
-                            placeholder="Any additional information for the buyer…"
-                            value={form.sellerNote}
-                            onChange={e => setForm(f => ({ ...f, sellerNote: e.target.value }))}
-                            style={{ padding: "8px 10px", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13, resize: "vertical" }}
-                        />
-                    </label>
-
-                    <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end", marginTop: "var(--space-1)" }}>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            style={{ padding: "8px 18px", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", background: "transparent", color: "var(--text-2)", fontSize: 13, cursor: "pointer" }}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            style={{
-                                padding: "8px 18px", borderRadius: "var(--r-sm)", border: "none",
-                                background: form.action === "DECLINE" ? "#dc2626" : "var(--accent)",
-                                color: "#fff", fontSize: 13, fontWeight: 600,
-                                cursor: saving ? "not-allowed" : "pointer",
-                                opacity: saving ? 0.7 : 1,
-                            }}
-                        >
-                            {saving ? "Sending…" : form.action === "DECLINE" ? "Decline Quote" : "Send Response"}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     );
 };
 
@@ -300,8 +172,9 @@ const SellerQuotesPage = () => {
             </div>
 
             {active && (
-                <RespondModal
+                <QuoteRespondModal
                     quote={active}
+                    endpoint={`/seller/quotes/${active.quoteId}/respond`}
                     onClose={() => setActive(null)}
                     onSaved={fetchQuotes}
                 />
