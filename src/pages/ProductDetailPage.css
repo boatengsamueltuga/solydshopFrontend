@@ -74,6 +74,17 @@
     .pdp-main-image-area { height: clamp(180px, 28vh, 220px) !important; }
 }
 
+/* ── Price card — no card chrome on mobile (just clean text) ─ */
+@media (max-width: 767px) {
+    .pdp-price-card {
+        background:    transparent !important;
+        border:        none !important;
+        border-radius: 0 !important;
+        padding:       var(--space-4) 0 !important;
+        border-top:    1px solid var(--border) !important;
+    }
+}
+
 /* ── Thumbnail strip (desktop only) ──────────────────────── */
 .pdp-thumb-strip {
     display: none;

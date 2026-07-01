@@ -332,16 +332,11 @@ export default function ProductDetailPage() {
                 <h1 className="pdp-mobile-title">
                     {product.productName}
                 </h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginTop: 'var(--space-1)', flexWrap: 'wrap' }}>
-                    {product.partNumber && (
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>
-                            {product.partNumber}
-                        </span>
-                    )}
-                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: stockColor(product.quantity) }}>
-                        {stockLabel(product.quantity)}
+                {product.partNumber && (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em', marginTop: 'var(--space-1)', display: 'block' }}>
+                        {product.partNumber}
                     </span>
-                </div>
+                )}
             </div>
 
             {/* Two-column grid */}
@@ -524,10 +519,11 @@ export default function ProductDetailPage() {
                         )}
                     </div>
 
-                    {/* Thumbnail strip — desktop only (mobile uses arrow nav + counter) */}
+                    {/* Thumbnail strip */}
                     <div
                         className="pdp-thumb-strip"
                         style={{
+                            display:         'flex',
                             gap:             '8px',
                             padding:         '8px 12px',
                             borderTop:       '1px solid var(--border)',
@@ -626,6 +622,7 @@ export default function ProductDetailPage() {
 
                     {/* Price + availability box */}
                     <div
+                        className="pdp-price-card"
                         style={{
                             background: 'var(--surface-mid)',
                             border: '1px solid var(--border)',
