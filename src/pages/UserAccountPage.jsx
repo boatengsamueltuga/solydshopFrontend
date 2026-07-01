@@ -115,11 +115,67 @@ const UserAccountPage = () => {
             background:    "var(--bg)",
             color:         "var(--text)",
             fontFamily:    "var(--font-body)",
-            paddingTop:    "80px",
             paddingBottom: "var(--space-12)",
         }}>
 
-            {/* Page header band */}
+            {/* Quick actions — very first thing on the page */}
+            <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
+                <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-4) var(--space-6)", display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+                    <Link
+                        to="/orders"
+                        style={{
+                            display: "flex", alignItems: "center", gap: "var(--space-2)",
+                            padding: "var(--space-3) var(--space-5)",
+                            background: "var(--accent)", color: "var(--text)",
+                            textDecoration: "none", borderRadius: "var(--r-md)",
+                            fontFamily: "var(--font-body)", fontWeight: 700,
+                            fontSize: "var(--text-sm)", letterSpacing: "0.04em",
+                            textTransform: "uppercase", transition: "opacity 0.15s",
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
+                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                    >
+                        <ListAltOutlinedIcon style={{ fontSize: 18 }} />
+                        My Orders
+                    </Link>
+                    <Link
+                        to="/quotes/my"
+                        style={{
+                            display: "flex", alignItems: "center", gap: "var(--space-2)",
+                            padding: "var(--space-3) var(--space-5)",
+                            background: "transparent", color: "var(--text-2)",
+                            textDecoration: "none", borderRadius: "var(--r-md)",
+                            border: "1px solid var(--border)", fontFamily: "var(--font-body)",
+                            fontWeight: 600, fontSize: "var(--text-sm)",
+                            transition: "border-color 0.15s, color 0.15s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                    >
+                        <RequestQuoteOutlinedIcon style={{ fontSize: 18 }} />
+                        My Quotes
+                    </Link>
+                    <Link
+                        to="/"
+                        style={{
+                            display: "flex", alignItems: "center", gap: "var(--space-2)",
+                            padding: "var(--space-3) var(--space-5)",
+                            background: "transparent", color: "var(--text-2)",
+                            textDecoration: "none", borderRadius: "var(--r-md)",
+                            border: "1px solid var(--border)", fontFamily: "var(--font-body)",
+                            fontWeight: 600, fontSize: "var(--text-sm)",
+                            transition: "border-color 0.15s, color 0.15s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                    >
+                        <StorefrontOutlinedIcon style={{ fontSize: 18 }} />
+                        Browse Catalog
+                    </Link>
+                </div>
+            </div>
+
+            {/* Profile header band */}
             <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-6) var(--space-6)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
@@ -157,61 +213,6 @@ const UserAccountPage = () => {
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--space-4)", marginTop: "var(--space-5)" }}>
                         <StatCard label="Orders Placed" value={orders.length} loading={loading} />
                         <StatCard label="Total Spend" value={fmtCurrency(totalSpend)} loading={loading} />
-                    </div>
-
-                    {/* Quick actions — inside the header band */}
-                    <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap", marginTop: "var(--space-5)", paddingTop: "var(--space-5)", borderTop: "1px solid var(--border)" }}>
-                        <Link
-                            to="/orders"
-                            style={{
-                                display: "flex", alignItems: "center", gap: "var(--space-2)",
-                                padding: "var(--space-3) var(--space-5)",
-                                background: "var(--accent)", color: "var(--text)",
-                                textDecoration: "none", borderRadius: "var(--r-md)",
-                                fontFamily: "var(--font-body)", fontWeight: 700,
-                                fontSize: "var(--text-sm)", letterSpacing: "0.04em",
-                                textTransform: "uppercase", transition: "opacity 0.15s",
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
-                            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-                        >
-                            <ListAltOutlinedIcon style={{ fontSize: 18 }} />
-                            My Orders
-                        </Link>
-                        <Link
-                            to="/quotes/my"
-                            style={{
-                                display: "flex", alignItems: "center", gap: "var(--space-2)",
-                                padding: "var(--space-3) var(--space-5)",
-                                background: "transparent", color: "var(--text-2)",
-                                textDecoration: "none", borderRadius: "var(--r-md)",
-                                border: "1px solid var(--border)", fontFamily: "var(--font-body)",
-                                fontWeight: 600, fontSize: "var(--text-sm)",
-                                transition: "border-color 0.15s, color 0.15s",
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                        >
-                            <RequestQuoteOutlinedIcon style={{ fontSize: 18 }} />
-                            My Quotes
-                        </Link>
-                        <Link
-                            to="/"
-                            style={{
-                                display: "flex", alignItems: "center", gap: "var(--space-2)",
-                                padding: "var(--space-3) var(--space-5)",
-                                background: "transparent", color: "var(--text-2)",
-                                textDecoration: "none", borderRadius: "var(--r-md)",
-                                border: "1px solid var(--border)", fontFamily: "var(--font-body)",
-                                fontWeight: 600, fontSize: "var(--text-sm)",
-                                transition: "border-color 0.15s, color 0.15s",
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                        >
-                            <StorefrontOutlinedIcon style={{ fontSize: 18 }} />
-                            Browse Catalog
-                        </Link>
                     </div>
                 </div>
             </div>
