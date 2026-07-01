@@ -139,7 +139,9 @@ const QuoteRespondModal = ({ quote, endpoint, isAdmin = false, onClose, onSaved 
                             <Detail label="From" value={quote.buyerName} />
                             <Detail label="Email" value={quote.buyerEmail} />
                             {quote.phone && <Detail label="Phone" value={quote.phone} />}
-                            <Detail label="Contact" value={quote.contactEmail} />
+                            {quote.contactEmail && quote.contactEmail !== quote.buyerEmail && (
+                                <Detail label="Alt. contact" value={quote.contactEmail} />
+                            )}
                             <div>
                                 <p style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-4)", margin: "0 0 3px" }}>Qty</p>
                                 <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-sm)", fontWeight: 700, color: "var(--text)", margin: 0 }}>{quote.qtyNeeded}</p>
