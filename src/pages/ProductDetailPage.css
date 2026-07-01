@@ -153,7 +153,9 @@
 }
 
 /* ── Action bar internals ─────────────────────────────────── */
-.pdp-action-bar-price  { flex: 1; min-width: 0; }
+/* Price is already visible in the scrollable right panel — hide it from the bar */
+.pdp-action-bar-price  { display: none; }
+.pdp-action-bar .pdp-action-bar-btn { flex: 1; }
 .pdp-action-bar-label  {
     font-family:    var(--font-body);
     font-size:      10px;
