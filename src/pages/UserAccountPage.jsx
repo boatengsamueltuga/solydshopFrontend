@@ -118,60 +118,44 @@ const UserAccountPage = () => {
             paddingBottom: "var(--space-12)",
         }}>
 
-            {/* Quick actions — very first thing on the page */}
+            {/* Quick actions — icon launcher strip */}
             <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
-                <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-4) var(--space-6)", display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-                    <Link
-                        to="/orders"
-                        style={{
-                            display: "flex", alignItems: "center", gap: "var(--space-2)",
-                            padding: "var(--space-3) var(--space-5)",
-                            background: "var(--accent)", color: "var(--text)",
-                            textDecoration: "none", borderRadius: "var(--r-md)",
-                            fontFamily: "var(--font-body)", fontWeight: 700,
-                            fontSize: "var(--text-sm)", letterSpacing: "0.04em",
-                            textTransform: "uppercase", transition: "opacity 0.15s",
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
-                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-                    >
-                        <ListAltOutlinedIcon style={{ fontSize: 18 }} />
-                        My Orders
-                    </Link>
-                    <Link
-                        to="/quotes/my"
-                        style={{
-                            display: "flex", alignItems: "center", gap: "var(--space-2)",
-                            padding: "var(--space-3) var(--space-5)",
-                            background: "transparent", color: "var(--text-2)",
-                            textDecoration: "none", borderRadius: "var(--r-md)",
-                            border: "1px solid var(--border)", fontFamily: "var(--font-body)",
-                            fontWeight: 600, fontSize: "var(--text-sm)",
-                            transition: "border-color 0.15s, color 0.15s",
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                    >
-                        <RequestQuoteOutlinedIcon style={{ fontSize: 18 }} />
-                        My Quotes
-                    </Link>
-                    <Link
-                        to="/"
-                        style={{
-                            display: "flex", alignItems: "center", gap: "var(--space-2)",
-                            padding: "var(--space-3) var(--space-5)",
-                            background: "transparent", color: "var(--text-2)",
-                            textDecoration: "none", borderRadius: "var(--r-md)",
-                            border: "1px solid var(--border)", fontFamily: "var(--font-body)",
-                            fontWeight: 600, fontSize: "var(--text-sm)",
-                            transition: "border-color 0.15s, color 0.15s",
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}
-                    >
-                        <StorefrontOutlinedIcon style={{ fontSize: 18 }} />
-                        Browse Catalog
-                    </Link>
+                <div style={{ maxWidth: "680px", margin: "0 auto", padding: "var(--space-3) var(--space-6)", display: "flex", gap: "var(--space-2)" }}>
+                    {[
+                        { to: "/orders",     Icon: ListAltOutlinedIcon,     label: "Orders"  },
+                        { to: "/quotes/my",  Icon: RequestQuoteOutlinedIcon, label: "Quotes"  },
+                        { to: "/",           Icon: StorefrontOutlinedIcon,   label: "Catalog" },
+                    ].map(({ to, Icon, label }) => (
+                        <Link
+                            key={to}
+                            to={to}
+                            style={{
+                                display:        "flex",
+                                flexDirection:  "column",
+                                alignItems:     "center",
+                                gap:            "4px",
+                                padding:        "var(--space-2) var(--space-4)",
+                                textDecoration: "none",
+                                borderRadius:   "var(--r-md)",
+                                color:          "var(--text-3)",
+                                transition:     "background 0.15s, color 0.15s",
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "var(--surface-mid)"; e.currentTarget.style.color = "var(--accent)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "transparent";        e.currentTarget.style.color = "var(--text-3)";  }}
+                        >
+                            <Icon style={{ fontSize: 22 }} />
+                            <span style={{
+                                fontFamily:    "var(--font-body)",
+                                fontSize:      "10px",
+                                fontWeight:    600,
+                                letterSpacing: "0.06em",
+                                textTransform: "uppercase",
+                                lineHeight:    1,
+                            }}>
+                                {label}
+                            </span>
+                        </Link>
+                    ))}
                 </div>
             </div>
 
