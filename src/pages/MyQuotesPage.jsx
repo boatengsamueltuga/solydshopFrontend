@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/api";
 import toast from "react-hot-toast";
-import Navbar      from "../components/Navbar";
-import Footer      from "../components/Footer";
 import BackButton  from "../components/BackButton";
 
 const STATUS_STYLE = {
@@ -28,7 +26,6 @@ const MyQuotesPage = () => {
 
     return (
         <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
-            <Navbar />
             <div style={{ maxWidth: 720, margin: "0 auto", padding: "var(--space-6) var(--space-4)" }}>
                 <BackButton style={{ marginBottom: "var(--space-4)" }} />
                 <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.75rem", color: "var(--text)", marginBottom: "var(--space-5)" }}>
@@ -161,7 +158,6 @@ const MyQuotesPage = () => {
                     </div>
                 )}
             </div>
-            <Footer />
         </div>
     );
 };
