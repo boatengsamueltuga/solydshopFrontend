@@ -5,9 +5,12 @@ import { logoutSuccess } from "../features/auth/authSlice";
 import { clearWishlist } from "../features/wishlist/wishlistSlice";
 import { setCartCount, resetCartCount } from "../features/cart/cartSlice";
 import api from "../api/api";
-import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd, HiMoon, HiSun } from "react-icons/hi";
+import { HiMenu, HiX, HiChevronDown, HiUser, HiClipboardList, HiLogout, HiHome, HiShoppingBag, HiViewGrid, HiLogin, HiUserAdd, HiMoon, HiSun, HiBell } from "react-icons/hi";
 import SolydLogo from "./SolydLogo";
 import { FaShoppingCart, FaHeart } from "react-icons/fa";
+import { fetchUnreadCount } from "../store/actions/notificationActions";
+import { togglePanel } from "../store/reducers/notificationReducer";
+import NotificationPanel from "./navigation/NotificationPanel";
 
 // ── Design tokens (CSS vars — update with theme automatically) ───────────
 const C = {
@@ -45,6 +48,7 @@ const Navbar = () => {
     const { isAuthenticated, user } = useSelector((s) => s.auth);
     const wishlistCount = useSelector((s) => s.wishlist.items.length);
     const cartCount     = useSelector((s) => s.cart.count);
+    const { panelOpen, unreadCount } = useSelector((s) => s.notifications);
 
     const isAdmin  = user?.roles?.includes("ROLE_ADMIN");
     const isSeller = user?.roles?.includes("ROLE_SELLER");
@@ -53,6 +57,14 @@ const Navbar = () => {
 
     const isActive = (path) => location.pathname === path;
     const initials  = user?.email?.[0]?.toUpperCase() ?? "U";
+
+    // Poll notification unread count
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        dispatch(fetchUnreadCount());
+        const id = setInterval(() => dispatch(fetchUnreadCount()), 30_000);
+        return () => clearInterval(id);
+    }, [isAuthenticated, dispatch]);
 
     // Sync cart count from server on login/logout
     useEffect(() => {
@@ -179,6 +191,27 @@ const Navbar = () => {
                                     </span>
                                 )}
                             </button>
+                        )}
+
+                        {/* Notification bell — desktop */}
+                        {isAuthenticated && (
+                            <div style={{ position: "relative" }}>
+                                <button
+                                    onClick={() => dispatch(togglePanel())}
+                                    aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : "Notifications"}
+                                    style={{ position: "relative", color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "6px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = C.text}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = C.textMuted}
+                                >
+                                    <HiBell size={20} />
+                                    {unreadCount > 0 && (
+                                        <span style={{ position: "absolute", top: "-3px", right: "-4px", minWidth: "17px", height: "17px", borderRadius: "9px", background: "var(--error)", color: "#fff", fontSize: "10px", fontWeight: 700, fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: `1.5px solid ${C.bg}`, lineHeight: 1 }}>
+                                            {unreadCount > 99 ? "99+" : unreadCount}
+                                        </span>
+                                    )}
+                                </button>
+                                {panelOpen && <NotificationPanel />}
+                            </div>
                         )}
 
                         {/* Cart icon with badge */}
@@ -359,6 +392,27 @@ const Navbar = () => {
                                     </span>
                                 )}
                             </button>
+                        )}
+
+                        {/* Notification bell — mobile */}
+                        {isAuthenticated && (
+                            <div style={{ position: "relative" }}>
+                                <button
+                                    onClick={() => dispatch(togglePanel())}
+                                    aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : "Notifications"}
+                                    style={{ position: "relative", color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                                    onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                                >
+                                    <HiBell size={20} />
+                                    {unreadCount > 0 && (
+                                        <span style={{ position: "absolute", top: "-2px", right: "-2px", minWidth: "17px", height: "17px", borderRadius: "9px", background: "var(--error)", color: "#fff", fontSize: "10px", fontWeight: 700, fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: `1.5px solid ${C.bg}`, lineHeight: 1 }}>
+                                            {unreadCount > 99 ? "99+" : unreadCount}
+                                        </span>
+                                    )}
+                                </button>
+                                {panelOpen && <NotificationPanel />}
+                            </div>
                         )}
 
                         {/* Cart with badge */}

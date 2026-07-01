@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiArrowRight } from 'react-icons/hi';
+import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiArrowRight, HiBadgeCheck } from 'react-icons/hi';
 import Tooltip from '@mui/material/Tooltip';
 import { closePanel } from '../../store/reducers/notificationReducer';
 import {
@@ -20,6 +20,8 @@ const TYPE_ICON = {
     PRODUCT_REJECTED:  <HiExclamationCircle />,
     PRODUCT_SUSPENDED: <HiPause />,
     PRODUCT_ARCHIVED:  <HiArchive />,
+    SELLER_APPROVED:   <HiBadgeCheck />,
+    SELLER_REJECTED:   <HiExclamationCircle />,
 };
 
 const TYPE_COLOR = {
@@ -28,6 +30,8 @@ const TYPE_COLOR = {
     PRODUCT_REJECTED:  'var(--error)',
     PRODUCT_SUSPENDED: '#60a5fa',
     PRODUCT_ARCHIVED:  'var(--text-3)',
+    SELLER_APPROVED:   'var(--success)',
+    SELLER_REJECTED:   'var(--error)',
 };
 
 /* build navigation target from a notification */
@@ -40,6 +44,10 @@ const getNavTarget = (n) => {
         case 'PRODUCT_SUSPENDED':
         case 'PRODUCT_ARCHIVED':
             return { path: '/seller/dashboard', state: { highlightProductId: n.resourceId } };
+        case 'SELLER_APPROVED':
+            return { path: '/seller/dashboard', state: {} };
+        case 'SELLER_REJECTED':
+            return { path: '/seller-application', state: {} };
         default:
             return null;
     }
