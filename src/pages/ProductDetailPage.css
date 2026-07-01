@@ -175,7 +175,7 @@
 .pdp-overlay {
     position:        fixed;
     inset:           0;
-    z-index:         var(--z-modal-bg);
+    z-index:         9500;
     background:      oklch(0 0 0 / 0.72);
     display:         flex;
     align-items:     center;
@@ -195,7 +195,19 @@
     flex-direction: column;
     gap:           var(--space-5);
 }
-@media (max-width: 479px) { .pdp-modal { padding: var(--space-4); } }
+@media (max-width: 479px) {
+    .pdp-modal {
+        padding:    var(--space-4);
+        max-height: 85vh;
+    }
+}
+.pdp-modal-footer {
+    position:   sticky;
+    bottom:     0;
+    background: var(--surface);
+    padding-top: var(--space-2);
+    margin-top:  auto;
+}
 
 .pdp-field { display: flex; flex-direction: column; gap: var(--space-2); }
 .pdp-label {

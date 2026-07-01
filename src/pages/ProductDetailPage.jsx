@@ -1219,7 +1219,7 @@ export default function ProductDetailPage() {
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', gap: 'var(--space-3)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--border)' }}>
+                            <div className="pdp-modal-footer" style={{ display: 'flex', gap: 'var(--space-3)', borderTop: '1px solid var(--border)' }}>
                                 <button
                                     type="submit"
                                     disabled={quoteSending}
