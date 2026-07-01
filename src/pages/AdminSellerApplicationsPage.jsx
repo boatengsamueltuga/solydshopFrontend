@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import AdminLayout from "../components/layouts/AdminLayout";
 import BackButton  from "../components/BackButton";
 import AssignmentIndOutlinedIcon from "@mui/icons-material/AssignmentIndOutlined";
-import CheckCircleOutlineIcon    from "@mui/icons-material/CheckCircleOutline";
+import CheckCircleOutlineIcon    from "@mui/icons-material/CheckCircleOutlined";
 import CancelOutlinedIcon        from "@mui/icons-material/CancelOutlined";
 
 const getXsrfToken = () =>

@@ -108,7 +108,7 @@ export default function SellerApplicationPage() {
     });
 
     useEffect(() => {
-        api.get("/seller-applications/my")
+        api.get("/seller-applications/my", { silent: true })
             .then(r => setExisting(r.data))
             .catch(() => setExisting(null));
     }, []);

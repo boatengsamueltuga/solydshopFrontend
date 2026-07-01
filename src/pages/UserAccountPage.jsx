@@ -106,7 +106,7 @@ const UserAccountPage = () => {
 
     useEffect(() => {
         if (!isBuyerOnly) { setSellerApp(null); return; }
-        api.get("/seller-applications/my")
+        api.get("/seller-applications/my", { silent: true })
             .then(r => setSellerApp(r.data))
             .catch(() => setSellerApp(null));
     }, [isBuyerOnly]);
@@ -280,16 +280,20 @@ const UserAccountPage = () => {
                     );
 
                     if (status === "PENDING") return (
-                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderLeft: "3px solid var(--warning)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
-                            <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--warning)", margin: "0 0 var(--space-1)" }}>
-                                Seller Application · Under Review
-                            </p>
-                            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
-                                {sellerApp.businessName}
-                            </p>
-                            <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
-                                Your application is being reviewed. We'll notify you once a decision has been made.
-                            </p>
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--warning)", borderRadius: "var(--r-md)", overflow: "hidden", marginBottom: "var(--space-6)" }}>
+                            <div style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>
+                                <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--warning)", margin: 0 }}>
+                                    Seller Application · Under Review
+                                </p>
+                            </div>
+                            <div style={{ padding: "var(--space-4) var(--space-5)" }}>
+                                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                    {sellerApp.businessName}
+                                </p>
+                                <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
+                                    Your application is being reviewed. We'll notify you once a decision has been made.
+                                </p>
+                            </div>
                         </section>
                     );
 
