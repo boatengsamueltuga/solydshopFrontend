@@ -227,31 +227,27 @@ const SellerQuotesPage = () => {
                                             </div>
                                         </div>
 
-                                        {/* Row 2 — buyer */}
-                                        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-1)" }}>
-                                            <span style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "var(--text-2)", fontWeight: 600 }}>
+                                        {/* Buyer */}
+                                        <div style={{ marginBottom: "var(--space-3)" }}>
+                                            <p style={{ fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 700, color: "var(--text-2)", margin: "0 0 2px" }}>
                                                 {q.buyerName}
-                                            </span>
-                                            {q.contactEmail && (
-                                                <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-3)" }}>
-                                                    {q.contactEmail}
-                                                </span>
-                                            )}
-                                            {q.phone && (
-                                                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-3)" }}>
-                                                    {q.phone}
-                                                </span>
-                                            )}
+                                            </p>
+                                            <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-3)", margin: 0 }}>
+                                                {q.buyerEmail || q.contactEmail}
+                                                {q.phone && <span style={{ marginLeft: 6 }}>· {q.phone}</span>}
+                                            </p>
                                         </div>
 
-                                        {/* Row 3 — qty + date */}
-                                        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", marginBottom: q.notes ? "var(--space-2)" : 0 }}>
-                                            <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-3)" }}>
-                                                Qty: <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--text-2)" }}>{q.qtyNeeded}</span>
-                                            </span>
-                                            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-4)" }}>
-                                                {fmtDate(q.createdAt)}
-                                            </span>
+                                        {/* Meta row — labeled data columns */}
+                                        <div style={{ display: "flex", gap: "var(--space-5)", paddingTop: "var(--space-2)", borderTop: "1px solid var(--border)", marginBottom: q.notes ? "var(--space-3)" : 0 }}>
+                                            <div>
+                                                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-4)", margin: "0 0 2px" }}>Qty</p>
+                                                <p style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 700, color: "var(--text-2)", margin: 0 }}>{q.qtyNeeded}</p>
+                                            </div>
+                                            <div>
+                                                <p style={{ fontFamily: "var(--font-body)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-4)", margin: "0 0 2px" }}>Submitted</p>
+                                                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-2)", margin: 0 }}>{fmtDate(q.createdAt)}</p>
+                                            </div>
                                         </div>
 
                                         {/* Notes */}
@@ -263,27 +259,28 @@ const SellerQuotesPage = () => {
                                             </div>
                                         )}
 
-                                        {/* Responded / Declined state */}
+                                        {/* Responded state */}
                                         {q.status === "RESPONDED" && q.quotedPrice != null && (
-                                            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", marginTop: "var(--space-3)", padding: "var(--space-3)", background: "rgba(5,150,105,0.06)", borderRadius: "var(--r-md)", border: "1px solid rgba(5,150,105,0.2)", flexWrap: "wrap" }}>
-                                                <div>
-                                                    <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-4)", margin: "0 0 2px", fontFamily: "var(--font-body)" }}>Offer sent</p>
-                                                    <p style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "1.1rem", color: "#059669", margin: 0 }}>
-                                                        ${Number(q.quotedPrice).toFixed(2)} <span style={{ fontWeight: 400, fontSize: 12, color: "var(--text-3)" }}>/ unit</span>
-                                                    </p>
-                                                </div>
+                                            <div style={{ marginTop: "var(--space-3)", padding: "var(--space-3)", background: "rgba(5,150,105,0.06)", borderRadius: "var(--r-md)", border: "1px solid rgba(5,150,105,0.2)" }}>
+                                                <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#059669", margin: "0 0 var(--space-1)", fontFamily: "var(--font-body)" }}>Offer sent</p>
+                                                <p style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "1.1rem", color: "#059669", margin: "0 0 4px" }}>
+                                                    ${Number(q.quotedPrice).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    <span style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 12, color: "var(--text-3)", marginLeft: 4 }}>/ unit</span>
+                                                </p>
                                                 {q.sellerNote && (
-                                                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-3)", margin: 0, flex: 1 }}>
+                                                    <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-3)", margin: 0 }}>
                                                         {q.sellerNote}
                                                     </p>
                                                 )}
                                             </div>
                                         )}
 
-                                        {q.status === "DECLINED" && q.sellerNote && (
-                                            <div style={{ marginTop: "var(--space-2)", padding: "var(--space-2) var(--space-3)", background: "rgba(220,38,38,0.05)", borderRadius: "var(--r-sm)", border: "1px solid rgba(220,38,38,0.15)" }}>
-                                                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#dc2626", margin: 0 }}>
-                                                    Reason: {q.sellerNote}
+                                        {/* Declined state */}
+                                        {q.status === "DECLINED" && (
+                                            <div style={{ marginTop: "var(--space-3)", padding: "var(--space-3)", background: "rgba(220,38,38,0.05)", borderRadius: "var(--r-sm)", border: "1px solid rgba(220,38,38,0.15)" }}>
+                                                <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#dc2626", margin: "0 0 var(--space-1)", fontFamily: "var(--font-body)" }}>Declined</p>
+                                                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text-3)", margin: 0 }}>
+                                                    {q.sellerNote || "No reason provided."}
                                                 </p>
                                             </div>
                                         )}
