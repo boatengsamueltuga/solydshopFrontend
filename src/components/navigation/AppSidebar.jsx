@@ -11,6 +11,7 @@ import {
   HiLogout,
   HiPlusCircle,
   HiDocumentText,
+  HiBadgeCheck,
 } from 'react-icons/hi';
 
 import api from '../../api/api';
@@ -35,9 +36,10 @@ const ADMIN_GROUPS = [
   {
     label: 'OPERATIONS',
     links: [
-      { to: '/admin/orders',     label: 'Orders',     Icon: HiClipboardList },
-      { to: '/admin/users',      label: 'Users',      Icon: HiUsers },
-      { to: '/admin/quotes',     label: 'Quotes',     Icon: HiDocumentText },
+      { to: '/admin/orders',               label: 'Orders',       Icon: HiClipboardList },
+      { to: '/admin/users',                label: 'Users',        Icon: HiUsers },
+      { to: '/admin/quotes',               label: 'Quotes',       Icon: HiDocumentText },
+      { to: '/admin/seller-applications',  label: 'Applications', Icon: HiBadgeCheck },
     ],
   },
 ];

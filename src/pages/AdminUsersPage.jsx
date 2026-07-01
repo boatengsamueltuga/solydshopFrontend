@@ -68,13 +68,14 @@ const RoleBadge = memo(({ role }) => {
 /* ── AdminUsersPage ── */
 const AdminUsersPage = () => {
 
-    const [users,        setUsers]        = useState([]);
-    const [loading,      setLoading]      = useState(true);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [isSheetOpen,  setIsSheetOpen]  = useState(false);
-    const [newRole,      setNewRole]      = useState("");
-    const [activeTab,    setActiveTab]    = useState("ALL");
-    const [search,       setSearch]       = useState("");
+    const [users,             setUsers]             = useState([]);
+    const [loading,           setLoading]           = useState(true);
+    const [selectedUser,      setSelectedUser]      = useState(null);
+    const [isSheetOpen,       setIsSheetOpen]       = useState(false);
+    const [newRole,           setNewRole]           = useState("");
+    const [activeTab,         setActiveTab]         = useState("ALL");
+    const [search,            setSearch]            = useState("");
+    const [sellerBypassWarn,  setSellerBypassWarn]  = useState(false);
 
     const [isMobile,  setIsMobile]  = useState(window.innerWidth < 600);
     const [isCompact, setIsCompact] = useState(window.innerWidth < 1100);
@@ -152,7 +153,16 @@ const AdminUsersPage = () => {
         setIsSheetOpen(true);
     }, []);
 
-    const handleUpdateRole = async () => {
+    const handleUpdateRole = () => {
+        if (newRole === "ROLE_SELLER" && !selectedUser?.roles?.includes("ROLE_SELLER")) {
+            setSellerBypassWarn(true);
+            return;
+        }
+        commitRoleUpdate();
+    };
+
+    const commitRoleUpdate = async () => {
+        setSellerBypassWarn(false);
         try {
             await api.put(`/admin/users/${selectedUser.userId}/role?role=${newRole}`);
             toast.success("Role updated successfully");
@@ -495,6 +505,42 @@ const AdminUsersPage = () => {
                     </Box>
                 )}
             </SheetPanel>
+
+            {/* ── Seller bypass warning dialog ── */}
+            {sellerBypassWarn && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 10001, background: "oklch(0 0 0 / 0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-4)" }}>
+                    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderTop: "3px solid var(--warning)", borderRadius: "var(--r-lg)", width: "100%", maxWidth: 480, padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+                        <div>
+                            <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--warning)", margin: "0 0 var(--space-2)" }}>
+                                Caution — bypassing review process
+                            </p>
+                            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.1rem", color: "var(--text)", margin: "0 0 var(--space-3)" }}>
+                                Grant seller access without an application?
+                            </p>
+                            <p style={{ color: "var(--text-2)", fontSize: 13, margin: "0 0 var(--space-2)", lineHeight: 1.6 }}>
+                                <strong style={{ color: "var(--text)" }}>{selectedUser?.name}</strong> has not submitted a seller application. Granting seller access directly bypasses the onboarding review and cannot be automatically reversed.
+                            </p>
+                            <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+                                Use this only when you have verified the seller's credentials out-of-band. Consider asking them to apply via their account page instead.
+                            </p>
+                        </div>
+                        <div style={{ display: "flex", gap: "var(--space-3)" }}>
+                            <button
+                                onClick={() => setSellerBypassWarn(false)}
+                                style={{ flex: 1, padding: "var(--space-3)", background: "transparent", border: "1px solid var(--border)", borderRadius: "var(--r-md)", color: "var(--text-2)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 600, cursor: "pointer" }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={commitRoleUpdate}
+                                style={{ flex: 2, padding: "var(--space-3)", background: "var(--warning-subtle)", border: "1px solid var(--warning)", borderRadius: "var(--r-md)", color: "var(--warning)", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)", fontWeight: 700, cursor: "pointer", letterSpacing: "0.02em" }}
+                            >
+                                Yes, bypass review and grant access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </AdminLayout>
     );

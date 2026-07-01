@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { fmtCurrency } from "../utils/format";
 import { HiUser, HiMail, HiShieldCheck, HiClipboardList } from "react-icons/hi";
@@ -80,9 +80,11 @@ const StatCard = ({ label, value, loading }) => (
 
 const UserAccountPage = () => {
     const { user } = useSelector(s => s.auth);
+    const navigate = useNavigate();
 
-    const [orders,  setOrders]  = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [orders,    setOrders]    = useState([]);
+    const [loading,   setLoading]   = useState(true);
+    const [sellerApp, setSellerApp] = useState(undefined); // undefined = loading
 
     useEffect(() => {
         if (!user?.userId) { setLoading(false); return; }
@@ -99,8 +101,17 @@ const UserAccountPage = () => {
         fetch();
     }, [user]);
 
-    const totalSpend = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
     const roles = user?.roles ?? [];
+    const isBuyerOnly = roles.includes("ROLE_USER") && !roles.includes("ROLE_SELLER") && !roles.includes("ROLE_ADMIN");
+
+    useEffect(() => {
+        if (!isBuyerOnly) { setSellerApp(null); return; }
+        api.get("/seller-applications/my")
+            .then(r => setSellerApp(r.data))
+            .catch(() => setSellerApp(null));
+    }, [isBuyerOnly]);
+
+    const totalSpend = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
 
     const initials = (user?.name ?? "U")
         .split(" ")
@@ -224,6 +235,66 @@ const UserAccountPage = () => {
                         }
                     />
                 </section>
+
+                {/* ── Seller access section (buyers only) ── */}
+                {isBuyerOnly && sellerApp !== undefined && (() => {
+                    const status = sellerApp?.status;
+
+                    if (!sellerApp || status === "REJECTED") return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                                <div>
+                                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--accent)", margin: "0 0 var(--space-1)" }}>
+                                        Sell on SolydShop
+                                    </p>
+                                    <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                        {status === "REJECTED" ? "Application not approved" : "List your products and reach more buyers"}
+                                    </p>
+                                    {status === "REJECTED" ? (
+                                        <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                                            {sellerApp.rejectionReason ?? "Your previous application was not approved."}{" "}
+                                            <span style={{ color: "var(--text-4)" }}>You can update your details and reapply below.</span>
+                                        </p>
+                                    ) : (
+                                        <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
+                                            Apply to become a seller. Applications are reviewed by our team before access is granted.
+                                        </p>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => navigate("/seller-application")}
+                                    style={{
+                                        flexShrink: 0, padding: "var(--space-3) var(--space-5)",
+                                        background: "var(--accent)", border: "none", borderRadius: "var(--r-md)",
+                                        color: "var(--text)", fontFamily: "var(--font-body)", fontWeight: 700,
+                                        fontSize: "var(--text-sm)", cursor: "pointer", letterSpacing: "0.04em",
+                                        textTransform: "uppercase", transition: "opacity 0.15s", whiteSpace: "nowrap",
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.opacity = "0.88"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+                                >
+                                    {status === "REJECTED" ? "Reapply" : "Apply now"}
+                                </button>
+                            </div>
+                        </section>
+                    );
+
+                    if (status === "PENDING") return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderLeft: "3px solid var(--warning)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
+                            <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--warning)", margin: "0 0 var(--space-1)" }}>
+                                Seller Application · Under Review
+                            </p>
+                            <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                {sellerApp.businessName}
+                            </p>
+                            <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
+                                Your application is being reviewed. We'll notify you once a decision has been made.
+                            </p>
+                        </section>
+                    );
+
+                    return null;
+                })()}
 
                 {/* Recent Orders */}
                 <section style={{
