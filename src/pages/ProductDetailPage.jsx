@@ -204,7 +204,6 @@ export default function ProductDetailPage() {
             style={{
                 background: 'var(--bg)',
                 minHeight: '100vh',
-                paddingTop: 'var(--topbar-height)',
                 color: 'var(--text)',
                 fontFamily: 'var(--font-body)',
             }}
@@ -214,7 +213,7 @@ export default function ProductDetailPage() {
                 style={{
                     maxWidth: '1440px',
                     margin: '0 auto',
-                    padding: '24px 16px 80px',
+                    padding: '12px 16px 80px',
                 }}
             >
                 {children}
@@ -292,8 +291,9 @@ export default function ProductDetailPage() {
             {/* Breadcrumb */}
             <nav
                 aria-label="breadcrumb"
+                className="pdp-breadcrumb"
                 style={{
-                    marginBottom: 'var(--space-6)',
+                    marginBottom: 'var(--space-3)',
                     fontSize: 'var(--text-xs)',
                     color: 'var(--text-3)',
                     display: 'flex',
@@ -327,6 +327,23 @@ export default function ProductDetailPage() {
                 </span>
             </nav>
 
+            {/* Mobile-only product identity — visible above the image */}
+            <div className="pdp-mobile-id">
+                <h1 className="pdp-mobile-title">
+                    {product.productName}
+                </h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginTop: 'var(--space-1)', flexWrap: 'wrap' }}>
+                    {product.partNumber && (
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>
+                            {product.partNumber}
+                        </span>
+                    )}
+                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: stockColor(product.quantity) }}>
+                        {stockLabel(product.quantity)}
+                    </span>
+                </div>
+            </div>
+
             {/* Two-column grid */}
             <div className="pdp-grid">
 
@@ -342,6 +359,7 @@ export default function ProductDetailPage() {
                 >
                     {/* Main image viewer */}
                     <div
+                        className="pdp-main-image-area"
                         onClick={() => { if (selectedImg) setLightboxOpen(true); }}
                         style={{
                             width:      '100%',
@@ -506,11 +524,10 @@ export default function ProductDetailPage() {
                         )}
                     </div>
 
-                    {/* Thumbnail strip — 4 slots always visible */}
+                    {/* Thumbnail strip — desktop only (mobile uses arrow nav + counter) */}
                     <div
                         className="pdp-thumb-strip"
                         style={{
-                            display:         'flex',
                             gap:             '8px',
                             padding:         '8px 12px',
                             borderTop:       '1px solid var(--border)',
@@ -577,8 +594,8 @@ export default function ProductDetailPage() {
                 {/* ── Right: specs panel ───────────────────────── */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', minWidth: 0 }}>
 
-                    {/* Product name + category */}
-                    <div>
+                    {/* Product name + category — desktop only (mobile shows pdp-mobile-id above the grid) */}
+                    <div className="pdp-desktop-title">
                         <h1
                             style={{
                                 fontFamily: 'var(--font-display)',

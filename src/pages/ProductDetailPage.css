@@ -41,6 +41,39 @@
     }
 }
 
+/* ── Breadcrumb spacing ───────────────────────────────────── */
+@media (min-width: 768px) {
+    .pdp-breadcrumb { margin-bottom: var(--space-6) !important; }
+}
+
+/* ── Mobile-only product identity strip ───────────────────── */
+.pdp-mobile-id {
+    display:       block;
+    margin-bottom: var(--space-3);
+}
+@media (min-width: 768px) {
+    .pdp-mobile-id { display: none; }
+}
+
+.pdp-mobile-title {
+    font-family:    var(--font-display);
+    font-weight:    700;
+    font-size:      1.15rem;
+    color:          var(--text);
+    line-height:    1.2;
+    letter-spacing: -0.01em;
+    margin:         0;
+}
+
+/* ── Desktop-only product name in the right panel ─────────── */
+.pdp-desktop-title { display: block; }
+@media (max-width: 767px) { .pdp-desktop-title { display: none; } }
+
+/* ── Main image area — shorter on mobile ──────────────────── */
+@media (max-width: 767px) {
+    .pdp-main-image-area { height: clamp(180px, 28vh, 220px) !important; }
+}
+
 /* ── Thumbnail strip (desktop only) ──────────────────────── */
 .pdp-thumb-strip {
     display: none;
