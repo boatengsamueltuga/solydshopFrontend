@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { FaRegHeart, FaShoppingCart, FaTrash } from "react-icons/fa";
 import { optimisticRemoveItem, setWishlistItems } from "../features/wishlist/wishlistSlice";
 import { incrementCartCount } from "../features/cart/cartSlice";
+import BackButton from "../components/BackButton";
 
 const getXsrfToken = () =>
     document.cookie.split("; ").find((r) => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -46,6 +47,8 @@ export default function WishlistPage() {
 
     return (
         <div style={{ maxWidth: "1440px", margin: "0 auto", padding: "32px 24px", minHeight: "60vh" }}>
+
+            <BackButton style={{ marginBottom: "16px" }} />
 
             {/* Header */}
             <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "28px" }}>

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { fmtCurrency, fmtPrice } from "../utils/format";
 import { Step, StepLabel, Stepper } from "@mui/material";
 import { HiShoppingBag, HiCube, HiRefresh } from "react-icons/hi";
+import BackButton from "../components/BackButton";
 
 const getXsrfToken = () =>
     document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -133,6 +134,7 @@ const OrdersPage = () => {
 
             {/* ── Page Header ── */}
             <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "var(--space-6) var(--space-8)" }}>
+                <BackButton style={{ marginBottom: "var(--space-3)" }} />
                 <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-3xl)", color: "var(--text)", margin: 0, letterSpacing: "-0.01em" }}>
                     MY ORDERS
                 </h1>

@@ -41,6 +41,7 @@ import toast       from "react-hot-toast";
 import AdminLayout from "../components/layouts/AdminLayout";
 import SheetPanel  from "../components/common/SheetPanel";
 import PageBanner  from "../components/common/PageBanner";
+import BackButton  from "../components/BackButton";
 
 /* ── Status badge styles ── */
 const STATUS_STYLE = {
@@ -509,6 +510,8 @@ const AdminProductsPage = () => {
 
     return (
         <AdminLayout title="Admin Panel">
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-4)" }}>
                 <PageBanner

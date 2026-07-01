@@ -6,6 +6,7 @@ import api from '../api/api';
 import { fmtPrice } from '../utils/format';
 import { incrementCartCount } from '../features/cart/cartSlice';
 import ReviewsSection from '../components/products/ReviewsSection';
+import BackButton from '../components/BackButton';
 import './ProductDetailPage.css';
 
 /* ── XSRF helper (mirrors the pattern used in HomePage.jsx) ─── */
@@ -288,6 +289,8 @@ export default function ProductDetailPage() {
     /* ── Rendered page ───────────────────────────────────────── */
     return shell(
         <>
+            <BackButton style={{ marginBottom: 'var(--space-3)' }} />
+
             {/* Breadcrumb */}
             <nav
                 aria-label="breadcrumb"

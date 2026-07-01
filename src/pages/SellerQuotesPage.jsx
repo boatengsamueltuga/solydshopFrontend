@@ -3,6 +3,7 @@ import api from "../api/api";
 import toast from "react-hot-toast";
 import SellerLayout from "../components/layouts/SellerLayout";
 import QuoteRespondModal from "../components/quotes/QuoteRespondModal";
+import BackButton from "../components/BackButton";
 
 const STATUS = {
     PENDING:   { label: "Pending",   color: "#d97706", bg: "rgba(217,119,6,0.10)",  border: "rgba(217,119,6,0.25)"  },
@@ -89,6 +90,8 @@ const SellerQuotesPage = () => {
     return (
         <SellerLayout title="Quote Requests">
             <div style={{ maxWidth: 860, margin: "0 auto" }}>
+
+                <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
                 {/* ── Page header ── */}
                 <div style={{ marginBottom: "var(--space-5)" }}>

@@ -32,6 +32,7 @@ import confirmToast  from "../utils/confirmToast";
 import AdminLayout   from "../components/layouts/AdminLayout";
 import SheetPanel    from "../components/common/SheetPanel";
 import PageBanner    from "../components/common/PageBanner";
+import BackButton    from "../components/BackButton";
 
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 
@@ -261,6 +262,8 @@ const AdminUsersPage = () => {
 
     return (
         <AdminLayout title="Admin Panel">
+
+            <BackButton style={{ marginBottom: "var(--space-4)" }} />
 
             {/* ── Page banner ── */}
             <div style={{ marginTop: "-24px", marginLeft: "-24px", marginRight: "-24px", marginBottom: "var(--space-5)" }}>
