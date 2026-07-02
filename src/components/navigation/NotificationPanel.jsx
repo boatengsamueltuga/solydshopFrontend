@@ -77,7 +77,13 @@ const NotificationPanel = () => {
 
     useEffect(() => {
         const handler = (e) => {
-            if (panelRef.current && !panelRef.current.contains(e.target)) {
+            const el = panelRef.current;
+            // Ignore duplicate instances that are mounted but hidden (e.g. the
+            // mobile panel while on desktop, or vice-versa). A CSS-hidden element
+            // has no offsetParent; letting its handler run would close the visible
+            // panel on mousedown before the clicked item's onClick can fire.
+            if (!el || el.offsetParent === null) return;
+            if (!el.contains(e.target)) {
                 dispatch(closePanel());
             }
         };
