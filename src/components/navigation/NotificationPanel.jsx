@@ -84,7 +84,7 @@ const getNavTarget = (n, isAdmin) => {
         case 'NEW_ORDER':
             return isAdmin
                 ? { path: '/admin/orders', state: {} }
-                : { path: '/seller/dashboard', state: {} };
+                : { path: '/seller/orders', state: {} };
         case 'ORDER_STATUS':
             return { path: '/orders', state: {} };
         default:

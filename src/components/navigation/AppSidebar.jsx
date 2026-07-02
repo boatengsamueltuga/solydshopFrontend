@@ -52,6 +52,7 @@ const SELLER_GROUPS = [
     links: [
       { to: '/seller/dashboard',    label: 'Dashboard',   Icon: HiChartBar },
       { to: '/seller/products/new', label: 'Add Product', Icon: HiPlusCircle },
+      { to: '/seller/orders',       label: 'Orders',      Icon: HiClipboardList },
       { to: '/seller/quotes',       label: 'Quotes',      Icon: HiDocumentText },
     ],
   },
