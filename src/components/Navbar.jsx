@@ -365,6 +365,21 @@ const Navbar = () => {
                     {/* ── Mobile: utility strip + hamburger ────────── */}
                     <div className="md:hidden flex items-center gap-0.5">
 
+                        {/* Home — desktop shows this in the persistent nav; on
+                            mobile it's otherwise only reachable via the (unlabeled)
+                            logo tap, or not at all on pages where MobileBottomNav
+                            is hidden (e.g. /login). */}
+                        <button
+                            onClick={() => navigate("/")}
+                            aria-label="Home"
+                            title="Home"
+                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                        >
+                            <HiHome size={20} />
+                        </button>
+
                         {/* Theme toggle */}
                         <button
                             onClick={toggleTheme}
