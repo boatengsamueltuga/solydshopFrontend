@@ -1,10 +1,6 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { HiMenu, HiBell, HiHome } from 'react-icons/hi';
-import { togglePanel } from '../../store/reducers/notificationReducer';
-import { fetchUnreadCount } from '../../store/actions/notificationActions';
-import NotificationPanel from './NotificationPanel';
+import { HiMenu, HiHome } from 'react-icons/hi';
 
 /* ── Inline styles ─────────────────────────────────────────────────────── */
 
@@ -93,18 +89,10 @@ const S = {
 /* ── TopBar ────────────────────────────────────────────────────────────── */
 
 const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
-  const dispatch  = useDispatch();
   const navigate  = useNavigate();
   const { user }  = useSelector((s) => s.auth);
-  const { unreadCount, panelOpen } = useSelector((s) => s.notifications);
 
   const initials = user?.email?.[0]?.toUpperCase() ?? 'U';
-
-  useEffect(() => {
-    dispatch(fetchUnreadCount());
-    const id = setInterval(() => dispatch(fetchUnreadCount()), 30_000);
-    return () => clearInterval(id);
-  }, [dispatch]);
 
   return (
     <div style={S.bar} role="banner">
@@ -149,64 +137,8 @@ const TopBar = ({ title = 'SolydShop', onMenuClick }) => {
         <span style={S.title}>{title}</span>
       </div>
 
-      {/* Right: notifications + user avatar */}
+      {/* Right: user avatar (notifications live in the global Navbar) */}
       <div style={{ ...S.right, position: 'relative' }}>
-
-        {/* Notification bell */}
-        <button
-          style={S.iconBtn}
-          aria-label="Notifications"
-          title="Notifications"
-          onClick={() => dispatch(togglePanel())}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-            e.currentTarget.style.color = 'var(--text)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'var(--text-3)';
-          }}
-        >
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <HiBell size={18} />
-            {unreadCount > 0 ? (
-              <span style={{
-                position:        'absolute',
-                top:             '-5px',
-                right:           '-6px',
-                minWidth:        '16px',
-                height:          '16px',
-                borderRadius:    '999px',
-                backgroundColor: 'var(--accent)',
-                border:          '1.5px solid var(--surface)',
-                color:           'var(--text)',
-                fontSize:        '9px',
-                fontWeight:      700,
-                fontFamily:      'var(--font-mono)',
-                display:         'flex',
-                alignItems:      'center',
-                justifyContent:  'center',
-                padding:         '0 3px',
-              }}>
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            ) : (
-              <span style={{
-                position:        'absolute',
-                top:             '-2px',
-                right:           '-3px',
-                width:           '6px',
-                height:          '6px',
-                borderRadius:    '50%',
-                backgroundColor: 'var(--accent)',
-                border:          '1.5px solid var(--surface)',
-              }} />
-            )}
-          </div>
-        </button>
-
-        {/* Notification panel dropdown */}
-        {panelOpen && <NotificationPanel />}
 
         {/* User avatar */}
         <div

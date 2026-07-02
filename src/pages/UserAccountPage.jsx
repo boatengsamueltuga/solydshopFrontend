@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import api from "../api/api";
 import { fmtCurrency } from "../utils/format";
-import { HiUser, HiMail, HiShieldCheck, HiClipboardList } from "react-icons/hi";
+import { HiUser, HiMail, HiShieldCheck, HiClipboardList, HiUserRemove } from "react-icons/hi";
 import ListAltOutlinedIcon    from "@mui/icons-material/ListAltOutlined";
 import RequestQuoteOutlinedIcon from "@mui/icons-material/RequestQuoteOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import DowngradeRequestModal from "../components/seller/DowngradeRequestModal";
+
+const getXsrfToken = () =>
+    document.cookie.split("; ").find(r => r.startsWith("XSRF-TOKEN="))?.split("=")[1];
 
 const ROLE_STYLE = {
     ROLE_ADMIN:  { label: "Admin",  color: "var(--error)",   bg: "var(--error-subtle)"   },
@@ -85,6 +90,8 @@ const UserAccountPage = () => {
     const [orders,    setOrders]    = useState([]);
     const [loading,   setLoading]   = useState(true);
     const [sellerApp, setSellerApp] = useState(undefined); // undefined = loading
+    const [downgradeRequest,   setDowngradeRequest]   = useState(undefined); // undefined = loading, null = none
+    const [showDowngradeModal, setShowDowngradeModal] = useState(false);
 
     useEffect(() => {
         if (!user?.userId) { setLoading(false); return; }
@@ -103,6 +110,7 @@ const UserAccountPage = () => {
 
     const roles = user?.roles ?? [];
     const isBuyerOnly = roles.includes("ROLE_USER") && !roles.includes("ROLE_SELLER") && !roles.includes("ROLE_ADMIN");
+    const isSeller    = roles.includes("ROLE_SELLER");
 
     useEffect(() => {
         if (!isBuyerOnly) { setSellerApp(null); return; }
@@ -110,6 +118,26 @@ const UserAccountPage = () => {
             .then(r => setSellerApp(r.data))
             .catch(() => setSellerApp(null));
     }, [isBuyerOnly]);
+
+    useEffect(() => {
+        if (!isSeller) { setDowngradeRequest(null); return; }
+        api.get("/seller-downgrade-requests/my", { silent: true })
+            .then(r => setDowngradeRequest(r.data))
+            .catch(() => setDowngradeRequest(null));
+    }, [isSeller]);
+
+    const handleSubmitDowngrade = async (reason) => {
+        try {
+            const res = await api.post("/seller-downgrade-requests", { reason }, {
+                headers: { "X-XSRF-TOKEN": getXsrfToken() },
+            });
+            toast.success("Request submitted — an admin will review it shortly.");
+            setDowngradeRequest(res.data);
+            setShowDowngradeModal(false);
+        } catch {
+            // global interceptor already surfaced the error toast
+        }
+    };
 
     const totalSpend = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
 
@@ -297,7 +325,109 @@ const UserAccountPage = () => {
                         </section>
                     );
 
+                    // status === "APPROVED" while isBuyerOnly means the user was
+                    // approved as a seller before but has since been downgraded
+                    // back to a buyer — offer to reapply rather than hiding this
+                    // section entirely.
+                    if (status === "APPROVED") return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                                <div>
+                                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--accent)", margin: "0 0 var(--space-1)" }}>
+                                        Sell on SolydShop
+                                    </p>
+                                    <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                        Ready to sell again?
+                                    </p>
+                                    <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                                        You previously sold on SolydShop as {sellerApp.businessName}. Submit a new application to regain seller access.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => navigate("/seller-application")}
+                                    style={{
+                                        flexShrink: 0, padding: "var(--space-3) var(--space-5)",
+                                        background: "var(--accent)", border: "none", borderRadius: "var(--r-md)",
+                                        color: "var(--text)", fontFamily: "var(--font-body)", fontWeight: 700,
+                                        fontSize: "var(--text-sm)", cursor: "pointer", letterSpacing: "0.04em",
+                                        textTransform: "uppercase", transition: "opacity 0.15s", whiteSpace: "nowrap",
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.opacity = "0.88"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+                                >
+                                    Apply again
+                                </button>
+                            </div>
+                        </section>
+                    );
+
                     return null;
+                })()}
+
+                {/* ── Seller access section (sellers only) ── */}
+                {isSeller && downgradeRequest !== undefined && (() => {
+                    const status = downgradeRequest?.status;
+
+                    if (status === "PENDING") return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--warning)", borderRadius: "var(--r-md)", overflow: "hidden", marginBottom: "var(--space-6)" }}>
+                            <div style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>
+                                <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--warning)", margin: 0 }}>
+                                    Downgrade Request · Under Review
+                                </p>
+                            </div>
+                            <div style={{ padding: "var(--space-4) var(--space-5)" }}>
+                                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                    Revert to buyer account
+                                </p>
+                                <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
+                                    You've asked to revert to a standard buyer account. An admin is reviewing your request — you'll be notified once a decision is made.
+                                </p>
+                            </div>
+                        </section>
+                    );
+
+                    return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                                <div>
+                                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--error)", margin: "0 0 var(--space-1)" }}>
+                                        Selling on SolydShop
+                                    </p>
+                                    <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                        Step down from your seller account
+                                    </p>
+                                    {status === "REJECTED" ? (
+                                        <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                                            Your last downgrade request was declined
+                                            {downgradeRequest?.rejectionReason ? `: ${downgradeRequest.rejectionReason}` : "."}{" "}
+                                            <span style={{ color: "var(--text-4)" }}>You can submit a new request below.</span>
+                                        </p>
+                                    ) : (
+                                        <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0 }}>
+                                            Revert to a standard buyer account. Requires admin approval — your product listings
+                                            will be archived if approved.
+                                        </p>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => setShowDowngradeModal(true)}
+                                    style={{
+                                        display: "flex", alignItems: "center", gap: 6, flexShrink: 0,
+                                        padding: "var(--space-3) var(--space-5)",
+                                        background: "transparent", border: "1px solid var(--error)", borderRadius: "var(--r-md)",
+                                        color: "var(--error)", fontFamily: "var(--font-body)", fontWeight: 700,
+                                        fontSize: "var(--text-sm)", cursor: "pointer", letterSpacing: "0.02em",
+                                        transition: "background-color 0.15s", whiteSpace: "nowrap",
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--error-subtle)"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                                >
+                                    <HiUserRemove size={15} />
+                                    {status === "REJECTED" ? "Request again" : "Revert to buyer"}
+                                </button>
+                            </div>
+                        </section>
+                    );
                 })()}
 
                 {/* Recent Orders */}
@@ -381,6 +511,13 @@ const UserAccountPage = () => {
                 </section>
 
             </div>
+
+            {showDowngradeModal && (
+                <DowngradeRequestModal
+                    onClose={() => setShowDowngradeModal(false)}
+                    onConfirm={handleSubmitDowngrade}
+                />
+            )}
         </div>
     );
 };

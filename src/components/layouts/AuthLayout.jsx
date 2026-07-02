@@ -1,10 +1,22 @@
 /**
  * AuthLayout — two-column auth shell.
- * Left: brand panel (hidden on mobile). Right: scrollable form area.
+ * Desktop: brand panel (left) + form panel (right), side by side.
+ * Small screens: stacked vertically — brand panel on top (full width),
+ * form panel below — so the brand content stays part of the page instead
+ * of disappearing entirely.
  * The global Navbar (80px fixed) floats above this layout.
  */
 const AuthLayout = ({ children }) => (
-  <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', fontFamily: 'var(--font-body)' }}>
+  <div
+    className="auth-shell"
+    style={{
+      display:      'flex',
+      minHeight:    '100vh',
+      background:   'var(--bg)',
+      fontFamily:   'var(--font-body)',
+      paddingTop:   '80px',
+    }}
+  >
 
     {/* ── Brand panel ── */}
     <div
@@ -17,7 +29,7 @@ const AuthLayout = ({ children }) => (
         display:         'flex',
         flexDirection:   'column',
         justifyContent:  'center',
-        padding:         'calc(80px + 48px) 40px 48px',
+        padding:         '48px 40px',
         position:        'relative',
         overflow:        'hidden',
       }}
@@ -128,7 +140,7 @@ const AuthLayout = ({ children }) => (
         flexDirection:  'column',
         alignItems:     'center',
         justifyContent: 'center',
-        padding:        'calc(80px + var(--space-8)) var(--space-6) var(--space-8)',
+        padding:        'var(--space-8) var(--space-6)',
       }}
     >
       <div style={{ width: '100%', maxWidth: '420px' }}>
@@ -138,7 +150,13 @@ const AuthLayout = ({ children }) => (
 
     <style>{`
       @media (max-width: 767px) {
-        .auth-brand-panel { display: none !important; }
+        .auth-shell { flex-direction: column !important; }
+        .auth-brand-panel {
+          width: 100% !important;
+          border-right: none !important;
+          border-bottom: 1px solid var(--border) !important;
+          padding: 32px 24px !important;
+        }
       }
     `}</style>
 

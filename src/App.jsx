@@ -61,6 +61,7 @@ const OrdersPage           = lazy(() => import("./pages/OrdersPage"));
 const SellerDashboardPage  = lazy(() => import("./pages/SellerDashboardPage"));
 const SellerProductFormPage = lazy(() => import("./pages/SellerProductFormPage"));
 const SellerQuotesPage     = lazy(() => import("./pages/SellerQuotesPage"));
+const SellerOrdersPage     = lazy(() => import("./pages/SellerOrdersPage"));
 const MyQuotesPage         = lazy(() => import("./pages/MyQuotesPage"));
 const AdminQuotesPage      = lazy(() => import("./pages/AdminQuotesPage"));
 const NotFoundPage         = lazy(() => import("./pages/NotFoundPage"));
@@ -72,6 +73,7 @@ const AdminCategoriesPage            = lazy(() => import("./pages/AdminCategorie
 const AdminOrdersPage                = lazy(() => import("./pages/AdminOrdersPage"));
 const AdminUsersPage                 = lazy(() => import("./pages/AdminUsersPage"));
 const AdminSellerApplicationsPage    = lazy(() => import("./pages/AdminSellerApplicationsPage"));
+const AdminSellerDowngradeRequestsPage = lazy(() => import("./pages/AdminSellerDowngradeRequestsPage"));
 const SellerApplicationPage          = lazy(() => import("./pages/SellerApplicationPage"));
 const ProductDetailPage    = lazy(() => import("./pages/ProductDetailPage"));
 const AboutPage            = lazy(() => import("./pages/AboutPage"));
@@ -131,6 +133,7 @@ function App() {
                     <Route path="/seller/products/new" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerProductFormPage /></ProtectedRoute>} />
                     <Route path="/seller/products/:id/edit" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerProductFormPage /></ProtectedRoute>} />
                     <Route path="/seller/quotes" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerQuotesPage /></ProtectedRoute>} />
+                    <Route path="/seller/orders" element={<ProtectedRoute allowedRoles={["ROLE_SELLER"]}><SellerOrdersPage /></ProtectedRoute>} />
 
                     <Route path="/quotes/my" element={<ProtectedRoute><MyQuotesPage /></ProtectedRoute>} />
 
@@ -141,6 +144,7 @@ function App() {
                     <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminUsersPage /></ProtectedRoute>} />
                     <Route path="/admin/quotes" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminQuotesPage /></ProtectedRoute>} />
                     <Route path="/admin/seller-applications" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminSellerApplicationsPage /></ProtectedRoute>} />
+                    <Route path="/admin/seller-downgrade-requests" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminSellerDowngradeRequestsPage /></ProtectedRoute>} />
 
                     <Route path="/products/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
 

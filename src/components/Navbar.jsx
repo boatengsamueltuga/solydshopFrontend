@@ -341,29 +341,48 @@ const Navbar = () => {
 
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link
-                                    to="/login"
-                                    style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "14px", fontWeight: 500, color: C.textMuted, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
-                                    onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
-                                >
-                                    <HiLogin size={15} aria-hidden="true" />
-                                    Login
-                                </Link>
-                                <Link
-                                    to="/register"
-                                    className="text-sm font-bold rounded-lg px-4 py-2 transition-opacity hover:opacity-90"
-                                    style={{ display: "flex", alignItems: "center", gap: "5px", background: C.btnBg, color: C.btnText, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
-                                >
-                                    <HiUserAdd size={15} aria-hidden="true" />
-                                    Register
-                                </Link>
+                                {!isActive("/login") && (
+                                    <Link
+                                        to="/login"
+                                        style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "14px", fontWeight: 500, color: C.textMuted, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
+                                        onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                                    >
+                                        <HiLogin size={15} aria-hidden="true" />
+                                        Login
+                                    </Link>
+                                )}
+                                {!isActive("/register") && (
+                                    <Link
+                                        to="/register"
+                                        className="text-sm font-bold rounded-lg px-4 py-2 transition-opacity hover:opacity-90"
+                                        style={{ display: "flex", alignItems: "center", gap: "5px", background: C.btnBg, color: C.btnText, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                    >
+                                        <HiUserAdd size={15} aria-hidden="true" />
+                                        Register
+                                    </Link>
+                                )}
                             </div>
                         )}
                     </div>
 
                     {/* ── Mobile: utility strip + hamburger ────────── */}
                     <div className="md:hidden flex items-center gap-0.5">
+
+                        {/* Home — desktop shows this in the persistent nav; on
+                            mobile it's otherwise only reachable via the (unlabeled)
+                            logo tap, or not at all on pages where MobileBottomNav
+                            is hidden (e.g. /login). */}
+                        <button
+                            onClick={() => navigate("/")}
+                            aria-label="Home"
+                            title="Home"
+                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                        >
+                            <HiHome size={20} />
+                        </button>
 
                         {/* Theme toggle */}
                         <button
@@ -451,6 +470,24 @@ const Navbar = () => {
                             </button>
                         )}
 
+                        {/* Admin/Seller dashboard shortcut — mobile.
+                            Desktop shows this as a persistent "Admin"/"Seller" nav
+                            link; on mobile it would otherwise only be reachable by
+                            opening the hamburger menu, so it gets its own icon here
+                            for one-tap parity with desktop. */}
+                        {isAuthenticated && (isAdmin || isSeller) && (
+                            <button
+                                onClick={() => navigate(isAdmin ? "/admin/dashboard" : "/seller/dashboard")}
+                                aria-label={isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
+                                title={isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
+                                style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                            >
+                                {isAdmin ? <HiViewGrid size={20} /> : <HiShoppingBag size={20} />}
+                            </button>
+                        )}
+
                         {/* Avatar (authenticated) or login icon (guest) */}
                         {isAuthenticated ? (
                             <button
@@ -478,13 +515,15 @@ const Navbar = () => {
                                 {initials}
                             </button>
                         ) : (
-                            <Link
-                                to="/login"
-                                aria-label="Login"
-                                style={{ color: C.textMuted, padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px" }}
-                            >
-                                <HiLogin size={20} />
-                            </Link>
+                            !isActive("/login") && (
+                                <Link
+                                    to="/login"
+                                    aria-label="Login"
+                                    style={{ color: C.textMuted, padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px" }}
+                                >
+                                    <HiLogin size={20} />
+                                </Link>
+                            )
                         )}
 
                         {/* Hamburger */}
@@ -591,12 +630,16 @@ const Navbar = () => {
 
                         {!isAuthenticated ? (
                             <div className="flex gap-3 mt-2">
-                                <Link to="/login"    onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm rounded-lg" style={{ border: `1px solid ${C.border}`, color: C.textMuted, textDecoration: "none" }}>
-                                    <HiLogin size={14} aria-hidden="true" /> Login
-                                </Link>
-                                <Link to="/register" onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-bold rounded-lg" style={{ background: C.btnBg, color: C.btnText, textDecoration: "none" }}>
-                                    <HiUserAdd size={14} aria-hidden="true" /> Register
-                                </Link>
+                                {!isActive("/login") && (
+                                    <Link to="/login"    onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm rounded-lg" style={{ border: `1px solid ${C.border}`, color: C.textMuted, textDecoration: "none" }}>
+                                        <HiLogin size={14} aria-hidden="true" /> Login
+                                    </Link>
+                                )}
+                                {!isActive("/register") && (
+                                    <Link to="/register" onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-bold rounded-lg" style={{ background: C.btnBg, color: C.btnText, textDecoration: "none" }}>
+                                        <HiUserAdd size={14} aria-hidden="true" /> Register
+                                    </Link>
+                                )}
                             </div>
                         ) : (
                             <button

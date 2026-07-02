@@ -7,6 +7,7 @@ import { fmtCurrency } from "../utils/format";
 
 import SellerLayout from "../components/layouts/SellerLayout";
 import DataTable from "../components/common/DataTable";
+import DowngradeRequestModal from "../components/seller/DowngradeRequestModal";
 import { useGridApiRef } from "@mui/x-data-grid";
 
 import Chip            from "@mui/material/Chip";
@@ -21,7 +22,7 @@ import ClearIcon           from "@mui/icons-material/Clear";
 import RefreshIcon         from "@mui/icons-material/Refresh";
 import WarningAmberIcon    from "@mui/icons-material/WarningAmber";
 
-import { HiCube } from "react-icons/hi";
+import { HiCube, HiUserRemove } from "react-icons/hi";
 
 /* ── Status badge styles (shared with admin) ── */
 const STATUS_STYLE = {
@@ -88,6 +89,56 @@ const StatCard = memo(({ label, value, sub, loading }) => (
     </div>
 ));
 
+/* ── Account management: revert to buyer account ── */
+const AccountManagement = ({ downgradeRequest, onOpenModal }) => {
+    if (downgradeRequest === undefined) return null;
+
+    if (downgradeRequest?.status === "PENDING") {
+        return (
+            <div style={{ background: "var(--warning-subtle)", border: "1px solid var(--warning)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginTop: "var(--space-8)" }}>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--warning)", margin: "0 0 var(--space-2)" }}>
+                    Downgrade request pending
+                </p>
+                <p style={{ color: "var(--text-2)", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+                    You've asked to revert to a buyer account. An admin is reviewing your request — you'll be notified once a decision is made.
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ background: "var(--surface)", border: "1px solid var(--error)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginTop: "var(--space-8)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+            <div>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--error)", margin: "0 0 var(--space-2)" }}>
+                    Account Management
+                </p>
+                <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-base)", color: "var(--text)", margin: "0 0 4px" }}>
+                    Revert to buyer account
+                </p>
+                <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0, lineHeight: 1.6, maxWidth: 480 }}>
+                    Stop selling and go back to a standard buyer account. Requires admin approval
+                    {downgradeRequest?.status === "REJECTED" ? " — your last request was declined." : "."}
+                </p>
+            </div>
+            <button
+                onClick={onOpenModal}
+                style={{
+                    display: "flex", alignItems: "center", gap: 6, flexShrink: 0,
+                    padding: "var(--space-3) var(--space-5)",
+                    background: "transparent", border: "1px solid var(--error)", borderRadius: "var(--r-md)",
+                    color: "var(--error)", fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 700,
+                    cursor: "pointer", letterSpacing: "0.02em", transition: "background-color 0.15s",
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "var(--error-subtle)"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+                <HiUserRemove size={15} />
+                Revert to buyer account
+            </button>
+        </div>
+    );
+};
+
 const SellerDashboardPage = () => {
 
     const navigate           = useNavigate();
@@ -98,7 +149,28 @@ const SellerDashboardPage = () => {
     const [deleting,        setDeleting]        = useState(false);
     const [search,          setSearch]          = useState("");
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const [downgradeRequest,   setDowngradeRequest]   = useState(undefined); // undefined = loading, null = none
+    const [showDowngradeModal, setShowDowngradeModal] = useState(false);
     const gridApiRef = useGridApiRef();
+
+    useEffect(() => {
+        api.get("/seller-downgrade-requests/my", { silent: true })
+            .then(r => setDowngradeRequest(r.data))
+            .catch(() => setDowngradeRequest(null));
+    }, []);
+
+    const handleSubmitDowngrade = async (reason) => {
+        try {
+            const res = await api.post("/seller-downgrade-requests", { reason }, {
+                headers: { "X-XSRF-TOKEN": getXsrfToken() },
+            });
+            toast.success("Request submitted — an admin will review it shortly.");
+            setDowngradeRequest(res.data);
+            setShowDowngradeModal(false);
+        } catch {
+            // global interceptor already surfaced the error toast
+        }
+    };
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -470,6 +542,19 @@ const SellerDashboardPage = () => {
                 }}
                 emptyMessage="No products listed yet. Click 'Add Product' to get started."
             />
+
+            {/* ── Account management ── */}
+            <AccountManagement
+                downgradeRequest={downgradeRequest}
+                onOpenModal={() => setShowDowngradeModal(true)}
+            />
+
+            {showDowngradeModal && (
+                <DowngradeRequestModal
+                    onClose={() => setShowDowngradeModal(false)}
+                    onConfirm={handleSubmitDowngrade}
+                />
+            )}
 
         </SellerLayout>
     );
