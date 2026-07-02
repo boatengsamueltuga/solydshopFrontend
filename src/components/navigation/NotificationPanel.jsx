@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiBadgeCheck, HiSwitchHorizontal } from 'react-icons/hi';
+import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiBadgeCheck, HiSwitchHorizontal, HiDocumentText } from 'react-icons/hi';
 import Tooltip from '@mui/material/Tooltip';
 import { closePanel } from '../../store/reducers/notificationReducer';
 import {
@@ -15,11 +15,14 @@ import {
 const TYPE_ICON = {
     NEW_ORDER:         <HiShoppingBag />,
     ORDER_STATUS:      <HiCheckCircle />,
+    QUOTE_REQUEST:     <HiDocumentText />,
+    QUOTE_RESPONSE:    <HiDocumentText />,
     PRODUCT_REVIEW:    <HiClipboardList />,
     PRODUCT_APPROVED:  <HiCheckCircle />,
     PRODUCT_REJECTED:  <HiExclamationCircle />,
     PRODUCT_SUSPENDED: <HiPause />,
     PRODUCT_ARCHIVED:  <HiArchive />,
+    PRODUCT_REINSTATED: <HiCheckCircle />,
     SELLER_APPLICATION: <HiBadgeCheck />,
     SELLER_APPROVED:   <HiBadgeCheck />,
     SELLER_REJECTED:   <HiExclamationCircle />,
@@ -29,11 +32,16 @@ const TYPE_ICON = {
 };
 
 const TYPE_COLOR = {
+    NEW_ORDER:         'var(--success)',
+    ORDER_STATUS:      'var(--info)',
+    QUOTE_REQUEST:     'var(--warning)',
+    QUOTE_RESPONSE:    'var(--info)',
     PRODUCT_REVIEW:    'var(--warning)',
     PRODUCT_APPROVED:  'var(--success)',
     PRODUCT_REJECTED:  'var(--error)',
     PRODUCT_SUSPENDED: '#60a5fa',
     PRODUCT_ARCHIVED:  'var(--text-3)',
+    PRODUCT_REINSTATED: 'var(--success)',
     SELLER_APPLICATION: 'var(--warning)',
     SELLER_APPROVED:   'var(--success)',
     SELLER_REJECTED:   'var(--error)',
@@ -42,8 +50,10 @@ const TYPE_COLOR = {
     SELLER_DOWNGRADE_REJECTED: 'var(--error)',
 };
 
-/* build navigation target from a notification */
-const getNavTarget = (n) => {
+/* build navigation target from a notification. isAdmin disambiguates types
+   that are sent to more than one audience (e.g. a quote request goes to
+   either the seller or, for platform products, every admin). */
+const getNavTarget = (n, isAdmin) => {
     switch (n.type) {
         case 'PRODUCT_REVIEW':
             return { path: '/admin/products',   state: { autoFilter: 'PENDING_REVIEW', highlightProductId: n.resourceId } };
@@ -53,6 +63,7 @@ const getNavTarget = (n) => {
         case 'PRODUCT_REJECTED':
         case 'PRODUCT_SUSPENDED':
         case 'PRODUCT_ARCHIVED':
+        case 'PRODUCT_REINSTATED':
             return { path: '/seller/dashboard', state: { highlightProductId: n.resourceId } };
         case 'SELLER_APPROVED':
             return { path: '/seller/dashboard', state: {} };
@@ -64,6 +75,18 @@ const getNavTarget = (n) => {
             return { path: '/account', state: {} };
         case 'SELLER_DOWNGRADE_REJECTED':
             return { path: '/seller/dashboard', state: {} };
+        case 'QUOTE_REQUEST':
+            return isAdmin
+                ? { path: '/admin/quotes', state: {} }
+                : { path: '/seller/quotes', state: {} };
+        case 'QUOTE_RESPONSE':
+            return { path: '/quotes/my', state: {} };
+        case 'NEW_ORDER':
+            return isAdmin
+                ? { path: '/admin/orders', state: {} }
+                : { path: '/seller/dashboard', state: {} };
+        case 'ORDER_STATUS':
+            return { path: '/orders', state: {} };
         default:
             return null;
     }
@@ -86,6 +109,8 @@ const NotificationPanel = () => {
     const navigate  = useNavigate();
     const panelRef  = useRef(null);
     const { items, loading, unreadCount } = useSelector((s) => s.notifications);
+    const { user } = useSelector((s) => s.auth);
+    const isAdmin  = Boolean(user?.roles?.includes('ROLE_ADMIN'));
 
     useEffect(() => {
         dispatch(fetchNotifications());
@@ -109,7 +134,7 @@ const NotificationPanel = () => {
 
     const handleClick = (n) => {
         if (!n.read) dispatch(markNotificationRead(n.id));
-        const dest = getNavTarget(n);
+        const dest = getNavTarget(n, isAdmin);
         if (dest) {
             dispatch(closePanel());
             navigate(dest.path, { state: dest.state });
@@ -233,7 +258,7 @@ const NotificationPanel = () => {
                 ) : (
                     items.map((n) => {
                         const iconColor  = TYPE_COLOR[n.type] ?? 'var(--accent)';
-                        const clickable  = Boolean(getNavTarget(n)) || !n.read;
+                        const clickable  = Boolean(getNavTarget(n, isAdmin)) || !n.read;
                         return (
                         <div
                             key={n.id}
@@ -287,7 +312,7 @@ const NotificationPanel = () => {
                                         {n.message}
                                       </p>
                                 }
-                                {getNavTarget(n) && (
+                                {getNavTarget(n, isAdmin) && (
                                     <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: iconColor, margin: 0 }}>
                                         Click to view
                                     </p>
