@@ -451,6 +451,24 @@ const Navbar = () => {
                             </button>
                         )}
 
+                        {/* Admin/Seller dashboard shortcut — mobile.
+                            Desktop shows this as a persistent "Admin"/"Seller" nav
+                            link; on mobile it would otherwise only be reachable by
+                            opening the hamburger menu, so it gets its own icon here
+                            for one-tap parity with desktop. */}
+                        {isAuthenticated && (isAdmin || isSeller) && (
+                            <button
+                                onClick={() => navigate(isAdmin ? "/admin/dashboard" : "/seller/dashboard")}
+                                aria-label={isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
+                                title={isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
+                                style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                            >
+                                {isAdmin ? <HiViewGrid size={20} /> : <HiShoppingBag size={20} />}
+                            </button>
+                        )}
+
                         {/* Avatar (authenticated) or login icon (guest) */}
                         {isAuthenticated ? (
                             <button
