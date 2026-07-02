@@ -3,8 +3,8 @@ import toast from "react-hot-toast";
 
 /**
  * DowngradeRequestModal — reason prompt for a seller requesting to revert
- * to a standard buyer account. Shared by SellerDashboardPage (Danger Zone)
- * and UserAccountPage (Seller access section) so both entry points submit
+ * to a standard buyer account. Shared by SellerDashboardPage (Account
+ * Management) and UserAccountPage (Seller access section) so both entry points submit
  * through the exact same UX and validation.
  */
 const DowngradeRequestModal = ({ onClose, onConfirm }) => {

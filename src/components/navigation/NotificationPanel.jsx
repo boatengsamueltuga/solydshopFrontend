@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiArrowRight, HiBadgeCheck, HiSwitchHorizontal } from 'react-icons/hi';
+import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiBadgeCheck, HiSwitchHorizontal } from 'react-icons/hi';
 import Tooltip from '@mui/material/Tooltip';
 import { closePanel } from '../../store/reducers/notificationReducer';
 import {
@@ -288,8 +288,8 @@ const NotificationPanel = () => {
                                       </p>
                                 }
                                 {getNavTarget(n) && (
-                                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: iconColor, margin: 0, display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                        <HiArrowRight size={10} /> Click to view
+                                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: iconColor, margin: 0 }}>
+                                        Click to view
                                     </p>
                                 )}
                                 <p style={{

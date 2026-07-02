@@ -89,8 +89,8 @@ const StatCard = memo(({ label, value, sub, loading }) => (
     </div>
 ));
 
-/* ── Danger zone: revert to buyer account ── */
-const DangerZone = ({ downgradeRequest, onOpenModal }) => {
+/* ── Account management: revert to buyer account ── */
+const AccountManagement = ({ downgradeRequest, onOpenModal }) => {
     if (downgradeRequest === undefined) return null;
 
     if (downgradeRequest?.status === "PENDING") {
@@ -110,7 +110,7 @@ const DangerZone = ({ downgradeRequest, onOpenModal }) => {
         <div style={{ background: "var(--surface)", border: "1px solid var(--error)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginTop: "var(--space-8)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
             <div>
                 <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--error)", margin: "0 0 var(--space-2)" }}>
-                    Danger zone
+                    Account Management
                 </p>
                 <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-base)", color: "var(--text)", margin: "0 0 4px" }}>
                     Revert to buyer account
@@ -543,8 +543,8 @@ const SellerDashboardPage = () => {
                 emptyMessage="No products listed yet. Click 'Add Product' to get started."
             />
 
-            {/* ── Danger zone ── */}
-            <DangerZone
+            {/* ── Account management ── */}
+            <AccountManagement
                 downgradeRequest={downgradeRequest}
                 onOpenModal={() => setShowDowngradeModal(true)}
             />
