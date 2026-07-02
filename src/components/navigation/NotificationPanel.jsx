@@ -20,6 +20,7 @@ const TYPE_ICON = {
     PRODUCT_REJECTED:  <HiExclamationCircle />,
     PRODUCT_SUSPENDED: <HiPause />,
     PRODUCT_ARCHIVED:  <HiArchive />,
+    SELLER_APPLICATION: <HiBadgeCheck />,
     SELLER_APPROVED:   <HiBadgeCheck />,
     SELLER_REJECTED:   <HiExclamationCircle />,
     SELLER_DOWNGRADE_REQUEST:  <HiSwitchHorizontal />,
@@ -33,6 +34,7 @@ const TYPE_COLOR = {
     PRODUCT_REJECTED:  'var(--error)',
     PRODUCT_SUSPENDED: '#60a5fa',
     PRODUCT_ARCHIVED:  'var(--text-3)',
+    SELLER_APPLICATION: 'var(--warning)',
     SELLER_APPROVED:   'var(--success)',
     SELLER_REJECTED:   'var(--error)',
     SELLER_DOWNGRADE_REQUEST:  'var(--warning)',
@@ -45,6 +47,8 @@ const getNavTarget = (n) => {
     switch (n.type) {
         case 'PRODUCT_REVIEW':
             return { path: '/admin/products',   state: { autoFilter: 'PENDING_REVIEW', highlightProductId: n.resourceId } };
+        case 'SELLER_APPLICATION':
+            return { path: '/admin/seller-applications', state: {} };
         case 'PRODUCT_APPROVED':
         case 'PRODUCT_REJECTED':
         case 'PRODUCT_SUSPENDED':
