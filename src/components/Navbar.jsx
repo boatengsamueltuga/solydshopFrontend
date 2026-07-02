@@ -341,23 +341,27 @@ const Navbar = () => {
 
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link
-                                    to="/login"
-                                    style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "14px", fontWeight: 500, color: C.textMuted, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
-                                    onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
-                                >
-                                    <HiLogin size={15} aria-hidden="true" />
-                                    Login
-                                </Link>
-                                <Link
-                                    to="/register"
-                                    className="text-sm font-bold rounded-lg px-4 py-2 transition-opacity hover:opacity-90"
-                                    style={{ display: "flex", alignItems: "center", gap: "5px", background: C.btnBg, color: C.btnText, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
-                                >
-                                    <HiUserAdd size={15} aria-hidden="true" />
-                                    Register
-                                </Link>
+                                {!isActive("/login") && (
+                                    <Link
+                                        to="/login"
+                                        style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "14px", fontWeight: 500, color: C.textMuted, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
+                                        onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
+                                    >
+                                        <HiLogin size={15} aria-hidden="true" />
+                                        Login
+                                    </Link>
+                                )}
+                                {!isActive("/register") && (
+                                    <Link
+                                        to="/register"
+                                        className="text-sm font-bold rounded-lg px-4 py-2 transition-opacity hover:opacity-90"
+                                        style={{ display: "flex", alignItems: "center", gap: "5px", background: C.btnBg, color: C.btnText, textDecoration: "none", fontFamily: "Inter, sans-serif" }}
+                                    >
+                                        <HiUserAdd size={15} aria-hidden="true" />
+                                        Register
+                                    </Link>
+                                )}
                             </div>
                         )}
                     </div>
@@ -511,13 +515,15 @@ const Navbar = () => {
                                 {initials}
                             </button>
                         ) : (
-                            <Link
-                                to="/login"
-                                aria-label="Login"
-                                style={{ color: C.textMuted, padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px" }}
-                            >
-                                <HiLogin size={20} />
-                            </Link>
+                            !isActive("/login") && (
+                                <Link
+                                    to="/login"
+                                    aria-label="Login"
+                                    style={{ color: C.textMuted, padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px" }}
+                                >
+                                    <HiLogin size={20} />
+                                </Link>
+                            )
                         )}
 
                         {/* Hamburger */}
@@ -624,12 +630,16 @@ const Navbar = () => {
 
                         {!isAuthenticated ? (
                             <div className="flex gap-3 mt-2">
-                                <Link to="/login"    onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm rounded-lg" style={{ border: `1px solid ${C.border}`, color: C.textMuted, textDecoration: "none" }}>
-                                    <HiLogin size={14} aria-hidden="true" /> Login
-                                </Link>
-                                <Link to="/register" onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-bold rounded-lg" style={{ background: C.btnBg, color: C.btnText, textDecoration: "none" }}>
-                                    <HiUserAdd size={14} aria-hidden="true" /> Register
-                                </Link>
+                                {!isActive("/login") && (
+                                    <Link to="/login"    onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm rounded-lg" style={{ border: `1px solid ${C.border}`, color: C.textMuted, textDecoration: "none" }}>
+                                        <HiLogin size={14} aria-hidden="true" /> Login
+                                    </Link>
+                                )}
+                                {!isActive("/register") && (
+                                    <Link to="/register" onClick={closeMenu} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-bold rounded-lg" style={{ background: C.btnBg, color: C.btnText, textDecoration: "none" }}>
+                                        <HiUserAdd size={14} aria-hidden="true" /> Register
+                                    </Link>
+                                )}
                             </div>
                         ) : (
                             <button
