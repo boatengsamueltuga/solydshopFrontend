@@ -150,12 +150,12 @@ const AuthLayout = ({ children }) => (
 
     <style>{`
       @media (max-width: 767px) {
-        .auth-shell { flex-direction: column; }
+        .auth-shell { flex-direction: column !important; }
         .auth-brand-panel {
-          width: 100%;
-          border-right: none;
-          border-bottom: 1px solid var(--border);
-          padding: 32px 24px;
+          width: 100% !important;
+          border-right: none !important;
+          border-bottom: 1px solid var(--border) !important;
+          padding: 32px 24px !important;
         }
       }
     `}</style>
