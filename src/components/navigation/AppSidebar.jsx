@@ -12,6 +12,7 @@ import {
   HiPlusCircle,
   HiDocumentText,
   HiBadgeCheck,
+  HiUserRemove,
 } from 'react-icons/hi';
 
 import api from '../../api/api';
@@ -40,6 +41,7 @@ const ADMIN_GROUPS = [
       { to: '/admin/users',                label: 'Users',        Icon: HiUsers },
       { to: '/admin/quotes',               label: 'Quotes',       Icon: HiDocumentText },
       { to: '/admin/seller-applications',  label: 'Applications', Icon: HiBadgeCheck },
+      { to: '/admin/seller-downgrade-requests', label: 'Downgrades', Icon: HiUserRemove },
     ],
   },
 ];

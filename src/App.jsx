@@ -72,6 +72,7 @@ const AdminCategoriesPage            = lazy(() => import("./pages/AdminCategorie
 const AdminOrdersPage                = lazy(() => import("./pages/AdminOrdersPage"));
 const AdminUsersPage                 = lazy(() => import("./pages/AdminUsersPage"));
 const AdminSellerApplicationsPage    = lazy(() => import("./pages/AdminSellerApplicationsPage"));
+const AdminSellerDowngradeRequestsPage = lazy(() => import("./pages/AdminSellerDowngradeRequestsPage"));
 const SellerApplicationPage          = lazy(() => import("./pages/SellerApplicationPage"));
 const ProductDetailPage    = lazy(() => import("./pages/ProductDetailPage"));
 const AboutPage            = lazy(() => import("./pages/AboutPage"));
@@ -141,6 +142,7 @@ function App() {
                     <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminUsersPage /></ProtectedRoute>} />
                     <Route path="/admin/quotes" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminQuotesPage /></ProtectedRoute>} />
                     <Route path="/admin/seller-applications" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminSellerApplicationsPage /></ProtectedRoute>} />
+                    <Route path="/admin/seller-downgrade-requests" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminSellerDowngradeRequestsPage /></ProtectedRoute>} />
 
                     <Route path="/products/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
 

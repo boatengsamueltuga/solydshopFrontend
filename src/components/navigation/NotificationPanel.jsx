@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiArrowRight, HiBadgeCheck } from 'react-icons/hi';
+import { HiBell, HiX, HiCheckCircle, HiShoppingBag, HiTrash, HiClipboardList, HiExclamationCircle, HiArchive, HiPause, HiArrowRight, HiBadgeCheck, HiSwitchHorizontal } from 'react-icons/hi';
 import Tooltip from '@mui/material/Tooltip';
 import { closePanel } from '../../store/reducers/notificationReducer';
 import {
@@ -22,6 +22,9 @@ const TYPE_ICON = {
     PRODUCT_ARCHIVED:  <HiArchive />,
     SELLER_APPROVED:   <HiBadgeCheck />,
     SELLER_REJECTED:   <HiExclamationCircle />,
+    SELLER_DOWNGRADE_REQUEST:  <HiSwitchHorizontal />,
+    SELLER_DOWNGRADE_APPROVED: <HiCheckCircle />,
+    SELLER_DOWNGRADE_REJECTED: <HiExclamationCircle />,
 };
 
 const TYPE_COLOR = {
@@ -32,6 +35,9 @@ const TYPE_COLOR = {
     PRODUCT_ARCHIVED:  'var(--text-3)',
     SELLER_APPROVED:   'var(--success)',
     SELLER_REJECTED:   'var(--error)',
+    SELLER_DOWNGRADE_REQUEST:  'var(--warning)',
+    SELLER_DOWNGRADE_APPROVED: 'var(--success)',
+    SELLER_DOWNGRADE_REJECTED: 'var(--error)',
 };
 
 /* build navigation target from a notification */
@@ -48,6 +54,12 @@ const getNavTarget = (n) => {
             return { path: '/seller/dashboard', state: {} };
         case 'SELLER_REJECTED':
             return { path: '/seller-application', state: {} };
+        case 'SELLER_DOWNGRADE_REQUEST':
+            return { path: '/admin/seller-downgrade-requests', state: {} };
+        case 'SELLER_DOWNGRADE_APPROVED':
+            return { path: '/account', state: {} };
+        case 'SELLER_DOWNGRADE_REJECTED':
+            return { path: '/seller/dashboard', state: {} };
         default:
             return null;
     }
