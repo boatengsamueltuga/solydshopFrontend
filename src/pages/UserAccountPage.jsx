@@ -325,6 +325,42 @@ const UserAccountPage = () => {
                         </section>
                     );
 
+                    // status === "APPROVED" while isBuyerOnly means the user was
+                    // approved as a seller before but has since been downgraded
+                    // back to a buyer — offer to reapply rather than hiding this
+                    // section entirely.
+                    if (status === "APPROVED") return (
+                        <section style={{ background: "var(--surface-mid)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "var(--space-5)", marginBottom: "var(--space-6)" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                                <div>
+                                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--accent)", margin: "0 0 var(--space-1)" }}>
+                                        Sell on SolydShop
+                                    </p>
+                                    <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 var(--space-2)" }}>
+                                        Ready to sell again?
+                                    </p>
+                                    <p style={{ color: "var(--text-3)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                                        You previously sold on SolydShop as {sellerApp.businessName}. Submit a new application to regain seller access.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => navigate("/seller-application")}
+                                    style={{
+                                        flexShrink: 0, padding: "var(--space-3) var(--space-5)",
+                                        background: "var(--accent)", border: "none", borderRadius: "var(--r-md)",
+                                        color: "var(--text)", fontFamily: "var(--font-body)", fontWeight: 700,
+                                        fontSize: "var(--text-sm)", cursor: "pointer", letterSpacing: "0.04em",
+                                        textTransform: "uppercase", transition: "opacity 0.15s", whiteSpace: "nowrap",
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.opacity = "0.88"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+                                >
+                                    Apply again
+                                </button>
+                            </div>
+                        </section>
+                    );
+
                     return null;
                 })()}
 
