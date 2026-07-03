@@ -33,20 +33,37 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
           <CssBaseline />
 
-          {/* Global toast notifications */}
+          {/* Global toast notifications — themed off the app's design tokens
+              so they adapt to light/dark mode and signal severity by color,
+              not just icon. */}
           <Toaster
             position="top-right"
             reverseOrder={false}
             toastOptions={{
-              duration: 2000,
+              duration: 3000,
               style: {
-                background: '#111827',
-                color: '#ffffff',
-                borderRadius: '10px',
-                padding: '16px',
-                fontSize: '16px'
-              }
+                background: 'var(--surface-high)',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
+                borderLeft: '3px solid var(--border-strong)',
+                borderRadius: 'var(--r-lg)',
+                padding: 'var(--space-4)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-sm)',
+                boxShadow: 'var(--shadow-2)',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: { primary: 'var(--success)', secondary: 'var(--surface-high)' },
+                style: { borderLeft: '3px solid var(--success)' },
+              },
+              error: {
+                duration: 4500,
+                iconTheme: { primary: 'var(--error)', secondary: 'var(--surface-high)' },
+                style: { borderLeft: '3px solid var(--error)' },
+              },
             }}
+            containerStyle={{ zIndex: 'var(--z-toast)' }}
           />
 
           <ErrorBoundary>

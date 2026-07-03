@@ -141,7 +141,12 @@ api.interceptors.response.use(
                     }
                 );
 
-                window.location.href = "/login";
+                // window.location.href triggers a full page reload, which tears
+                // down the React tree (and the toast just scheduled) before the
+                // browser ever paints it. Give it a moment to actually render.
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 1500);
             }
         }
 

@@ -198,7 +198,7 @@ const AdminProductsPage = () => {
 
     const fetchCategories = useCallback(async () => {
         try {
-            const res = await api.get("/public/categories");
+            const res = await api.get("/public/categories?pageSize=1000");
             setCategories(res.data.content ?? []);
         } catch {
             // non-critical
