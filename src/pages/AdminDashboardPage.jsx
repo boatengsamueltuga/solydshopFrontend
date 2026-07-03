@@ -138,7 +138,7 @@ const AdminDashboardPage = () => {
         try {
             const [prodRes, catRes, ordRes, usrRes] = await Promise.all([
                 api.get("/public/products"),
-                api.get("/public/categories"),
+                api.get("/public/categories?pageSize=1000"),
                 api.get("/order/admin"),
                 api.get("/admin/users"),
             ]);
