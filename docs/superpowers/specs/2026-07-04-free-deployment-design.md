@@ -103,6 +103,28 @@ yourname.duckdns.org {
 }
 ```
 
+### 5b. Production seed-data fix (already applied, `solydshop_ecomm`)
+
+A structural review before implementation surfaced that `DataInitializer.java`
+unconditionally seeds `admin@mail.com` / `seller1@mail.com` / etc. with a
+hardcoded password (`1234`) on every boot, in every environment — deploying
+as-is would put a publicly-known admin login on the live production
+database. Fixed by annotating it `@Profile("!prod")`, so it only runs when
+`SPRING_PROFILES_ACTIVE` is not `prod` (the VM's `.env` will set
+`SPRING_PROFILES_ACTIVE=prod`). Production gets no default admin account —
+create the real one by signing up normally, then granting `ROLE_ADMIN`
+directly in Postgres:
+```sql
+UPDATE user_roles SET role_id = (SELECT role_id FROM roles WHERE role_name = 'ROLE_ADMIN')
+WHERE user_id = (SELECT user_id FROM users WHERE email = 'your-real-email@example.com');
+```
+Also removed `data.sql` (confirmed dead code — Spring Boot only auto-runs
+`data.sql` for embedded databases, and no `spring.sql.init.mode` override
+existed to force it for Postgres, so it never actually executed; it also
+duplicated `DataInitializer`'s seed data with separate hardcoded IDs). Added
+`application.properties.example` as a bootstrap template for new developers,
+listing every required property with placeholder values.
+
 ### 6. CI/CD
 
 **Backend** (`solydshop_ecomm/.github/workflows/deploy.yml`): on push to
