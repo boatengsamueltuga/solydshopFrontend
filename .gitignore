@@ -27,3 +27,6 @@ dist-ssr
 # Claude Code tooling
 .agents/
 skills-lock.json
+
+# Subagent-driven development scratch state
+.superpowers/
