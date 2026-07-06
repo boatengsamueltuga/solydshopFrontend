@@ -125,6 +125,17 @@ duplicated `DataInitializer`'s seed data with separate hardcoded IDs). Added
 `application.properties.example` as a bootstrap template for new developers,
 listing every required property with placeholder values.
 
+**Follow-up (Task 10 review):** the original `@Profile("!prod")` fix put
+*all* seeding — including the `ROLE_USER`/`ROLE_ADMIN`/`ROLE_SELLER` rows —
+behind the non-prod profile, which was a Critical bug: with no roles in the
+database, production signup itself failed (it depends on `ROLE_USER`
+existing). Role-seeding was split out into a separate, always-on
+`RoleSeeder` component that runs in every environment, while
+`DataInitializer` keeps `@Profile("!prod")` and now only seeds the demo
+accounts. The distinction: roles are structural data every environment
+needs to function; demo accounts with known passwords are a dev-only
+convenience.
+
 ### 6. CI/CD
 
 **Backend** (`solydshop_ecomm/.github/workflows/deploy.yml`): on push to
