@@ -6,9 +6,11 @@
 
 ## Goal
 
-Get SolydShop hosted publicly, for free, with production-quality behavior — no
+Get SolydShop hosted publicly, cheaply, with production-quality behavior — no
 sleeping/cold-start API, no exposed secrets, auto-deploy on push, and a
-documented recovery path (backups) if something goes wrong.
+documented recovery path (backups) if something goes wrong. Frontend hosting
+(Vercel) is free; the backend runs on a low-cost DigitalOcean droplet rather
+than a free-tier host (see "Why DigitalOcean over Oracle Cloud" below).
 
 ## Architecture
 
@@ -19,10 +21,10 @@ GitHub (main branch)
    │              └── serves the React static build at https://<project>.vercel.app
    │
    └── push ──► GitHub Actions workflow (solydshop_ecomm repo)
-                  └── mvn test → build Docker image (linux/arm64) → push to ghcr.io
-                        └── SSH into Oracle Cloud VM → docker compose pull && up -d
+                  └── mvn test → build Docker image (linux/amd64) → push to ghcr.io
+                        └── SSH into DigitalOcean droplet → docker compose pull && up -d
 
-Oracle Cloud "Always Free" VM (Ampere A1, ARM, always-on, static public IP)
+DigitalOcean droplet (Basic, Ubuntu 24.04, always-on, static public IP)
    │
    ├── Caddy (reverse proxy container) — automatic free HTTPS via Let's Encrypt,
    │     bound to a DuckDNS hostname (Let's Encrypt requires a hostname, not a bare IP)
@@ -31,13 +33,25 @@ Oracle Cloud "Always Free" VM (Ampere A1, ARM, always-on, static public IP)
 ```
 
 **Why this shape:** Frontend and backend are fully decoupled onto different
-free hosts talking over HTTPS + CORS — the standard SPA/API pattern, and it
-matches the existing two-repo structure. Vercel's CDN never sleeps. An Oracle
-Always Free VM is a real always-on box, not a free-tier container platform
-that suspends after inactivity — this is what buys "fast" without paying for
-it. Docker Compose keeps the backend + DB + proxy stack reproducible from one
-file instead of hand-run `apt install` steps that only exist in one admin's
-memory.
+hosts talking over HTTPS + CORS — the standard SPA/API pattern, and it
+matches the existing two-repo structure. Vercel's CDN never sleeps. A
+DigitalOcean droplet is a real always-on box, not a free-tier container
+platform that suspends after inactivity — this is what buys "fast" without
+the cold-start problem. Docker Compose keeps the backend + DB + proxy stack
+reproducible from one file instead of hand-run `apt install` steps that only
+exist in one admin's memory.
+
+**Why DigitalOcean over Oracle Cloud:** the original design targeted
+Oracle's Always Free Ampere A1 (ARM) tier for zero infrastructure cost, but
+that tier is notoriously hard to actually provision (frequent "out of host
+capacity" errors across regions) and has a history of reclaiming
+free-tier resources it deems idle. Oracle's ARM instances also forced the
+CI image build onto `linux/arm64`, and Oracle's default Ubuntu image blocks
+80/443 at the iptables level in addition to the console security list — an
+extra footgun. DigitalOcean droplets provision instantly, default to
+`amd64`, have simpler firewall handling, and a much simpler console. The
+tradeoff is real cost (a few dollars/month) instead of Oracle's
+theoretical $0 — accepted deliberately for reliability.
 
 ## Components
 
@@ -140,10 +154,10 @@ convenience.
 
 **Backend** (`solydshop_ecomm/.github/workflows/deploy.yml`): on push to
 `main` — run `./mvnw test` (fail fast before building anything), then build
-the Docker image for `linux/arm64` and push to `ghcr.io/<owner>/solydshop-backend`
+the Docker image for `linux/amd64` and push to `ghcr.io/<owner>/solydshop-backend`
 using the repo's built-in `GITHUB_TOKEN` (no separate registry account),
-then SSH into the VM (`docker/build-push-action` + `appleboy/ssh-action`) and
-run `docker compose pull backend && docker compose up -d backend`.
+then SSH into the droplet (`docker/build-push-action` + `appleboy/ssh-action`)
+and run `docker compose pull backend && docker compose up -d backend`.
 
 Required GitHub Actions secrets (backend repo): `VM_HOST`, `VM_USER`,
 `VM_SSH_KEY` (private key of a deploy-only keypair).
@@ -161,14 +175,16 @@ the Vercel dashboard.
 
 ### 7. One-time manual setup (user-executed, credentials only the user holds)
 
-1. Oracle Cloud: sign up for Always Free tier, create an Ampere A1 (ARM) VM
-   with a reserved static public IP, open ports 22/80/443 in the security list.
-2. DuckDNS: sign up, claim a subdomain, point it at the VM's static IP.
-3. VM bootstrap: SSH in once, run a provided setup script (installs Docker +
-   Compose plugin), create the deploy directory with `docker-compose.yml`,
-   `Caddyfile`, and a real `.env`.
-4. Generate a deploy-only SSH keypair, add the public key to the VM's
-   `authorized_keys`, add the private key + VM host/user as GitHub secrets.
+1. DigitalOcean: sign up, create a Basic Ubuntu 24.04 droplet (2 GB RAM
+   recommended), add a firewall allowing ports 22/80/443. The droplet's
+   public IP is static by default.
+2. DuckDNS: sign up, claim a subdomain, point it at the droplet's IP.
+3. Droplet bootstrap: SSH in once, run a provided setup script (installs
+   Docker + Compose plugin), create the deploy directory with
+   `docker-compose.yml`, `Caddyfile`, and a real `.env`.
+4. Generate a deploy-only SSH keypair, add the public key to the droplet's
+   `authorized_keys`, add the private key + droplet host/user as GitHub
+   secrets.
 5. Vercel: connect the frontend repo, set `VITE_BACK_END_URL`,
    `VITE_FRONTEND_URL`, `VITE_STRIPE_PUBLISHABLE_KEY` as project env vars.
 6. Stripe: replace local `stripe listen` CLI forwarding with a real webhook
