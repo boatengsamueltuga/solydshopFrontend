@@ -17,6 +17,33 @@ const api = axios.create({
 
 /*
 |--------------------------------------------------------------------------
+| CSRF Token Cache
+|--------------------------------------------------------------------------
+| When frontend and backend are on different registrable domains (e.g.
+| Vercel + a separate API domain), JS on the frontend can never read the
+| XSRF-TOKEN cookie set by the backend - cookies are strictly scoped per
+| domain regardless of SameSite/Secure. So we fetch the token value once
+| via a JSON endpoint and cache it here as a fallback for when the cookie
+| read comes up empty (same-domain/local dev keeps working via the cookie).
+*/
+
+let cachedCsrfToken = null;
+let cachedCsrfHeaderName = "X-XSRF-TOKEN";
+
+export const primeCsrfToken = async () => {
+    try {
+        const { data } = await api.get("/auth/csrf", { silent: true });
+        cachedCsrfToken = data.token;
+        cachedCsrfHeaderName = data.headerName || "X-XSRF-TOKEN";
+    } catch {
+        // best-effort - state-changing requests will just fail CSRF checks
+    }
+};
+
+
+
+/*
+|--------------------------------------------------------------------------
 | Request Interceptor
 |--------------------------------------------------------------------------
 */
@@ -25,14 +52,18 @@ api.interceptors.request.use(
 
     (config) => {
 
-    const token = document.cookie
+    const cookieToken = document.cookie
         .split("; ")
         .find(row => row.startsWith("XSRF-TOKEN="))
         ?.split("=")[1];
 
-    if (token) {
+    if (cookieToken) {
 
-        config.headers["X-XSRF-TOKEN"] = token;
+        config.headers["X-XSRF-TOKEN"] = cookieToken;
+
+    } else if (cachedCsrfToken) {
+
+        config.headers[cachedCsrfHeaderName] = cachedCsrfToken;
     }
 
     return config;

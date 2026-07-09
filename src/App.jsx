@@ -48,7 +48,7 @@ import ScrollToTop      from "./components/ScrollToTop";
 
 import { restoreUser, setInitialized } from "./features/auth/authSlice";
 import { setWishlistItems } from "./features/wishlist/wishlistSlice";
-import api from "./api/api";
+import api, { primeCsrfToken } from "./api/api";
 
 const HomePage             = lazy(() => import("./pages/HomePage"));
 const LoginPage            = lazy(() => import("./pages/LoginPage"));
@@ -105,6 +105,7 @@ function App() {
                 dispatch(setInitialized());
             }
         };
+        primeCsrfToken();
         restoreSession();
     }, [dispatch]);
 
