@@ -94,7 +94,7 @@ function App() {
     useEffect(() => {
         const restoreSession = async () => {
             try {
-                const response = await api.get("/auth/me");
+                const response = await api.get("/auth/me", { silent: true });
                 dispatch(restoreUser(response.data));
                 api.get("/wishlist")
                     .then((r) => dispatch(setWishlistItems(r.data)))
