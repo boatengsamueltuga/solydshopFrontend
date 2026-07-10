@@ -46,7 +46,9 @@ const AuthLayout = ({ children }) => (
 
       <div style={{ position: 'relative', zIndex: 1 }}>
 
-        {/* Label */}
+        {/* Label — kept compact (no large headline below it) so this
+            panel doesn't push the actual form off-screen on mobile,
+            where it stacks above the form instead of sitting beside it. */}
         <p style={{
           fontFamily:    'var(--font-mono)',
           fontSize:      'var(--text-2xs)',
@@ -54,26 +56,10 @@ const AuthLayout = ({ children }) => (
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color:         'var(--text-3)',
-          marginBottom:  'var(--space-3)',
+          marginBottom:  'var(--space-6)',
         }}>
           Industrial Procurement
         </p>
-
-        {/* Headline — the brand name already appears in the Navbar right
-            above this panel, so lead with the value prop instead of
-            repeating "SolydShop" a second time. */}
-        <h1 style={{
-          fontFamily:    'var(--font-display)',
-          fontWeight:    700,
-          fontSize:      'clamp(1.5rem, 2.4vw, 2rem)',
-          lineHeight:    1.25,
-          letterSpacing: '-0.01em',
-          color:         'var(--text)',
-          maxWidth:      '300px',
-          margin:        '0 0 var(--space-8)',
-        }}>
-          The parts catalog built for fleet managers, mechanics, and construction teams.
-        </h1>
 
         {/* Feature bullets */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
