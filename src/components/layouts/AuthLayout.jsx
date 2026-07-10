@@ -59,30 +59,21 @@ const AuthLayout = ({ children }) => (
           Industrial Procurement
         </p>
 
-        {/* Wordmark */}
+        {/* Headline — the brand name already appears in the Navbar right
+            above this panel, so lead with the value prop instead of
+            repeating "SolydShop" a second time. */}
         <h1 style={{
           fontFamily:    'var(--font-display)',
           fontWeight:    700,
-          fontSize:      'clamp(2rem, 3vw, 2.75rem)',
-          lineHeight:    1.1,
-          letterSpacing: '-0.02em',
+          fontSize:      'clamp(1.5rem, 2.4vw, 2rem)',
+          lineHeight:    1.25,
+          letterSpacing: '-0.01em',
           color:         'var(--text)',
-          margin:        '0 0 var(--space-6)',
-        }}>
-          Solyd<span style={{ color: 'var(--accent)' }}>Shop</span>
-        </h1>
-
-        {/* Tagline */}
-        <p style={{
-          fontFamily:    'var(--font-body)',
-          fontSize:      'var(--text-sm)',
-          color:         'var(--text-2)',
-          lineHeight:    1.7,
-          maxWidth:      '280px',
-          marginBottom:  'var(--space-8)',
+          maxWidth:      '300px',
+          margin:        '0 0 var(--space-8)',
         }}>
           The parts catalog built for fleet managers, mechanics, and construction teams.
-        </p>
+        </h1>
 
         {/* Feature bullets */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
