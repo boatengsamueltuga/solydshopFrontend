@@ -369,49 +369,10 @@ const Navbar = () => {
                     {/* ── Mobile: utility strip + hamburger ────────── */}
                     <div className="md:hidden flex items-center gap-0.5">
 
-                        {/* Home — desktop shows this in the persistent nav; on
-                            mobile it's otherwise only reachable via the (unlabeled)
-                            logo tap, or not at all on pages where MobileBottomNav
-                            is hidden (e.g. /login). */}
-                        <button
-                            onClick={() => navigate("/")}
-                            aria-label="Home"
-                            title="Home"
-                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
-                        >
-                            <HiHome size={20} />
-                        </button>
-
-                        {/* Theme toggle */}
-                        <button
-                            onClick={toggleTheme}
-                            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-                            style={{ color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
-                        >
-                            {isDark ? <HiSun size={20} /> : <HiMoon size={20} />}
-                        </button>
-
-                        {/* Wishlist with badge — mobile */}
-                        {isAuthenticated && (
-                            <button
-                                onClick={() => navigate("/wishlist")}
-                                aria-label={wishlistCount > 0 ? `Wishlist (${wishlistCount} items)` : "Wishlist"}
-                                style={{ position: "relative", color: C.textMuted, background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", borderRadius: "8px", transition: "color 0.15s" }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = C.textMuted)}
-                            >
-                                <FaHeart size={20} />
-                                {wishlistCount > 0 && (
-                                    <span style={{ position: "absolute", top: "-2px", right: "-2px", minWidth: "17px", height: "17px", borderRadius: "9px", background: "var(--error)", color: "#fff", fontSize: "10px", fontWeight: 700, fontFamily: "Inter, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: `1.5px solid ${C.bg}`, lineHeight: 1 }}>
-                                        {wishlistCount > 99 ? "99+" : wishlistCount}
-                                    </span>
-                                )}
-                            </button>
-                        )}
+                        {/* Home, Theme, and Wishlist are reachable via the
+                            hamburger dropdown menu below - kept off this
+                            persistent strip so it doesn't overcrowd small
+                            screens. */}
 
                         {/* Notification bell — mobile */}
                         {isAuthenticated && (
