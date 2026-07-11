@@ -529,7 +529,8 @@ const Navbar = () => {
                                 to={isAdmin ? "/admin/dashboard" : "/seller/dashboard"}
                                 onClick={closeMenu}
                                 style={{
-                                    display:        "flex",
+                                    display:        "inline-flex",
+                                    alignSelf:      "flex-start",
                                     alignItems:     "center",
                                     gap:            "8px",
                                     marginTop:      "10px",
