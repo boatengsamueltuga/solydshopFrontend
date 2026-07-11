@@ -53,7 +53,7 @@ export default function ContactPage() {
                         <p style={{ fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: C.text3, marginBottom: "14px" }}>
                             What Sales Can Help With
                         </p>
-                        <ul style={{ margin: 0, paddingLeft: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <ul style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px", listStyleType: "disc", listStylePosition: "outside" }}>
                             {[
                                 "Bulk and volume orders",
                                 "OEM sourcing for unlisted parts",
