@@ -547,7 +547,7 @@ const Navbar = () => {
                                     : <HiShoppingBag size={16} aria-hidden="true" style={{ flexShrink: 0, color: "var(--accent)" }} />
                                 }
                                 <div>
-                                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, fontFamily: "Inter, sans-serif", color: "var(--accent)" }}>
+                                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, fontFamily: "Inter, sans-serif", color: C.text }}>
                                         {isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
                                     </p>
                                     <p style={{ margin: 0, fontSize: "11px", fontFamily: "Inter, sans-serif", color: C.textMuted }}>
