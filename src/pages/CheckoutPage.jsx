@@ -290,19 +290,19 @@ const AddressForm = ({ onContinue, hasBlockedItems }) => {
                 Shipping Details
             </p>
             <Stack spacing={2}>
-                <TextField label="Company Name"        value={companyName} onChange={(e) => setCompanyName(e.target.value)} fullWidth size="small" inputProps={{ onAnimationStart: handleAutofillAnimation }} />
-                <TextField label="Contact Name *"      value={contactName} onChange={(e) => setContactName(e.target.value)} fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
-                <TextField label="Address Line 1 *"    value={address1}    onChange={(e) => setAddress1(e.target.value)}    fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
-                <TextField label="Address Line 2"      value={address2}    onChange={(e) => setAddress2(e.target.value)}    fullWidth size="small" inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                <TextField label="Company Name"        value={companyName} onChange={(e) => setCompanyName(e.target.value)} fullWidth size="small" autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                <TextField label="Contact Name *"      value={contactName} onChange={(e) => setContactName(e.target.value)} fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                <TextField label="Address Line 1 *"    value={address1}    onChange={(e) => setAddress1(e.target.value)}    fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                <TextField label="Address Line 2"      value={address2}    onChange={(e) => setAddress2(e.target.value)}    fullWidth size="small" autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
                 <Stack direction="row" spacing={2}>
-                    <TextField label="City *"           value={city}        onChange={(e) => setCity(e.target.value)}        fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
-                    <TextField label="State / Province *" value={state}     onChange={(e) => setState(e.target.value)}       fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                    <TextField label="City *"           value={city}        onChange={(e) => setCity(e.target.value)}        fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                    <TextField label="State / Province *" value={state}     onChange={(e) => setState(e.target.value)}       fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
                 </Stack>
                 <Stack direction="row" spacing={2}>
-                    <TextField label="ZIP / Postal Code *" value={zip}     onChange={(e) => setZip(e.target.value)}         fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
-                    <TextField label="Country *"        value={country}     onChange={(e) => setCountry(e.target.value)}     fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                    <TextField label="ZIP / Postal Code *" value={zip}     onChange={(e) => setZip(e.target.value)}         fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                    <TextField label="Country *"        value={country}     onChange={(e) => setCountry(e.target.value)}     fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
                 </Stack>
-                <TextField label="Phone (optional)"    value={phone}       onChange={(e) => setPhone(e.target.value)}       fullWidth size="small" inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                <TextField label="Phone (optional)"    value={phone}       onChange={(e) => setPhone(e.target.value)}       fullWidth size="small" autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
             </Stack>
 
             <button
