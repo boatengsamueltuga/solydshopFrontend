@@ -2,6 +2,30 @@
 @import "./styles/typography.css";
 @import "tailwindcss";
 
+/* ── Notification panel ──────────────────────────────────────────────────
+   Anchored via `right: 0` to the bell button's own (icon-sized) wrapper,
+   which sits near the right edge of the mobile header - a fixed 340px
+   width extending leftward from there overflows past the left edge of the
+   viewport on phones. Below the sm breakpoint, switch to viewport-fixed
+   positioning centered horizontally instead of anchoring to the bell. */
+.solyd-notification-panel {
+    position: absolute;
+    top:      calc(100% + 8px);
+    right:    0;
+    width:    340px;
+}
+@media (max-width: 640px) {
+    .solyd-notification-panel {
+        position:  fixed;
+        top:       calc(var(--topbar-height) + 8px);
+        left:      50%;
+        right:     auto;
+        transform: translateX(-50%);
+        width:     calc(100vw - 24px);
+        max-width: 340px;
+    }
+}
+
 /* ── Stripe Link floating button ─────────────────────────────────────────────
    Stripe injects a persistent fixed-position Link button into document.body
    outside the React root. Hide it on every page except the checkout page,
