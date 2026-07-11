@@ -24,6 +24,7 @@ distinct roles — buyers, sellers, and admins — on top of a Spring Boot REST 
 - [Overview](#overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
@@ -32,6 +33,7 @@ distinct roles — buyers, sellers, and admins — on top of a Spring Boot REST 
 - [Roles](#roles)
 - [Deployment](#deployment)
 - [Related](#related)
+- [Author](#author)
 
 ## Overview
 
@@ -79,6 +81,20 @@ single generic storefront.
 - **Notifications:** React Hot Toast
 - **Linting:** ESLint 10
 - **Deployment:** Vercel
+
+## Architecture
+
+```
+┌──────────────┐   JWT cookie + CSRF   ┌──────────────────┐        ┌──────────────┐
+│   React SPA  │ ────────────────────► │  Spring Boot API │ ─────► │  PostgreSQL  │
+│  (this repo, │ ◄──────────────────── │ (solydshop_ecomm)│        └──────────────┘
+│   Vercel)    │      JSON / REST      │  (DigitalOcean)  │ ─────► Stripe (payments)
+└──────────────┘                       └──────────────────┘ ─────► Cloudinary (images)
+```
+
+The frontend never talks to Stripe or Cloudinary directly for anything security-sensitive — the
+backend creates the Stripe PaymentIntent and proxies image uploads to Cloudinary. The frontend
+only holds the Stripe *publishable* key needed to confirm payment client-side.
 
 ## Project Structure
 
@@ -169,3 +185,11 @@ the backend repo for the full production runbook covering both this frontend and
 
 - **Backend:** [solydshop_ecomm](https://github.com/boatengsamueltuga/solydshop_ecomm) — Spring Boot 3.5 / Java 17 REST API
 - **Live site:** [solydshop.vercel.app](https://solydshop.vercel.app)
+
+## Author
+
+**Samuel Nketiah Boateng**
+Full-Stack / Java Backend Developer
+
+[![GitHub](https://img.shields.io/badge/GitHub-boatengsamueltuga-181717?logo=github&logoColor=fff)](https://github.com/boatengsamueltuga)
+[![Email](https://img.shields.io/badge/Email-boatengsamuel237%40gmail.com-D14836?logo=gmail&logoColor=fff)](mailto:boatengsamuel237@gmail.com)
