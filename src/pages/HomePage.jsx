@@ -312,7 +312,7 @@ const HomePage = () => {
         dispatch(fetchProductsStart());
         setProductError(null);
         try {
-            let url = `/public/products?pageNumber=${page}&pageSize=8&`;
+            let url = `/public/products?pageNumber=${page}&pageSize=12&`;
             if (kw.trim())    url += `keyword=${encodeURIComponent(kw)}&`;
             if (catId)        url += `categoryId=${catId}&`;
             if (max < 100000) url += `maxPrice=${max}&`;
