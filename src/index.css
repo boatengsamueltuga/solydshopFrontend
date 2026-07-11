@@ -128,6 +128,23 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
     caret-color:             var(--text);
     transition: background-color 9999s ease-in-out 0s, box-shadow 9999s ease-in-out 0s;
 }
+
+/* Some iOS WebKit builds paint the autofill highlight in a way that
+   ignores the box-shadow override above entirely. As a last-resort,
+   JS-visible signal, attach a no-op animation to the autofill state so
+   components can detect the exact moment autofill fires (via
+   onAnimationStart) and force the correct colors directly with JS -
+   see CheckoutPage.jsx's handleAutofillAnimation. */
+@keyframes onAutoFillStart { from {} to {} }
+@keyframes onAutoFillCancel { from {} to {} }
+.MuiOutlinedInput-input:-webkit-autofill,
+.MuiOutlinedInput-input:autofill {
+    animation-name: onAutoFillStart;
+}
+.MuiOutlinedInput-input:not(:-webkit-autofill):not(:autofill) {
+    animation-name: onAutoFillCancel;
+}
+
 [data-theme="dark"] .MuiInputLabel-root {
     color: var(--text-3) !important;
 }
