@@ -144,11 +144,8 @@ const NotificationPanel = () => {
     return (
         <div
             ref={panelRef}
+            className="solyd-notification-panel"
             style={{
-                position:        'absolute',
-                top:             'calc(100% + 8px)',
-                right:           0,
-                width:           '340px',
                 maxHeight:       '480px',
                 backgroundColor: 'var(--surface)',
                 border:          '1px solid var(--border)',
