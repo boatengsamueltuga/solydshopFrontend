@@ -19,6 +19,25 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { CircularProgress } from "@mui/material";
 import { HiArrowLeft, HiCheckCircle, HiCube } from "react-icons/hi";
 
+/* Some iOS WebKit builds paint the browser's autofill highlight in a
+   way that ignores the CSS box-shadow override in index.css entirely.
+   index.css attaches a no-op animation to the :-webkit-autofill state
+   so we can detect the exact moment autofill fires here and force the
+   correct colors directly via JS, which isn't at the mercy of the
+   CSS cascade the way the pure-CSS override is. */
+const handleAutofillAnimation = (e) => {
+    const el = e.target;
+    if (e.animationName === "onAutoFillStart") {
+        el.style.setProperty("background-color", "var(--surface-high)", "important");
+        el.style.setProperty("color", "var(--text)", "important");
+        el.style.setProperty("-webkit-text-fill-color", "var(--text)", "important");
+    } else if (e.animationName === "onAutoFillCancel") {
+        el.style.removeProperty("background-color");
+        el.style.removeProperty("color");
+        el.style.removeProperty("-webkit-text-fill-color");
+    }
+};
+
 /* ── Progress step indicator ── */
 const StepIndicator = ({ step }) => {
     const steps = ["Shipping", "Payment"];
@@ -271,19 +290,19 @@ const AddressForm = ({ onContinue, hasBlockedItems }) => {
                 Shipping Details
             </p>
             <Stack spacing={2}>
-                <TextField label="Company Name"        value={companyName} onChange={(e) => setCompanyName(e.target.value)} fullWidth size="small" />
-                <TextField label="Contact Name *"      value={contactName} onChange={(e) => setContactName(e.target.value)} fullWidth size="small" required />
-                <TextField label="Address Line 1 *"    value={address1}    onChange={(e) => setAddress1(e.target.value)}    fullWidth size="small" required />
-                <TextField label="Address Line 2"      value={address2}    onChange={(e) => setAddress2(e.target.value)}    fullWidth size="small" />
+                <TextField label="Company Name"        value={companyName} onChange={(e) => setCompanyName(e.target.value)} fullWidth size="small" inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                <TextField label="Contact Name *"      value={contactName} onChange={(e) => setContactName(e.target.value)} fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                <TextField label="Address Line 1 *"    value={address1}    onChange={(e) => setAddress1(e.target.value)}    fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                <TextField label="Address Line 2"      value={address2}    onChange={(e) => setAddress2(e.target.value)}    fullWidth size="small" inputProps={{ onAnimationStart: handleAutofillAnimation }} />
                 <Stack direction="row" spacing={2}>
-                    <TextField label="City *"           value={city}        onChange={(e) => setCity(e.target.value)}        fullWidth size="small" required />
-                    <TextField label="State / Province *" value={state}     onChange={(e) => setState(e.target.value)}       fullWidth size="small" required />
+                    <TextField label="City *"           value={city}        onChange={(e) => setCity(e.target.value)}        fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                    <TextField label="State / Province *" value={state}     onChange={(e) => setState(e.target.value)}       fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
                 </Stack>
                 <Stack direction="row" spacing={2}>
-                    <TextField label="ZIP / Postal Code *" value={zip}     onChange={(e) => setZip(e.target.value)}         fullWidth size="small" required />
-                    <TextField label="Country *"        value={country}     onChange={(e) => setCountry(e.target.value)}     fullWidth size="small" required />
+                    <TextField label="ZIP / Postal Code *" value={zip}     onChange={(e) => setZip(e.target.value)}         fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
+                    <TextField label="Country *"        value={country}     onChange={(e) => setCountry(e.target.value)}     fullWidth size="small" required inputProps={{ onAnimationStart: handleAutofillAnimation }} />
                 </Stack>
-                <TextField label="Phone (optional)"    value={phone}       onChange={(e) => setPhone(e.target.value)}       fullWidth size="small" />
+                <TextField label="Phone (optional)"    value={phone}       onChange={(e) => setPhone(e.target.value)}       fullWidth size="small" inputProps={{ onAnimationStart: handleAutofillAnimation }} />
             </Stack>
 
             <button
