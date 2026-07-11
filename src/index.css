@@ -139,10 +139,14 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
 @keyframes onAutoFillCancel { from {} to {} }
 .MuiOutlinedInput-input:-webkit-autofill,
 .MuiOutlinedInput-input:autofill {
-    animation-name: onAutoFillStart;
+    /* A 0s (default) duration doesn't reliably fire animationstart on
+       iOS Safari - an explicit, imperceptibly short duration does. */
+    animation-name:     onAutoFillStart;
+    animation-duration:  0.01s;
 }
 .MuiOutlinedInput-input:not(:-webkit-autofill):not(:autofill) {
-    animation-name: onAutoFillCancel;
+    animation-name:     onAutoFillCancel;
+    animation-duration:  0.01s;
 }
 
 [data-theme="dark"] .MuiInputLabel-root {
