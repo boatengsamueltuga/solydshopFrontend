@@ -104,6 +104,20 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
     color:   var(--text-4) !important;
     opacity: 1;
 }
+
+/* Browser autofill (address/contact forms) paints its own light
+   background via an internal UA style that beats normal
+   background-color rules even with !important. The only reliable
+   override is the inset box-shadow trick, paired with a long
+   transition delay so it doesn't flash before applying. */
+[data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill,
+[data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill:hover,
+[data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--surface-high) inset !important;
+    -webkit-text-fill-color: var(--text) !important;
+    caret-color:             var(--text);
+    transition: background-color 9999s ease-in-out 0s;
+}
 [data-theme="dark"] .MuiInputLabel-root {
     color: var(--text-3) !important;
 }
