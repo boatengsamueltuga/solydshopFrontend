@@ -529,27 +529,28 @@ const Navbar = () => {
                                 to={isAdmin ? "/admin/dashboard" : "/seller/dashboard"}
                                 onClick={closeMenu}
                                 style={{
-                                    display:        "flex",
+                                    display:        "inline-flex",
+                                    alignSelf:      "flex-start",
                                     alignItems:     "center",
-                                    gap:            "10px",
+                                    gap:            "8px",
                                     marginTop:      "10px",
                                     marginBottom:   "4px",
-                                    padding:        "12px 14px",
-                                    background:     C.btnBg,
+                                    padding:        "8px 10px",
+                                    background:     "var(--accent-subtle)",
+                                    border:         "1px solid var(--accent-border)",
                                     borderRadius:   "8px",
                                     textDecoration: "none",
-                                    color:          C.btnText,
                                 }}
                             >
                                 {isAdmin
-                                    ? <HiViewGrid size={18} aria-hidden="true" style={{ flexShrink: 0 }} />
-                                    : <HiShoppingBag size={18} aria-hidden="true" style={{ flexShrink: 0 }} />
+                                    ? <HiViewGrid size={16} aria-hidden="true" style={{ flexShrink: 0, color: "var(--accent)" }} />
+                                    : <HiShoppingBag size={16} aria-hidden="true" style={{ flexShrink: 0, color: "var(--accent)" }} />
                                 }
                                 <div>
-                                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 700, fontFamily: "Inter, sans-serif", color: C.btnText }}>
+                                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, fontFamily: "Inter, sans-serif", color: C.text }}>
                                         {isAdmin ? "Admin Dashboard" : "Seller Dashboard"}
                                     </p>
-                                    <p style={{ margin: 0, fontSize: "11px", fontFamily: "Inter, sans-serif", color: C.btnText, opacity: 0.75 }}>
+                                    <p style={{ margin: 0, fontSize: "11px", fontFamily: "Inter, sans-serif", color: C.textMuted }}>
                                         {isAdmin ? "Manage products, orders & users" : "Manage your listings & orders"}
                                     </p>
                                 </div>
