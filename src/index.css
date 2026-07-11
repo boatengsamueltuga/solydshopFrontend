@@ -107,16 +107,26 @@ body:not(.solyd-in-checkout) [id^="stripe"] {
 
 /* Browser autofill (address/contact forms) paints its own light
    background via an internal UA style that beats normal
-   background-color rules even with !important. The only reliable
-   override is the inset box-shadow trick, paired with a long
-   transition delay so it doesn't flash before applying. */
+   background-color rules even with !important. The inset box-shadow
+   trick is the reliable override on Chrome/Edge, but iOS Safari needs
+   the :active state covered too (its autofill highlight persists
+   through press-and-hold), plus background/background-color forced
+   as a fallback for WebKit builds that don't fully honor the
+   box-shadow override on text inputs. */
 [data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill,
 [data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill:hover,
-[data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill:focus {
+[data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill:focus,
+[data-theme="dark"] .MuiOutlinedInput-input:-webkit-autofill:active,
+[data-theme="dark"] .MuiOutlinedInput-input:autofill,
+[data-theme="dark"] .MuiOutlinedInput-input:autofill:hover,
+[data-theme="dark"] .MuiOutlinedInput-input:autofill:focus,
+[data-theme="dark"] .MuiOutlinedInput-input:autofill:active {
     -webkit-box-shadow: 0 0 0 1000px var(--surface-high) inset !important;
+    box-shadow:         0 0 0 1000px var(--surface-high) inset !important;
     -webkit-text-fill-color: var(--text) !important;
+    background-color:   var(--surface-high) !important;
     caret-color:             var(--text);
-    transition: background-color 9999s ease-in-out 0s;
+    transition: background-color 9999s ease-in-out 0s, box-shadow 9999s ease-in-out 0s;
 }
 [data-theme="dark"] .MuiInputLabel-root {
     color: var(--text-3) !important;
