@@ -14,29 +14,40 @@ import api  from "../api/api";
 import toast from "react-hot-toast";
 import { fmtPrice } from "../utils/format";
 
-import { Button, Stack, TextField } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { CircularProgress } from "@mui/material";
 import { HiArrowLeft, HiCheckCircle, HiCube } from "react-icons/hi";
 
-/* Some iOS WebKit builds paint the browser's autofill highlight in a
-   way that ignores the CSS box-shadow override in index.css entirely.
-   index.css attaches a no-op animation to the :-webkit-autofill state
-   so we can detect the exact moment autofill fires here and force the
-   correct colors directly via JS, which isn't at the mercy of the
-   CSS cascade the way the pure-CSS override is. */
-const handleAutofillAnimation = (e) => {
-    const el = e.target;
-    if (e.animationName === "onAutoFillStart") {
-        el.style.setProperty("background-color", "var(--surface-high)", "important");
-        el.style.setProperty("color", "var(--text)", "important");
-        el.style.setProperty("-webkit-text-fill-color", "var(--text)", "important");
-    } else if (e.animationName === "onAutoFillCancel") {
-        el.style.removeProperty("background-color");
-        el.style.removeProperty("color");
-        el.style.removeProperty("-webkit-text-fill-color");
-    }
+/* Plain native inputs, styled the same way as the login/reset-password
+   forms. MUI's TextField/OutlinedInput was showing a white autofill
+   background on iOS that no CSS or JS override could beat - the plain
+   inputs used on the auth pages don't have that problem at all on the
+   same device, so shipping fields use that proven pattern instead. */
+const FIELD_INPUT = {
+    width: "100%", background: "var(--surface-mid)",
+    border: "1px solid var(--border)", borderRadius: "var(--r-sm)",
+    padding: "10px var(--space-3)", fontSize: "var(--text-sm)",
+    color: "var(--text)", fontFamily: "var(--font-body)",
+    outline: "none", boxSizing: "border-box",
+    transition: "border-color var(--duration-fast)",
 };
+const FIELD_LABEL = {
+    display: "block", fontFamily: "var(--font-mono)", fontSize: "10px",
+    fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
+    color: "var(--text-3)", marginBottom: "var(--space-2)",
+};
+const Field = ({ label, ...props }) => (
+    <div style={{ flex: 1, minWidth: 0 }}>
+        <label style={FIELD_LABEL}>{label}</label>
+        <input
+            {...props}
+            style={FIELD_INPUT}
+            onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
+            onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+        />
+    </div>
+);
 
 /* ── Progress step indicator ── */
 const StepIndicator = ({ step }) => {
@@ -290,19 +301,19 @@ const AddressForm = ({ onContinue, hasBlockedItems }) => {
                 Shipping Details
             </p>
             <Stack spacing={2}>
-                <TextField label="Company Name"        value={companyName} onChange={(e) => setCompanyName(e.target.value)} fullWidth size="small" autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
-                <TextField label="Contact Name *"      value={contactName} onChange={(e) => setContactName(e.target.value)} fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
-                <TextField label="Address Line 1 *"    value={address1}    onChange={(e) => setAddress1(e.target.value)}    fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
-                <TextField label="Address Line 2"      value={address2}    onChange={(e) => setAddress2(e.target.value)}    fullWidth size="small" autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                <Field label="Company Name"          value={companyName} onChange={(e) => setCompanyName(e.target.value)} autoComplete="organization" />
+                <Field label="Contact Name *"         value={contactName} onChange={(e) => setContactName(e.target.value)} required autoComplete="name" />
+                <Field label="Address Line 1 *"       value={address1}    onChange={(e) => setAddress1(e.target.value)}    required autoComplete="address-line1" />
+                <Field label="Address Line 2"         value={address2}    onChange={(e) => setAddress2(e.target.value)}    autoComplete="address-line2" />
                 <Stack direction="row" spacing={2}>
-                    <TextField label="City *"           value={city}        onChange={(e) => setCity(e.target.value)}        fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
-                    <TextField label="State / Province *" value={state}     onChange={(e) => setState(e.target.value)}       fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                    <Field label="City *"             value={city}        onChange={(e) => setCity(e.target.value)}        required autoComplete="address-level2" />
+                    <Field label="State / Province *" value={state}       onChange={(e) => setState(e.target.value)}       required autoComplete="address-level1" />
                 </Stack>
                 <Stack direction="row" spacing={2}>
-                    <TextField label="ZIP / Postal Code *" value={zip}     onChange={(e) => setZip(e.target.value)}         fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
-                    <TextField label="Country *"        value={country}     onChange={(e) => setCountry(e.target.value)}     fullWidth size="small" required autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                    <Field label="ZIP / Postal Code *" value={zip}        onChange={(e) => setZip(e.target.value)}         required autoComplete="postal-code" />
+                    <Field label="Country *"           value={country}    onChange={(e) => setCountry(e.target.value)}     required autoComplete="country-name" />
                 </Stack>
-                <TextField label="Phone (optional)"    value={phone}       onChange={(e) => setPhone(e.target.value)}       fullWidth size="small" autoComplete="off" inputProps={{ onAnimationStart: handleAutofillAnimation, autoComplete: "off" }} />
+                <Field label="Phone (optional)" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" />
             </Stack>
 
             <button
